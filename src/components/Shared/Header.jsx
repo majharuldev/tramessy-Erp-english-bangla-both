@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { FaBars } from "react-icons/fa6";
-import avatar from "../../assets/ms.png";
+import avatar from "../../assets/man-noimage.png";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
 

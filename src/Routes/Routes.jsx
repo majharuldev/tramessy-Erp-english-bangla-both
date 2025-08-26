@@ -97,6 +97,8 @@ import VendorPayment from "../Pages/Account/VendorPayment";
 import VendorPaymentForm from "../Pages/VendorPaymentForm";
 import RoutePricing from "../Pages/Customer/RoutePricing";
 import VehicleReport from "../Pages/Reports/VehicelReport";
+import OfficialProduct from "../Pages/Purchase/OfficialProducts";
+import OfficialProductForm from "../Pages/Purchase/OfficialProductForm";
 export const router = createBrowserRouter([
   {
     path: "/tramessy",
@@ -518,21 +520,37 @@ export const router = createBrowserRouter([
           ),
       },
       {
-        path: "/tramessy/Purchase/PurchaseList",
+        path: "/tramessy/Purchase/maintenance",
         element: <PurchaseList />,
       },
       {
-        path: "/tramessy/Purchase/PurchaseForm",
+        path: "/tramessy/Purchase/official-product",
+        element: <OfficialProduct/>,
+      },
+      {
+        path: "/tramessy/Purchase/add-maintenance",
         element: <PurchaseForm />,
       },
       {
-        path: "/tramessy/Purchase/UpdatePurchaseForm/:id",
-        element: <UpdatePurchaseForm />,
-        loader: ({ params }) =>
-          fetch(
-            `${import.meta.env.VITE_BASE_URL}/api/purchase/show/${params.id}`
-          ),
+        path: "/tramessy/Purchase/update-maintenance/:id",
+        element: <PurchaseForm />,
       },
+      {
+        path: "/tramessy/Purchase/add-officialProduct",
+        element: <OfficialProductForm />,
+      },
+      {
+        path: "/tramessy/Purchase/update-officialProduct/:id",
+        element: <OfficialProductForm />,
+      },
+      // {
+      //   path: "/tramessy/Purchase/UpdatePurchaseForm/:id",
+      //   element: <UpdatePurchaseForm />,
+      //   loader: ({ params }) =>
+      //     fetch(
+      //       `${import.meta.env.VITE_BASE_URL}/api/purchase/show/${params.id}`
+      //     ),
+      // },
       {
         path: "/tramessy/Purchase/SupplierList",
         element: <SupplierList />,

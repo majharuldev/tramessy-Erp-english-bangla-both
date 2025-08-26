@@ -11,6 +11,7 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import autoTable from "jspdf-autotable"; 
+import Pagination from "../../components/Shared/Pagination";
 
 const RoutePricing = () => {
   const [routePricing, setRoutePricing] = useState([]);
@@ -316,91 +317,15 @@ const printTripsTable = () => {
         </div>
 
         {/* Pagination */}
-        {currentCustomer.length > 0 && totalPages > 1 && (
-          <div className="mt-4 flex justify-center items-center space-x-2">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              className={`p-2 ${currentPage === 1 ? "bg-gray-300" : "bg-primary text-white"} rounded`}
-            >
-              <GrFormPrevious />
-            </button>
-            {[...Array(totalPages).keys()].map(num => (
-              <button
-                key={num}
-                onClick={() => setCurrentPage(num + 1)}
-                className={`px-3 py-1 rounded ${currentPage === num + 1 ? "bg-primary text-white" : "bg-gray-200 hover:bg-primary hover:text-white"}`}
-              >
-                {num + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              className={`p-2 ${currentPage === totalPages ? "bg-gray-300" : "bg-primary text-white"} rounded`}
-            >
-              <GrFormNext />
-            </button>
-          </div>
-        )}
+        {currentCustomer.length > 0 && totalPages >= 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+          maxVisible={8} 
+        />
+      )}
       </div>
-
-      {/* Add Modal */}
-      {/* {isAddModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md border border-gray-300">
-            <button onClick={closeAddModal} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
-              <IoMdClose className="text-2xl" />
-            </button>
-            <h2 className="text-xl font-bold text-[#11375B] mb-6 text-center">Add Route Pricing</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-
-              <div>
-                <label className="block text-gray-700 text-sm font-medium mb-1">Load Point</label>
-                <CreatableSelect
-                  options={customers.map(c => ({ value: c.customer_name, label: c.customer_name }))}
-                  value={formData.load_point ? { value: formData.load_point, label: formData.load_point } : null}
-                  onChange={selected => setFormData(prev => ({ ...prev, load_point: selected?.value || "" }))}
-                  isClearable
-                  placeholder="Select or type customer"
-                  className="focus:!ring-2 focus:!ring-primary"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-sm font-medium mb-1">Unload Point</label>
-                <CreatableSelect
-                  options={unloadpoints.map(c => ({ value: c.name, label: c.name }))}
-                  value={formData.unload_point ? { value: formData.unload_point, label: formData.unload_point } : null}
-                  onChange={selected => setFormData(prev => ({ ...prev, unload_point: selected?.value || "" }))}
-                  isClearable
-                  placeholder="Select or type unload point"
-                  className="focus:!ring-2 focus:!ring-primary"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-sm font-medium mb-1">Rate</label>
-                <input
-                  type="number"
-                  name="rate"
-                  value={formData.rate}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Enter price"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3">
-                <button type="button" onClick={closeAddModal} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
-                  Cancel
-                </button>
-                <button type="submit" className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80">
-                  Add Pricing
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )} */}
 
       {/* Add/Edit Modal */}
       {isModalOpen && (

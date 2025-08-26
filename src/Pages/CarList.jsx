@@ -10,6 +10,7 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
+import Pagination from "../components/Shared/Pagination";
 const CarList = () => {
   const [vehicles, setVehicle] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -377,44 +378,14 @@ const CarList = () => {
           </table>
         </div>
         {/* pagination */}
-      { currentVehicles.length > 0 && totalPages >= 1 &&
-      (<div className="mt-10 flex justify-center">
-        <div className="space-x-2 flex items-center">
-          <button
-            onClick={handlePrevPage}
-            className={`p-2 ${
-              currentPage === 1 ? "bg-gray-300" : "bg-primary text-white"
-            } rounded-sm`}
-            disabled={currentPage === 1}
-          >
-            <GrFormPrevious />
-          </button>
-          {[...Array(totalPages).keys()].map((number) => (
-            <button
-              key={number + 1}
-              onClick={() => handlePageClick(number + 1)}
-              className={`px-3 py-1 rounded-sm ${
-                currentPage === number + 1
-                  ? "bg-primary text-white hover:bg-gray-200 hover:text-primary transition-all duration-300 cursor-pointer"
-                  : "bg-gray-200 hover:bg-primary hover:text-white transition-all cursor-pointer"
-              }`}
-            >
-              {number + 1}
-            </button>
-          ))}
-          <button
-            onClick={handleNextPage}
-            className={`p-2 ${
-              currentPage === totalPages
-                ? "bg-gray-300"
-                : "bg-primary text-white"
-            } rounded-sm`}
-            disabled={currentPage === totalPages}
-          >
-            <GrFormNext />
-          </button>
-        </div>
-      </div>)}
+    {currentVehicles.length > 0 && totalPages >= 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+          maxVisible={8} 
+        />
+      )}
       </div>
       
       {/* Delete modal */}

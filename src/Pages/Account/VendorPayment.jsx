@@ -4,6 +4,7 @@ import { FaPen, FaPlus, FaTrashAlt } from "react-icons/fa";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { MdOutlineAirplaneTicket } from "react-icons/md";
 import { Link } from "react-router-dom";
+import Pagination from "../../components/Shared/Pagination";
 
 const VendorPayment = () => {
   const [payment, setPayment] = useState([]);
@@ -136,47 +137,14 @@ const VendorPayment = () => {
           </table>
         </div>
         {/* pagination */}
-                  {
-                    currentPayment.length === 0 ? (
-                      ""
-                    )
-                  :(<div className="mt-10 flex justify-center">
-                    <div className="space-x-2 flex items-center">
-                      <button
-                        onClick={handlePrevPage}
-                        className={`p-2 ${
-                          currentPage === 1 ? "bg-gray-300" : "bg-primary text-white"
-                        } rounded-sm`}
-                        disabled={currentPage === 1}
-                      >
-                        <GrFormPrevious />
-                      </button>
-                      {[...Array(totalPages).keys()].map((number) => (
-                        <button
-                          key={number + 1}
-                          onClick={() => handlePageClick(number + 1)}
-                          className={`px-3 py-1 rounded-sm ${
-                            currentPage === number + 1
-                              ? "bg-primary text-white hover:bg-gray-200 hover:text-primary transition-all duration-300 cursor-pointer"
-                              : "bg-gray-200 hover:bg-primary hover:text-white transition-all cursor-pointer"
-                          }`}
-                        >
-                          {number + 1}
-                        </button>
-                      ))}
-                      <button
-                        onClick={handleNextPage}
-                        className={`p-2 ${
-                          currentPage === totalPages
-                            ? "bg-gray-300"
-                            : "bg-primary text-white"
-                        } rounded-sm`}
-                        disabled={currentPage === totalPages}
-                      >
-                        <GrFormNext />
-                      </button>
-                    </div>
-                  </div>)}
+                  {currentPayment.length > 0 && totalPages >= 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+          maxVisible={8} 
+        />
+      )}
       </div>
     </div>
   );

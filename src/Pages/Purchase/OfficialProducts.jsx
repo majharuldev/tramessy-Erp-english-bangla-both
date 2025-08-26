@@ -67,7 +67,7 @@ const vehicleFiltered = filtered.filter((dt) => {
 // Search (Product ID, Supplier, Vehicle, Driver)
 const filteredPurchase = vehicleFiltered.filter((dt) => {
   // শুধু এই দুইটা ক্যাটেগরি দেখানোর জন্য
-  if (!(dt.category === "engine_oil" || dt.category === "parts")) {
+  if ((dt.category === "engine_oil" || dt.category === "parts")) {
     return false;
   }
   const term = searchTerm.toLowerCase();
@@ -285,9 +285,9 @@ const exportPDF = () => {
             >
               <FaFilter /> Filter
             </button>
-            <Link to="/tramessy/Purchase/add-maintenance">
+            <Link to="/tramessy/Purchase/add-officialProduct">
               <button className="bg-gradient-to-r from-primary to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
-                <FaPlus />Maintentance
+                <FaPlus />Official Product
               </button>
             </Link>
           </div>
@@ -415,8 +415,8 @@ const exportPDF = () => {
                   </td>
                   <td className="p-2">{dt.id}</td>
                   <td className="p-2">{dt.supplier_name}</td>
-                  <td className="px-2 py-2">{dt.driver_name!== "null"?dt.driver_name: "N/A"}</td>
-                  <td className="px-2 py-2">{dt.vehicle_no!== "null"?dt.vehicle_no:"N/A"}</td>
+                  <td className="px-2 py-2">{dt.driver_name?dt.driver_name: "N/A"}</td>
+                  <td className="px-2 py-2">{dt.vehicle_no?dt.vehicle_no:"N/A"}</td>
                   <td className="p-2">{dt.category}</td>
                   <td className="p-2">{dt.item_name}</td>
                   <td className="p-2">{dt.quantity}</td>
@@ -432,7 +432,7 @@ const exportPDF = () => {
                   <td className="px-2 action_column">
                     <div className="flex gap-1">
                       <Link
-                        to={`/tramessy/Purchase/update-maintenance/${dt.id}`}
+                        to={`/tramessy/Purchase/update-officialProduct/${dt.id}`}
                       >
                         <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
                           <FaPen className="text-[12px]" />
@@ -456,7 +456,7 @@ const exportPDF = () => {
           </table>
         </div>
         {/* pagination */}
-      
+       
         {currentPurchase.length > 0 && totalPages >= 1 && (
         <Pagination
           currentPage={currentPage}

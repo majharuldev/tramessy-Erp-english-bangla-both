@@ -1,5 +1,3 @@
-
-
 import { useEffect, useRef, useState } from "react";
 import BtnSubmit from "../../components/Button/BtnSubmit";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -10,7 +8,7 @@ import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
 
-const PurchaseForm = () => {
+const OfficialProductForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id);
@@ -185,7 +183,7 @@ const PurchaseForm = () => {
       }
       
       reset();
-      navigate("/tramessy/Purchase/maintenance");
+      navigate("/tramessy/Purchase/official-product");
     } catch (error) {
       console.error(error);
       const errorMessage =
@@ -245,8 +243,10 @@ const PurchaseForm = () => {
                 label="Category"
                 required={!isEditMode}
                 options={[
-                  { value: "engine_oil", label: "Engine Oil" },
-                  { value: "parts", label: "Parts" },
+                  { value: "It Product", label: "It Product" },
+                  { value: "Electrical", label: "Electrical" },
+                  { value: "Stationary", label: "Stationary" },
+                  
                 ]}
               />
             </div>
@@ -257,7 +257,7 @@ const PurchaseForm = () => {
             )}
           </div>
           
-          <div className="md:flex justify-between gap-x-3">
+          {/* <div className="md:flex justify-between gap-x-3">
             <div className="w-full">
               <SelectField
                 name="driver_name"
@@ -276,7 +276,7 @@ const PurchaseForm = () => {
                 control={control}
               />
             </div>
-          </div>
+          </div> */}
 
           <div className="flex flex-col lg:flex-row justify-between gap-x-3">
             <div className="w-full">
@@ -422,6 +422,4 @@ const PurchaseForm = () => {
   );
 };
 
-export default PurchaseForm;
-
-
+export default OfficialProductForm;

@@ -377,14 +377,14 @@ const Sidebar = () => {
                   </div>
 
                   {/* Animate HR submenu attendance*/}
-                  <div
+                  {/* <div
                     className={`transition-all duration-300 overflow-hidden px-1 ${
                       openMenu.hrManagement ? "max-h-[200px]" : "max-h-0"
                     }`}
                   >
                     <ul className="space-y-2 px-2 text-sm mt-2">
                       <li>
-                        {/* Attendance toggle inside HR */}
+                     
                         <div
                           onClick={() => toggleMenu("attendance")}
                           className="flex justify-between items-center p-2 cursor-pointer hover:text-primary rounded-sm"
@@ -401,7 +401,7 @@ const Sidebar = () => {
                             <FaChevronDown />
                           </span>
                         </div>
-                        {/* Animate HRM nested submenu */}
+                       
                         <div
                           className={`transition-all duration-900 overflow-hidden px-1 ${
                             openMenu.attendance ? "max-h-[500px]" : "max-h-0"
@@ -429,7 +429,7 @@ const Sidebar = () => {
                         </div>
                       </li>
                     </ul>
-                  </div>
+                  </div> */}
                   {/* Animate HR submenu leave*/}
                   {/* <div
                     className={`transition-all duration-300 overflow-hidden px-1 ${
@@ -577,7 +577,7 @@ const Sidebar = () => {
                 </li>
 
                 {/* Inventory management */}
-                <li className="text-primary font-medium rounded-sm">
+                {/* <li className="text-primary font-medium rounded-sm">
                   <div
                     onClick={() => toggleMenu("inventory")}
                     className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-900"
@@ -600,7 +600,7 @@ const Sidebar = () => {
                     }`}
                   >
                     <ul className="space-y-3 px-2 text-sm mt-2">
-                      {/* <li>
+                      <li>
                         <Link
                           to="/tramessy/Inventory/Stockin"
                           className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
@@ -618,7 +618,7 @@ const Sidebar = () => {
                           ></div>
                           <span>Stock in</span>
                         </Link>
-                      </li> */}
+                      </li>
                       <li>
                         <Link
                           to="/tramessy/Inventory/StockOut"
@@ -632,7 +632,7 @@ const Sidebar = () => {
                           <span>Stock Out</span>
                         </Link>
                       </li>
-                      {/* <li>
+                      <li>
                         <Link
                           to="/tramessy/Inventory/Inventory-supplier"
                           className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
@@ -650,10 +650,10 @@ const Sidebar = () => {
                           ></div>
                           <span>Inventory Supplier</span>
                         </Link>
-                      </li> */}
+                      </li>
                     </ul>
                   </div>
-                </li>
+                </li> */}
                 {/* Purchase */}
                 <li className="text-primary font-medium rounded-sm">
                   <div
@@ -676,21 +676,34 @@ const Sidebar = () => {
                   {/* Dropdown container with smooth expand/collapse */}
                   <div
                     className={`transition-all duration-900 ease-in-out overflow-hidden ${
-                      openMenu.purchase ? "max-h-[100px]" : "max-h-0"
+                      openMenu.purchase ? "max-h-[200px]" : "max-h-0"
                     }`}
                   >
                     <ul className="space-y-3 px-2 text-sm mt-2">
                       <li>
                         <Link
-                          to="/tramessy/Purchase/PurchaseList"
+                          to="/tramessy/Purchase/maintenance"
                           className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/Purchase/PurchaseList")
+                            isActive("/tramessy/Purchase/maintenance")
                               ? "text-white bg-primary"
                               : "text-gray-500 hover:text-primary"
                           }`}
                         >
                           
-                          <span>Purchase List</span>
+                          <span>Maintenance</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/Purchase/official-product"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
+                            isActive("/tramessy/Purchase/official-product")
+                              ? "text-white bg-primary"
+                              : "text-gray-500 hover:text-primary"
+                          }`}
+                        >
+                          
+                          <span>Official Products</span>
                         </Link>
                       </li>
                       <li>

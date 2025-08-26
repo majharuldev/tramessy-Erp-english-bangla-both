@@ -64,8 +64,8 @@ const StockOut = () => {
                   <td className="p-2 font-bold">{i + 1}</td>
                   <td className="p-2 font-bold">{dt.purchase_id}</td>
                   <td className="p-2">{dt.date}</td>
-                  <td className="p-2">{dt.vehicle_name}</td>
-                  <td className="p-2">{dt.driver_name}</td>
+                  <td className="p-2">{dt.vehicle_name?dt.vehicle_name:"N/A"}</td>
+                  <td className="p-2">{dt.driver_name?dt.driver_name: "N/A"}</td>
                   <td className="p-2">Engine Oil</td>
                   <td className="p-2">{dt.stock_in}</td>
                   <td className="p-2">{dt.stock_out}</td>

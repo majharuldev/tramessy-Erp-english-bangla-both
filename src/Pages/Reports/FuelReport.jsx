@@ -495,6 +495,7 @@ import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { FiFilter } from "react-icons/fi";
+import Pagination from "../../components/Shared/Pagination";
 
 export default function FuelReport() {
   const [tripData, setTripData] = useState([]);
@@ -936,35 +937,14 @@ const filteredReport = report.filter((item) => {
         )}
 
         {/* Pagination */}
-        {filteredReport.length > 0 && (
-          <div className="mt-6 flex justify-center items-center">
-            <button
-              onClick={handlePrevPage}
-              disabled={currentPage === 1}
-              className={`p-2 mx-1 rounded ${currentPage === 1 ? 'bg-gray-200 text-gray-500' : 'bg-primary text-white hover:bg-blue-700'}`}
-            >
-              <GrFormPrevious />
-            </button>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
-              <button
-                key={number}
-                onClick={() => handlePageClick(number)}
-                className={`mx-1 px-3 py-1 rounded ${currentPage === number ? 'bg-primary text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                {number}
-              </button>
-            ))}
-
-            <button
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-              className={`p-2 mx-1 rounded ${currentPage === totalPages ? 'bg-gray-200 text-gray-500' : 'bg-primary text-white hover:bg-blue-700'}`}
-            >
-              <GrFormNext />
-            </button>
-          </div>
-        )}
+        {currentItems.length > 0 && totalPages >= 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+          maxVisible={8} 
+        />
+      )}
       </div>
     </div>
   );
