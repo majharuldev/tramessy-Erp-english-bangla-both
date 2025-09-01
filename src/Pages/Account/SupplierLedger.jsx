@@ -1,8 +1,11 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { MdOutlineArrowDropDown } from "react-icons/md";
+import * as XLSX from "xlsx"; 
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const SupplierLedger = () => {
   const [supplies, setSupplies] = useState([]); // Supplier dropdown options
@@ -48,7 +51,7 @@ const SupplierLedger = () => {
     if (selectedSupplier) {
       // Find the selected supplier to get their due_amount
       const selectedSupply = supplies.find(
-        (supply) => supply.business_name === selectedSupplier
+        (supply) => supply.supplier_name === selectedSupplier
       );
       
       if (selectedSupply) {
@@ -89,6 +92,113 @@ const SupplierLedger = () => {
     }
   }, [selectedSupplier, supplies]);
 
+    //  Excel Export
+  const exportExcel = () => {
+    const tableData = ledgerWithBalance.map((item, index) => ({
+      SL: index + 1,
+      Date: item?.date,
+      Particulars: item?.remarks || "",
+      Mode: item?.mode || "",
+      PurchaseAmount: item?.purchase_amount || "",
+      PaymentAmount: item?.pay_amount || "",
+      Balance: item?.runningBalance || "",
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(tableData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Supplier Ledger");
+    XLSX.writeFile(wb, "Supplier_Ledger.xlsx");
+
+    toast.success("Excel file downloaded!");
+  };
+
+  //  PDF Export
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.text("Supplier Ledger", 14, 15);
+
+    autoTable(doc, {
+      head: [["SL", "Date", "Particulars", "Mode", "Purchase", "Payment", "Balance"]],
+      body: ledgerWithBalance.map((item, index) => [
+        index + 1,
+       item.date,
+        item.remarks || "",
+        item.mode|| "",
+        item?.purchase_amount || 0,
+        item?.pay_amount || 0,
+        item?.runningBalance || 0,
+      ]),
+      startY: 25,
+      theme: "grid",
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [17, 55, 91], textColor: 255 },
+    });
+
+    doc.save("Supplier_Ledger.pdf");
+    toast.success("PDF downloaded!");
+  };
+
+  //  Print
+  const printTable = () => {
+    const printWindow = window.open("", "", "width=900,height=650");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Supplier Ledger</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h2 { text-align: center; color: #11375B; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #333; padding: 6px; font-size: 12px; }
+            thead { background: #11375B; color: white; }
+            tr:nth-child(even) { background: #f9f9f9; }
+            tr:hover { background: #f1f5f9; }
+            .footer { margin-top: 20px; text-align: right; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <h2>Supplier Ledger</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>SL</th>
+                <th>Date</th>
+                <th>Particulars</th>
+                <th>Mode</th>
+                <th>Purchase</th>
+                <th>Payment</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${ledgerWithBalance
+                .map(
+                  (item, i) => `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td>${item?.date}</td>
+                  <td>${item?.remarks  || "--"}</td>
+                  <td>${item?.mode || "--"}</td>
+                  <td>${item?.purchase_amount || 0}</td>
+                  <td>${item?.pay_amount || 0}</td>
+                  <td>${item?.runningBalance || 0}</td>
+                </tr>`
+                )
+                .join("")}
+            </tbody>
+          </table>
+          <div class="footer">
+            Printed on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+
   // Calculate running balance
   const calculateRunningBalance = () => {
     let balance = openingBalance;
@@ -128,13 +238,13 @@ const closingBalance =
         {/* Export and Supplier Filter */}
         <div className="md:flex items-center justify-between mb-4">
           <div className="flex gap-1 md:gap-3 flex-wrap">
-            <button className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={exportExcel} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
               Excel
             </button>
-            <button className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={exportPDF} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
               PDF
             </button>
-            <button className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={printTable} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
               Print
             </button>
           </div>

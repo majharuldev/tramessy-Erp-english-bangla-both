@@ -504,7 +504,7 @@ const toNumber = (val) => {
         </div>
         {/* Month Filter Section */}
         {showFilter && (
-          <div className="flex  gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
+          <div className="flex flex-col md:flex-row gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
             <div className="w-full">
               <div className="relative w-full">
                 <label className="text-primary text-sm font-semibold">

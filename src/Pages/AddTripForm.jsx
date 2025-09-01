@@ -1467,7 +1467,7 @@ useEffect(() => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <InputField name="total_exp" label="Vendor Rent" type="number" required={!id} />
                   <InputField name="advance" label="Advance" type="number" required={!id} />
-                  <InputField name="due_amount" label="Due Amount" type="number" required={!id} />
+                  <InputField name="due_amount" readOnly label="Due Amount" type="number" required={!id} />
                 </div>
               </div>
             )}

@@ -92,14 +92,12 @@ const HelperList = () => {
   };
   // export functionality
   const exportHelpersToExcel = () => {
-    const tableData = currentHelpers.map((Helper, index) => ({
+    const tableData = filteredHelper.map((Helper, index) => ({
       "SL.": indexOfFirstItem + index + 1,
       Name: Helper.Helper_name,
-      Mobile: Helper.Helper_mobile,
+      Mobile: Helper.phone,
       Address: Helper.address,
-      Emergency: Helper.emergency_contact,
-      License: Helper.license,
-      Expired: Helper.license_expire_date,
+      Emergency: Helper.salary,
       Status: Helper.status,
     }));
 
@@ -123,20 +121,16 @@ const HelperList = () => {
       "Name",
       "Mobile",
       "Address",
-      "Emergency",
-      "License",
-      "Expired",
+      "Salary",
       "Status",
     ];
 
-    const tableRows = currentHelpers.map((Helper, index) => [
+    const tableRows = filteredHelper.map((Helper, index) => [
       indexOfFirstItem + index + 1,
       Helper.Helper_name,
-      Helper.Helper_mobile,
+      Helper.phone,
       Helper.address,
-      Helper.emergency_contact,
-      Helper.license,
-      Helper.license_expire_date,
+      Helper.salary,
       Helper.status,
     ]);
 
@@ -164,44 +158,61 @@ const HelperList = () => {
 
     doc.save("Helpers_data.pdf");
   };
-  const printHelpersTable = () => {
-    // Hide Action column
-    const actionColumns = document.querySelectorAll(".action_column");
-    actionColumns.forEach((col) => {
-      col.style.display = "none";
-    });
+ const printHelpersTable = () => {
+  const tableHeader = `
+    <thead>
+      <tr>
+        <th>SL.</th>
+        <th>Name</th>
+        <th>Mobile</th>
+        <th>Address</th>
+        <th>Salary</th>
+      </tr>
+    </thead>
+  `;
 
-    const printContent = document.querySelector("table").outerHTML;
-    const WinPrint = window.open("", "", "width=900,height=650");
+  const tableRows = filteredHelper.map((helper, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${helper.helper_name || ""}</td>
+      <td>${helper.phone || ""}</td>
+      <td>${helper.address || ""}</td>
+      <td>${helper.salary || ""}</td>
+    </tr>
+  `).join("");
 
-    WinPrint.document.write(`
+  const printContent = `
+    <table>
+      ${tableHeader}
+      <tbody>${tableRows}</tbody>
+    </table>
+  `;
+
+  const WinPrint = window.open("", "", "width=900,height=650");
+  WinPrint.document.write(`
     <html>
-    <head>
-      <title>Print</title>
-      <style>
-        table { width: 100%; border-collapse: collapse; font-family: Arial; }
-        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
-        thead { background-color: #11375B; color: white; }
-        tbody tr:nth-child(odd) { background-color: #f3f4f6; }
-      </style>
-    </head>
-    <body>
-      <h3>Helper List</h3>
-      ${printContent}
-    </body>
+      <head>
+        <title>Helper List</title>
+        <style>
+          table { width: 100%; border-collapse: collapse; font-family: Arial; }
+          th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+          thead { background-color: #11375B; color: white; }
+          tbody tr:nth-child(odd) { background-color: #f3f4f6; }
+        </style>
+      </head>
+      <body>
+        <h3>Helper List</h3>
+        ${printContent}
+      </body>
     </html>
   `);
 
-    WinPrint.document.close();
-    WinPrint.focus();
-    WinPrint.print();
-    WinPrint.close();
+  WinPrint.document.close();
+  WinPrint.focus();
+  WinPrint.print();
+  WinPrint.close();
+};
 
-    // Restore Action column
-    actionColumns.forEach((col) => {
-      col.style.display = "";
-    });
-  };
 
   // search
   const filteredHelper = helper.filter((h) => {
@@ -222,17 +233,8 @@ const HelperList = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.ceil(helper.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+  const totalPages = Math.ceil(filteredHelper.length / itemsPerPage);
+
   return (
     <main className=" md:p-2">
       <Toaster />

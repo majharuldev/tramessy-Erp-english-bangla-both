@@ -81,16 +81,7 @@ const Customer = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCustomer = filteredCustomers.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+
   return (
     <main className=" p-2">
       <Toaster />

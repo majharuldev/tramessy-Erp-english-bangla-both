@@ -77,7 +77,7 @@ const AddSupply = () => {
               />
             </div>
             <div className="w-full">
-              <InputField name="business_name" label="Supplier Name" required />
+              <InputField name="supplier_name" label="Supplier Name" required />
             </div>
              <div className="w-full">
               <InputField name="business_category" label="Business Category" required />

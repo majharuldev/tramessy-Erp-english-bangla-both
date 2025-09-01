@@ -2,10 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { FaFilter, FaUserSecret, FaFilePdf, FaPrint, FaFileExcel } from "react-icons/fa";
 import * as XLSX from "xlsx";
 import axios from "axios";
-import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import jsPDF  from "jspdf";
 import autoTable from "jspdf-autotable";
-import { useReactToPrint } from "react-to-print";
 import Pagination from "../../components/Shared/Pagination";
 
 const PurchaseReport = () => {
@@ -190,45 +188,72 @@ const PurchaseReport = () => {
 
     // Simple print function
  const handlePrint = () => {
-  const printContent = document.getElementById("purchaseReport");
+  // Generate table rows for all filtered purchases
+  const rowsHtml = filteredPurchases.map((p, i) => `
+    <tr>
+      <td style="border:1px solid #ddd;padding:6px;text-align:center">${i + 1}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:center">${p.date}</td>
+      <td style="border:1px solid #ddd;padding:6px">${p.supplier_name}</td>
+      <td style="border:1px solid #ddd;padding:6px">${p.category}</td>
+      <td style="border:1px solid #ddd;padding:6px">${p.item_name}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${p.quantity}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${p.unit_price}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${p.purchase_amount ?? (p.quantity * p.unit_price)}</td>
+    </tr>
+  `).join("");
+
+  // Totals row
+  const totalsRow = `
+    <tr style="font-weight:bold;background:#f0f0f0">
+      <td colspan="5" style="border:1px solid #ddd;padding:6px;text-align:right">Total:</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${totalQty}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${totalUnitPrice}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${totalAmountOverall}</td>
+    </tr>
+  `;
+
+  const html = `
+    <table style="width:100%;border-collapse:collapse">
+      <thead style="background:#11375B;color:white">
+        <tr>
+          <th style="border:1px solid #ddd;padding:6px">#</th>
+          <th style="border:1px solid #ddd;padding:6px">Date</th>
+          <th style="border:1px solid #ddd;padding:6px">Supplier</th>
+          <th style="border:1px solid #ddd;padding:6px">Category</th>
+          <th style="border:1px solid #ddd;padding:6px">Item</th>
+          <th style="border:1px solid #ddd;padding:6px">Qty</th>
+          <th style="border:1px solid #ddd;padding:6px">Unit Price</th>
+          <th style="border:1px solid #ddd;padding:6px">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+      <tfoot>
+        ${totalsRow}
+      </tfoot>
+    </table>
+  `;
+
   const WinPrint = window.open("", "", "width=900,height=650");
-  
   WinPrint.document.write(`
     <html>
       <head>
         <title>Purchase Report</title>
-        <style>
-          table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-          }
-          th {
-            background-color: #11375B;
-            color: white;
-          }
-          tr:nth-child(even) {
-            background-color: #f2f2f2;
-          }
-        </style>
       </head>
       <body>
-        <h1>Purchase Report</h1>
+        <h2>Purchase Report</h2>
         <p>Generated on: ${new Date().toLocaleDateString()}</p>
-        ${printContent.outerHTML}
+        ${html}
       </body>
     </html>
   `);
-  
   WinPrint.document.close();
   WinPrint.focus();
   WinPrint.print();
   WinPrint.close();
-}
+};
+
   // Grand totals for all filtered purchases
 // Grand totals for all filtered purchases
 const totalQty = filteredPurchases.reduce(
@@ -260,16 +285,6 @@ const totalAmountOverall = filteredPurchases.reduce(
     indexOfLastItem
   );
   const totalPages = Math.ceil(filteredPurchases.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
 
   return (
     <div className="md:p-2">

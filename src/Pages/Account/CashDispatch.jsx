@@ -35,20 +35,48 @@ const CashDispatch = () => {
   }, []);
 
   //  filter accounts by date range
+  // const filteredAccounts = useMemo(() => {
+  //   return account.filter((item) => {
+  //     if (!item.date) return false;
+  //     const itemDate = parseISO(item.date); // api theke "2025-08-02" type string ashle ok
+
+  //     // start & end date thakle check kora
+  //     const afterStart =
+  //       startDate === "" || isAfter(itemDate, parseISO(startDate)) || isEqual(itemDate, parseISO(startDate));
+  //     const beforeEnd =
+  //       endDate === "" || isBefore(itemDate, parseISO(endDate)) || isEqual(itemDate, parseISO(endDate));
+
+  //     return afterStart && beforeEnd;
+  //   });
+  // }, [account, startDate, endDate]);
   const filteredAccounts = useMemo(() => {
-    return account.filter((item) => {
-      if (!item.date) return false;
-      const itemDate = parseISO(item.date); // api theke "2025-08-02" type string ashle ok
+  return account.filter((item) => {
+    if (!item.date) return false;
+    const itemDate = parseISO(item.date);
 
-      // start & end date thakle check kora
-      const afterStart =
-        startDate === "" || isAfter(itemDate, parseISO(startDate)) || isEqual(itemDate, parseISO(startDate));
-      const beforeEnd =
-        endDate === "" || isBefore(itemDate, parseISO(endDate)) || isEqual(itemDate, parseISO(endDate));
+    // If only startDate is set, match exactly that date
+    if (startDate && !endDate) {
+      return isEqual(itemDate, parseISO(startDate));
+    }
 
-      return afterStart && beforeEnd;
-    });
-  }, [account, startDate, endDate]);
+    // If only endDate is set, match exactly that date
+    if (!startDate && endDate) {
+      return isEqual(itemDate, parseISO(endDate));
+    }
+
+    // If both startDate and endDate are set, filter range
+    if (startDate && endDate) {
+      return (
+        (isAfter(itemDate, parseISO(startDate)) || isEqual(itemDate, parseISO(startDate))) &&
+        (isBefore(itemDate, parseISO(endDate)) || isEqual(itemDate, parseISO(endDate)))
+      );
+    }
+
+    // If no date filter, include all
+    return true;
+  });
+}, [account, startDate, endDate]);
+
 
   const totalAmount = useMemo(() => {
   return filteredAccounts.reduce((sum, item) => sum + Number(item.amount || 0), 0);
@@ -60,16 +88,7 @@ const CashDispatch = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCash = filteredAccounts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+ 
   if (loading) return <p className="text-center mt-16">Loading...</p>;
   return (
     <div className=" md:p-2">

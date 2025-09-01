@@ -62,22 +62,23 @@ const DailyIncome = () => {
   // search and filter
  // search off, only filter by date + customer + vehicle
 const filteredIncome = trips.filter((dt) => {
-  const tripDate = dt.date;
+  const tripDate = new Date(dt.date);
+  const start = startDate ? new Date(startDate) : null;
+  const end = endDate ? new Date(endDate) : null;
 
-  // date range filter
-  const matchesDateRange =
-    (!startDate || new Date(tripDate) >= new Date(startDate)) &&
-    (!endDate || new Date(tripDate) <= new Date(endDate));
+  const matchesDate =
+    (start && end && tripDate >= start && tripDate <= end) ||
+    (start && tripDate.toDateString() === start.toDateString()) ||
+    (!start && !end);
 
-  // customer filter
   const matchesCustomer =
-    !selectedCustomer || dt.customer?.toLowerCase() === selectedCustomer.toLowerCase();
+    !selectedCustomer || dt.customer?.toLowerCase() === selectedCustomer.toLowerCase()
 
   // vehicle filter (dropdown বা input field নিলে সেভাবে handle করতে হবে)
   const matchesVehicle =
     !selectedVehicle || dt.vehicle_no?.toLowerCase() === selectedVehicle.toLowerCase();
 
-  return matchesDateRange && matchesCustomer && matchesVehicle;
+  return matchesDate && matchesCustomer && matchesVehicle;
 });
 
 
@@ -95,76 +96,64 @@ const filteredIncome = trips.filter((dt) => {
   ]
 
   // Correct CSV data mapping
-  const csvData = trips.map((dt, index) => {
-    const totalRent = Number.parseFloat(dt.total_rent ?? "0") || 0 // Changed trip_price to total_rent
-    const totalExp = Number.parseFloat(dt.total_exp ?? "0") || 0 // Used total_exp directly
-    const profit = (totalRent - totalExp).toFixed(2)
+ // CSV data for export
+const csvData = filteredIncome.map((dt, index) => {
+  const totalRent = Number.parseFloat(dt.total_rent ?? "0") || 0
+  const totalExp = Number.parseFloat(dt.total_exp ?? "0") || 0
+  const profit = (totalRent - totalExp).toFixed(2)
 
-    return {
-      index: index + 1,
-      date: new Date(dt.date).toLocaleDateString("en-GB"), 
-      customer: dt.customer,
-      vehicle_no: dt.vehicle_no,
-      load_point: dt.load_point,
-      unload_point: dt.unload_point,
-      total_rent: dt.total_rent, 
-      total_exp: totalExp, 
-      profit: profit,
-    }
-  })
+  return {
+    index: index + 1,
+    date: new Date(dt.date).toLocaleDateString("en-GB"),
+    customer: dt.customer,
+    vehicle_no: dt.vehicle_no,
+    load_point: dt.load_point,
+    unload_point: dt.unload_point,
+    total_rent: totalRent.toFixed(2),
+    total_exp: totalExp.toFixed(2),
+    profit: profit,
+  }
+})
+
 
   // Export Excel function
-  const exportExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(csvData)
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Trip Data")
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    })
-    const data = new Blob([excelBuffer], { type: "application/octet-stream" })
-    saveAs(data, "dailyincome_data.xlsx")
-  }
+const exportExcel = () => {
+  const worksheet = XLSX.utils.json_to_sheet(csvData)
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, "FilteredTrips")
+  XLSX.writeFile(workbook, "filtered_trips.xlsx")
+}
 
   // Export PDF function
-  const exportPDF = () => {
-    const doc = new jsPDF()
-    const tableColumn = headers.map((h) => h.label)
-    const tableRows = csvData.map((row) => headers.map((h) => row[h.key]))
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      styles: { font: "helvetica", fontSize: 8 },
-    })
-    doc.save("dailyincome_data.pdf")
-  }
+ const exportPDF = () => {
+  const doc = new jsPDF()
+  const tableColumn = headers.map((h) => h.label)
+  const tableRows = csvData.map((row) => headers.map((h) => row[h.key]))
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    styles: { font: "helvetica", fontSize: 8 },
+  })
+
+  doc.save("filtered_trips.pdf")
+}
 
   // Print function
-  const printTable = () => {
-    // hide specific column
-    const actionColumns = document.querySelectorAll(".action_column")
-    actionColumns.forEach((col) => {
-      col.style.display = "none"
-    })
-    const printContent = document.querySelector("table").outerHTML
-    const WinPrint = window.open("", "", "width=900,height=650")
-    WinPrint.document.write(`
-    <html>
-      <head>
-        <title>Print</title>
-        <style>
-          table { width: 100%; border-collapse: collapse; }
-          th, td { border: 1px solid #000; padding: 8px; text-align: center; }
-        </style>
-      </head>
-      <body>${printContent}</body>
-    </html>
-  `)
-    WinPrint.document.close()
-    WinPrint.focus()
-    WinPrint.print()
-    WinPrint.close()
-  }
+const printTable = () => {
+  const doc = new jsPDF()
+  const tableColumn = headers.map((h) => h.label)
+  const tableRows = csvData.map((row) => headers.map((h) => row[h.key]))
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    styles: { font: "helvetica", fontSize: 8 },
+  })
+
+  doc.autoPrint()
+  window.open(doc.output("bloburl"), "_blank")
+}
 
   // মোট যোগফল বের করা
 const totalRent = filteredIncome.reduce(
@@ -185,16 +174,6 @@ const totalProfit = totalRent - totalExpense;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentTrips = filteredIncome.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(filteredIncome.length / itemsPerPage)
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1)
-  }
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((currentPage) => currentPage + 1)
-  }
-  const handlePageClick = (number) => {
-    setCurrentPage(number)
-  }
 
   return (
     <main className="md:p-2">

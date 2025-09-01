@@ -18,7 +18,7 @@ import Pagination from "../../../components/Shared/Pagination"
 
 const OfficialExpense = () => {
   const [expenses, setExpenses] = useState([])
-   const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const printRef = useRef()
@@ -34,8 +34,8 @@ const OfficialExpense = () => {
   })
   const [errors, setErrors] = useState({})
   // Date filter state
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,7 +45,7 @@ const OfficialExpense = () => {
 
   //   branch api
   const [branches, setBranches] = useState([]);
-  
+
   useEffect(() => {
     const fetchBranches = async () => {
       try {
@@ -58,7 +58,7 @@ const OfficialExpense = () => {
         toast.error("Failed to load branch list");
       }
     };
-  
+
     fetchBranches();
   }, []);
 
@@ -113,16 +113,16 @@ const OfficialExpense = () => {
     fetchExpenses()
   }, [])
 
-//   expense
+  //   expense
   const fetchExpenses = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/expense/list`)
       const allExpenses = response.data?.data || [];
-      const utilityExpenses = allExpenses.filter(expense => 
+      const utilityExpenses = allExpenses.filter(expense =>
         expense.payment_category === 'Utility'
       );
-      
-      setExpenses(utilityExpenses); 
+
+      setExpenses(utilityExpenses);
       setLoading(false)
     } catch (err) {
       console.log("Data feching issue", "error")
@@ -146,7 +146,7 @@ const OfficialExpense = () => {
     e.preventDefault()
 
     if (!validateForm()) return
-setIsSubmitting(true);
+    setIsSubmitting(true);
     try {
       const payload = {
         ...formData,
@@ -166,18 +166,34 @@ setIsSubmitting(true);
     } catch (err) {
       console.error(err)
       toast.error("Operation failed", "error")
-    }finally {
-      setIsSubmitting(false); 
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
-  const filteredData = expenses.filter((item) =>
-    [item.paid_to, item.pay_amount, item.payment_category, item.remarks]
+  const filteredData = expenses.filter((item) => {
+    const itemDate = dayjs(item.date).format("YYYY-MM-DD");
+
+    const matchesSearch = [item.paid_to, item.pay_amount, item.payment_category, item.remarks, item.branch_name]
       .join(" ")
       .toLowerCase()
-      .includes(searchTerm.toLowerCase()),
-  )
-// csv
+      .includes(searchTerm.toLowerCase());
+
+    // Date filter logic
+    let matchesDate = true;
+    if (startDate && !endDate) {
+      // only start date dile oi ekta tarikh er data
+      matchesDate = itemDate === dayjs(startDate).format("YYYY-MM-DD");
+    } else if (startDate && endDate) {
+      // start + end dile range filter
+      matchesDate =
+        itemDate >= dayjs(startDate).format("YYYY-MM-DD") &&
+        itemDate <= dayjs(endDate).format("YYYY-MM-DD");
+    }
+
+    return matchesSearch && matchesDate;
+  })
+  // csv
   const exportCSV = () => {
     const csvContent = [
       ["Serial", "Date", "Paid To", "Amount", "Category", "Remarks"],
@@ -196,7 +212,7 @@ setIsSubmitting(true);
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
     saveAs(blob, "general_expense.csv")
   }
-// excel
+  // excel
   const exportExcel = () => {
     const data = filteredData.map((item, i) => ({
       SL: i + 1,
@@ -213,7 +229,7 @@ setIsSubmitting(true);
     const buffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
     saveAs(new Blob([buffer]), "general_expense.xlsx")
   }
-// pdf
+  // pdf
   const exportPDF = () => {
     const doc = new jsPDF()
     autoTable(doc, {
@@ -229,38 +245,72 @@ setIsSubmitting(true);
     })
     doc.save("general_expense.pdf")
   }
-// print
+  // print
+
   const printTable = () => {
-    // hide specific column
-    const actionColumns = document.querySelectorAll(".action_column");
-    actionColumns.forEach((col) => {
-      col.style.display = "none";
-    });
-    const content = printRef.current.innerHTML
-    const win = window.open("", "", "width=900,height=650")
+    const tableHeader = `
+    <thead>
+      <tr>
+        <th>SL</th>
+        <th>Date</th>
+        <th>Branch</th>
+        <th>Paid To</th>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+  `;
+
+    const tableRows = filteredData
+      .map(
+        (item, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${item.date || ""}</td>
+          <td>${item.branch_name || ""}</td>
+          <td>${item.paid_to || ""}</td>
+          <td>${item.pay_amount || ""}</td>
+          <td>${item.payment_category || ""}</td>
+          <td>${item.remarks || ""}</td>
+        </tr>
+      `
+      )
+      .join("");
+
+    const printContent = `
+    <table>
+      ${tableHeader}
+      <tbody>${tableRows}</tbody>
+    </table>
+  `;
+
+    const win = window.open("", "", "width=900,height=650");
     win.document.write(`
-      <html>
-        <head>
-          <title>Print</title>
-          <style>
-            body { font-family: Arial, sans-serif; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f5f5f5; }
-          </style>
-        </head>
-        <body>${content}</body>
-      </html>
-    `)
-    win.document.close()
-    win.focus()
-    win.print()
-    win.close()
-    // fallback: just in case (immediate reset)
-  actionColumns.forEach((col) => {
-    col.style.display = "";
-  });
-  }
+    <html>
+      <head>
+        <title>Salary Expense</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h3 { text-align: center; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
+          thead { background-color: #11375B; color: white; }
+          tbody tr:nth-child(odd) { background-color: #f9f9f9; }
+        </style>
+      </head>
+      <body>
+        <h3>Salary Expense List</h3>
+        ${printContent}
+      </body>
+    </html>
+  `);
+
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -269,76 +319,67 @@ setIsSubmitting(true);
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const filteredExpense = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+
 
   return (
     <div className=" min-h-screen">
-      <Toaster/>
+      <Toaster />
       <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 p-4">
         {/* Header */}
-                <div className="md:flex items-center justify-between mb-6">
-                  <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
-                    <FaTruck className="text-[#11375B] text-2xl" />
-                    Daily Office Expense 
-                  </h1>
-                  <div className="mt-3 md:mt-0 flex gap-2">
-                    {/* <Link to="/tramessy/AddSallaryExpenseForm"> */}
-                                  <button onClick={() => showModal()} className="bg-primary text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
-                                    <FaPlus /> Add 
-                                  </button>
-                                {/* </Link> */}
-                    <button
-                      onClick={() => setShowFilter((prev) => !prev)} // Toggle filter
-                      className=" text-primary border border-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
-                    >
-                      <FaFilter /> Filter
-                    </button>
-                  </div>
-                </div>
+        <div className="md:flex items-center justify-between mb-6">
+          <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
+            <FaTruck className="text-[#11375B] text-2xl" />
+            Daily Office Expense
+          </h1>
+          <div className="mt-3 md:mt-0 flex gap-2">
+            {/* <Link to="/tramessy/AddSallaryExpenseForm"> */}
+            <button onClick={() => showModal()} className="bg-primary text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
+              <FaPlus /> Add
+            </button>
+            {/* </Link> */}
+            <button
+              onClick={() => setShowFilter((prev) => !prev)} // Toggle filter
+              className=" text-primary border border-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+            >
+              <FaFilter /> Filter
+            </button>
+          </div>
+        </div>
 
         {/* Controls */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 gap-4">
           <div className="flex flex-wrap gap-2">
 
-                        <button
+            <button
               onClick={exportCSV}
               className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-cyan-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               <FiFileText size={16} />
               CSV
             </button>
-                        <button
-                                        onClick={exportExcel}
-                                        className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
-                                      >
-                                        <FaFileExcel className="" />
-                                        Excel
-                                      </button>
-                                    
-                                      <button
-                                        onClick={exportPDF}
-                                        className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
-                                      >
-                                        <FaFilePdf className="" />
-                                        PDF
-                                      </button>
-                                    
-                                      <button
-                                        onClick={printTable}
-                                        className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
-                                      >
-                                        <FaPrint className="" />
-                                        Print
-                                      </button>
+            <button
+              onClick={exportExcel}
+              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+            >
+              <FaFileExcel className="" />
+              Excel
+            </button>
+
+            <button
+              onClick={exportPDF}
+              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+            >
+              <FaFilePdf className="" />
+              PDF
+            </button>
+
+            <button
+              onClick={printTable}
+              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+            >
+              <FaPrint className="" />
+              Print
+            </button>
           </div>
 
           <div className="flex items-center gap-2">
@@ -350,53 +391,58 @@ setIsSubmitting(true);
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-             {/*  Clear button */}
-    {searchTerm && (
-      <button
-        onClick={() => {
-          setSearchTerm("");
-          setCurrentPage(1);
-        }}
-        className="absolute right-12 top-[11.3rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
-      >
-        ✕
-      </button>
-    )}
+            {/*  Clear button */}
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setCurrentPage(1);
+                }}
+                className="absolute right-12 top-[11.3rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
-         {/* Conditional Filter Section */}
-                {showFilter && (
-                  <div className="md:flex gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
-                    <div className="relative w-full">
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        placeholder="Start date"
-                        className="mt-1 w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-                      />
-                    </div>
-        
-                    <div className="relative w-full">
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        placeholder="End date"
-                        className="mt-1 w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-                      />
-                    </div>
-                    <div className="mt-3 md:mt-0 flex gap-2">
-                                                          <button
-                                                            onClick={() => setCurrentPage(1)}
-                                                            className="bg-primary text-white px-4 py-1 md:py-0 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
-                                                          >
-                                                            <FaFilter /> Filter
-                                                          </button>
-                                                        </div>
-                  </div>
-                )}
+        {/* Conditional Filter Section */}
+        {showFilter && (
+          <div className="md:flex gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
+            <div className="relative w-full">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="Start date"
+                className="mt-1 w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
+              />
+            </div>
+
+            <div className="relative w-full">
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="End date"
+                className="mt-1 w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
+              />
+            </div>
+            <div className="mt-3 md:mt-0 flex gap-2">
+              <button
+                onClick={() => {
+                  setCurrentPage(1)
+                  setStartDate("")
+                  setEndDate("")
+                  setShowFilter(false)
+                }}
+                className="bg-primary text-white px-4 py-1 md:py-0 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                <FaFilter /> Clear
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Table */}
         <div className="mt-5 overflow-x-auto rounded-xl border border-gray-200" ref={printRef}>
@@ -421,27 +467,27 @@ setIsSubmitting(true);
                   </td>
                 </tr>
               ) : filteredExpense.length === 0 ? (
-    <tr>
-      <td colSpan="8" className="text-center py-10 text-gray-500 italic">
-        <div className="flex flex-col items-center">
-          <svg
-            className="w-12 h-12 text-gray-300 mb-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.75 9.75L14.25 14.25M9.75 14.25L14.25 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          No Expense data found.
-        </div>
-      </td>
-    </tr>
-  ) : (
+                <tr>
+                  <td colSpan="8" className="text-center py-10 text-gray-500 italic">
+                    <div className="flex flex-col items-center">
+                      <svg
+                        className="w-12 h-12 text-gray-300 mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9.75 9.75L14.25 14.25M9.75 14.25L14.25 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      No Expense data found.
+                    </div>
+                  </td>
+                </tr>
+              ) : (
                 filteredExpense.map((item, index) => (
                   <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="px-3 py-3 text-sm">{index + 1}</td>
@@ -466,14 +512,14 @@ setIsSubmitting(true);
           </table>
         </div>
         {/* pagination */}
-            {filteredExpense.length > 0 && totalPages >= 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-          maxVisible={8} 
-        />
-      )}
+        {filteredExpense.length > 0 && totalPages >= 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+            maxVisible={8}
+          />
+        )}
       </div>
 
       {/* Modal */}
@@ -502,7 +548,7 @@ setIsSubmitting(true);
                     />
                     {errors.date && <p className="text-red-500 text-xs mt-1">{errors.date}</p>}
                   </div>
-                 <div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Paid To <span className="text-red-500">*</span></label>
                     <input
                       type="text"
@@ -513,22 +559,11 @@ setIsSubmitting(true);
                     />
                     {errors.paid_to && <p className="text-red-500 text-xs mt-1">{errors.paid_to}</p>}
                   </div>
-             
+
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Amount <span className="text-red-500">*</span></label>
-                    <input
-                      type="number"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Amount"
-                      value={formData.pay_amount}
-                      onChange={(e) => setFormData({ ...formData, pay_amount: e.target.value })}
-                    />
-                    {errors.pay_amount && <p className="text-red-500 text-xs mt-1">{errors.pay_amount}</p>}
-                  </div>
-                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Category <span className="text-red-500">*</span></label>
                     <select
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -544,6 +579,17 @@ setIsSubmitting(true);
                     </select>
                     {errors.payment_category && <p className="text-red-500 text-xs mt-1">{errors.payment_category}</p>}
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Amount <span className="text-red-500">*</span></label>
+                    <input
+                      type="number"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Amount"
+                      value={formData.pay_amount}
+                      onChange={(e) => setFormData({ ...formData, pay_amount: e.target.value })}
+                    />
+                    {errors.pay_amount && <p className="text-red-500 text-xs mt-1">{errors.pay_amount}</p>}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -556,24 +602,24 @@ setIsSubmitting(true);
                     >
                       <option value="">Select branch</option>
                       {branches.map((branch) => (
-  <option key={branch.id} value={branch.branch_name}>
-    {branch.branch_name}
-  </option>
-))}
+                        <option key={branch.id} value={branch.branch_name}>
+                          {branch.branch_name}
+                        </option>
+                      ))}
                     </select>
                     {errors.branch_name && <p className="text-red-500 text-xs mt-1">{errors.branch_name}</p>}
                   </div>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Remarks"
-                    value={formData.remarks}
-                    onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
-                  />
-                </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Remarks"
+                      value={formData.remarks}
+                      onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -587,7 +633,7 @@ setIsSubmitting(true);
                   Cancel
                 </button>
                 <BtnSubmit
-                 loading={isSubmitting}
+                  loading={isSubmitting}
                 >
                   Submit
                 </BtnSubmit>

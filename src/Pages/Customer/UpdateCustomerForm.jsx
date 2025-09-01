@@ -11,11 +11,11 @@ const UpdateCustomerForm = () => {
   const navigate = useNavigate();
   //   update loader data
   const updateCustomerLoaderData = useLoaderData();
-  const { id, date, customer_name, mobile, email, address, due, status } =
+  const { id, date, customer_name, mobile, email, address, due, status, rate } =
     updateCustomerLoaderData.data;
   //   console.log("updateCustomerLoaderData", updateCustomerLoaderData);
   const dateRef = useRef(null);
-  const methods = useForm({ defaultValues: { status } });
+  const methods = useForm({ defaultValues: { status, rate } });
   const { handleSubmit, register } = methods;
 
   // update customer
@@ -49,12 +49,12 @@ const UpdateCustomerForm = () => {
   };
 
   return (
-    <div className="mt-10 md:p-2">
+    <div className="mt-10 p-2">
       <Toaster />
       <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
        Update Customer information
       </h3>
-      <div className="mx-auto p-6 bg-gray-100 rounded-md shadow">
+      <div className="mx-auto p-6  rounded-md shadow">
         <FormProvider {...methods} className="">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="md:flex justify-between gap-3">
@@ -114,11 +114,11 @@ const UpdateCustomerForm = () => {
                 <SelectField
                   name="rate"
                   label="Rate status"
-                  required
                   options={[
                     { value: "Fixed", label: "Fixed" },
                     { value: "Unfixed", label: "Unfixed" },
                   ]}
+                  defaultValue={rate}
                 />
               </div>
               <div className="w-full relative">

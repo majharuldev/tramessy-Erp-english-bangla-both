@@ -1,162 +1,154 @@
-
-import { FormProvider, useForm } from "react-hook-form";
-import { InputField, SelectField } from "../../components/Form/FormFields";
-import BtnSubmit from "../../components/Button/BtnSubmit";
-import toast, { Toaster } from "react-hot-toast";
-import axios from "axios";
-import { useEffect, useRef, useState } from "react";
-import { FiCalendar } from "react-icons/fi";
-import { useParams, useNavigate } from "react-router-dom";
+import { FormProvider, useForm } from "react-hook-form"
+import { InputField, SelectField } from "../../components/Form/FormFields"
+import BtnSubmit from "../../components/Button/BtnSubmit"
+import toast, { Toaster } from "react-hot-toast"
+import axios from "axios"
+import { useEffect, useRef, useState } from "react"
+import { FiCalendar } from "react-icons/fi"
+import { useParams, useNavigate } from "react-router-dom"
 
 const CashDispatchForm = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [branch, setBranch] = useState([]);
-  const [employee, setEmployee] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const dateRef = useRef(null);
-  const methods = useForm();
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [branch, setBranch] = useState([])
+  const [employee, setEmployee] = useState([])
+  const [isEditing, setIsEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const dateRef = useRef(null)
+  const methods = useForm()
 
   // Fetch initial data if editing
   useEffect(() => {
     if (id) {
-      setIsEditing(true);
-      fetchData();
+      setIsEditing(true)
+      fetchData()
     }
-  }, [id]);
+  }, [id])
 
   const fetchData = async () => {
     try {
-      setLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/account/show/${id}`
-      );
-      const data = response.data.data;
-      
+      setLoading(true)
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/account/show/${id}`)
+      const data = response.data.data
+
       // Set form values
       methods.reset({
         date: data.date,
-        branch: data.branch_name,
+        branch_name: data.branch_name, // Changed from 'branch' to 'branch_name'
         person_name: data.person_name,
         type: data.type,
         amount: data.amount,
-        bank_name: data.bank_name || '',
+        bank_name: data.bank_name || "",
         remarks: data.remarks,
-        ref: data.ref || ''
-      });
+        ref: data.ref || "",
+      })
     } catch (error) {
-      console.error("Error fetching data:", error);
-      toast.error("Failed to load data");
+      console.error("Error fetching data:", error)
+      toast.error("Failed to load data")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // select branch from api
   useEffect(() => {
     fetch(`${import.meta.env.VITE_BASE_URL}/api/office/list`)
       .then((response) => response.json())
       .then((data) => setBranch(data.data))
-      .catch((error) => console.error("Error fetching branch name:", error));
-  }, []);
+      .catch((error) => console.error("Error fetching branch name:", error))
+  }, [])
 
   const branchOptions = branch.map((dt) => ({
     value: dt.branch_name,
     label: dt.branch_name,
-  }));
+  }))
 
   // select branch from api
   useEffect(() => {
     fetch(`${import.meta.env.VITE_BASE_URL}/api/employee/list`)
       .then((response) => response.json())
       .then((data) => setEmployee(data.data))
-      .catch((error) => console.error("Error fetching employee name:", error));
-  }, []);
+      .catch((error) => console.error("Error fetching employee name:", error))
+  }, [])
 
   const employeeOptions = employee.map((dt) => ({
     value: dt.full_name,
     label: dt.full_name,
-  }));
+  }))
 
-  const { handleSubmit, reset, register, control } = methods;
+  const { handleSubmit, reset, register, control } = methods
 
   // generate ref id
   const generateRefId = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let refId = "";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    let refId = ""
     for (let i = 0; i < 6; i++) {
-      refId += chars.charAt(Math.floor(Math.random() * chars.length));
+      refId += chars.charAt(Math.floor(Math.random() * chars.length))
     }
-    return refId;
-  };
+    return refId
+  }
 
   // post data on server
   const onSubmit = async (data) => {
-    const refId = isEditing ? data.ref_id : generateRefId();
-    
+    const refId = isEditing ? data.ref_id : generateRefId()
+
     try {
-      const formData = new FormData();
+      const formData = new FormData()
       for (const key in data) {
-        formData.append(key, data[key]);
+        formData.append(key, data[key])
       }
-      
+
       if (!isEditing) {
-        formData.append("ref_id", refId);
+        formData.append("ref_id", refId)
       }
 
       // Use update or create endpoint based on mode
-      const endpoint = isEditing 
+      const endpoint = isEditing
         ? `${import.meta.env.VITE_BASE_URL}/api/account/update/${id}`
-        : `${import.meta.env.VITE_BASE_URL}/api/account/create`;
-      
-      const method = isEditing ? "post" : "post";
+        : `${import.meta.env.VITE_BASE_URL}/api/account/create`
 
-      const response = await axios[method](endpoint, formData);
-      const responseData = response.data;
+      const method = isEditing ? "post" : "post"
+
+      const response = await axios[method](endpoint, formData)
+      const responseData = response.data
 
       if (responseData.success) {
-        toast.success(
-          isEditing ? "Fund transfer updated successfully" : "Fund transfer created successfully",
-          { position: "top-right" }
-        );
+        toast.success(isEditing ? "Fund transfer updated successfully" : "Fund transfer created successfully", {
+          position: "top-right",
+        })
 
         // For new entries, also create branch record
         if (!isEditing) {
-          const branchFormData = new FormData();
-          branchFormData.append("date", data.date);
-          branchFormData.append("cash_in", data.amount);
-          branchFormData.append("branch_name", data.branch_name);
-          branchFormData.append("remarks", data.ref);
-          branchFormData.append("mode", data.type);
-          branchFormData.append("ref_id", refId);
+          const branchFormData = new FormData()
+          branchFormData.append("date", data.date)
+          branchFormData.append("cash_in", data.amount)
+          branchFormData.append("branch_name", data.branch_name)
+          branchFormData.append("remarks", data.ref)
+          branchFormData.append("mode", data.type)
+          branchFormData.append("ref_id", refId)
 
-          await axios.post(
-            `${import.meta.env.VITE_BASE_URL}/api/branch/create`,
-            branchFormData
-          );
+          await axios.post(`${import.meta.env.VITE_BASE_URL}/api/branch/create`, branchFormData)
         }
 
         // Reset form if create, navigate back if edit
         if (isEditing) {
-          navigate("/tramessy/account/CashDispatch"); // Go back to previous page
+          navigate("/tramessy/account/CashDispatch") // Go back to previous page
         } else {
-          reset();
+          reset()
           navigate("/tramessy/account/CashDispatch")
         }
       } else {
-        toast.error(responseData.message || "Operation failed");
+        toast.error(responseData.message || "Operation failed")
       }
     } catch (error) {
-      console.error(error);
-      const errorMessage =
-        error.response?.data?.message || error.message || "Unknown error";
-      toast.error("Server issue: " + errorMessage);
+      console.error(error)
+      const errorMessage = error.response?.data?.message || error.message || "Unknown error"
+      toast.error("Server issue: " + errorMessage)
     }
-  };
+  }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   return (
@@ -166,10 +158,7 @@ const CashDispatchForm = () => {
         {isEditing ? "Edit Fund Transfer" : "Create Fund Transfer"}
       </h3>
       <FormProvider {...methods} className="">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-3 mx-auto  rounded-md shadow"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 mx-auto  rounded-md shadow">
           {/* Trip & Destination Section */}
           <div className="border border-gray-300 p-3 md:p-5 rounded-b-md">
             <div className="mt-5 md:mt-1 md:flex justify-between gap-3">
@@ -180,8 +169,8 @@ const CashDispatchForm = () => {
                   type="date"
                   required={!isEditing}
                   inputRef={(e) => {
-                    register("date").ref(e);
-                    dateRef.current = e;
+                    register("date").ref(e)
+                    dateRef.current = e
                   }}
                   icon={
                     <span
@@ -226,12 +215,7 @@ const CashDispatchForm = () => {
                 />
               </div>
               <div className="w-full">
-                <InputField
-                  name="amount"
-                  label="Amount" 
-                  type="number"
-                  required={!isEditing}
-                />
+                <InputField name="amount" label="Amount" type="number" required={!isEditing} />
               </div>
             </div>
             <div className="mt-5 md:mt-1 md:flex justify-between gap-3">
@@ -250,7 +234,7 @@ const CashDispatchForm = () => {
         </form>
       </FormProvider>
     </div>
-  );
-};
+  )
+}
 
-export default CashDispatchForm;
+export default CashDispatchForm

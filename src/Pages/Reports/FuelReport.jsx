@@ -209,46 +209,72 @@ export default function FuelReport() {
   };
 
   // Simple print function
- const handlePrint = () => {
-  const printContent = document.getElementById("fuelReport");
+const handlePrint = () => {
+  // Generate table rows for all filtered data
+  const rowsHtml = filteredReport.map(item => `
+    <tr>
+      <td style="border:1px solid #ddd;padding:6px;text-align:center">${item.date}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:center">${item.ref_id}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:center">${item.vehicle}</td>
+      <td style="border:1px solid #ddd;padding:6px">${item.driver}</td>
+      <td style="border:1px solid #ddd;padding:6px">${item.customer}</td>
+      <td style="border:1px solid #ddd;padding:6px">${item.route}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${item.fuel_cost.toFixed(2)}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${item.total_rent.toFixed(2)}</td>
+    </tr>
+  `).join("");
+
+  // Totals row
+  const totalsRow = `
+    <tr style="font-weight:bold;background:#f0f0f0">
+      <td colspan="6" style="border:1px solid #ddd;padding:6px;text-align:right">Total:</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${totals.totalFuelCost.toFixed(2)}</td>
+      <td style="border:1px solid #ddd;padding:6px;text-align:right">${totals.totalRent.toFixed(2)}</td>
+    </tr>
+  `;
+
+  const html = `
+    <table style="width:100%;border-collapse:collapse">
+      <thead style="background:#11375B;color:white">
+        <tr>
+          <th style="border:1px solid #ddd;padding:6px">Date</th>
+          <th style="border:1px solid #ddd;padding:6px">Ref ID</th>
+          <th style="border:1px solid #ddd;padding:6px">Vehicle</th>
+          <th style="border:1px solid #ddd;padding:6px">Driver</th>
+          <th style="border:1px solid #ddd;padding:6px">Customer</th>
+          <th style="border:1px solid #ddd;padding:6px">Route</th>
+          <th style="border:1px solid #ddd;padding:6px">Fuel Cost</th>
+          <th style="border:1px solid #ddd;padding:6px">Total Rent</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+      <tfoot>
+        ${totalsRow}
+      </tfoot>
+    </table>
+  `;
+
   const WinPrint = window.open("", "", "width=900,height=650");
-  
   WinPrint.document.write(`
     <html>
       <head>
         <title>Fuel Trip Report</title>
-        <style>
-          table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-          }
-          th {
-            background-color: #11375B;
-            color: white;
-          }
-          tr:nth-child(even) {
-            background-color: #f2f2f2;
-          }
-        </style>
       </head>
       <body>
-        <h1>Fuel Trip Report</h1>
+        <h2>Fuel Trip Report</h2>
         <p>Generated on: ${new Date().toLocaleDateString()}</p>
-        ${printContent.outerHTML}
+        ${html}
       </body>
     </html>
   `);
-  
   WinPrint.document.close();
   WinPrint.focus();
   WinPrint.print();
   WinPrint.close();
-}
+};
+
 
   return (
     <div className="md:p-2">
@@ -388,7 +414,7 @@ export default function FuelReport() {
                   <th className="p-3">Route</th>
                   <th className="p-3">Fuel Cost</th>
                   <th className="p-3">Total Rent</th>
-                  <th className="p-3">Fuel %</th>
+                  {/* <th className="p-3">Fuel %</th> */}
                 </tr>
               </thead>
               <tbody className="text-primary">
@@ -401,9 +427,9 @@ export default function FuelReport() {
                       <td className="p-3">{item.driver}</td>
                       <td className="p-3">{item.customer}</td>
                       <td className="p-3">{item.route}</td>
-                      <td className="p-3">{item.fuel_cost.toFixed(2)}</td>
-                      <td className="p-3">{item.total_rent.toFixed(2)}</td>
-                      <td className="p-3">{item.fuel_percentage}%</td>
+                      <td className="p-3">{item.fuel_cost}</td>
+                      <td className="p-3">{item.total_rent}</td>
+                      {/* <td className="p-3">{item.fuel_percentage}%</td> */}
                     </tr>
                   ))
                 ) : (
@@ -419,9 +445,9 @@ export default function FuelReport() {
                 <tfoot className="bg-gray-100 font-bold">
                   <tr>
                     <td colSpan={6} className="p-3 text-right">Total:</td>
-                    <td className="p-3">{totals.totalFuelCost.toFixed(2)}</td>
-                    <td className="p-3">{totals.totalRent.toFixed(2)}</td>
-                    <td className="p-3"></td>
+                    <td className="p-3">{totals.totalFuelCost}</td>
+                    <td className="p-3">{totals.totalRent}</td>
+                    {/* <td className="p-3"></td> */}
                   </tr>
                 </tfoot>
               )}

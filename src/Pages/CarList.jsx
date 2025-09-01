@@ -103,7 +103,7 @@ const CarList = () => {
       "Vehicle No",
       "Status",
     ];
-    const tableRows = currentVehicles.map((v, index) => [
+    const tableRows = filteredCarList.map((v, index) => [
       indexOfFirstItem + index + 1,
       v.driver_name,
       v.vehicle_name,
@@ -139,25 +139,43 @@ const CarList = () => {
   };
 
   const printTable = () => {
-    const actionColumns = document.querySelectorAll(".action_column");
-    actionColumns.forEach((col) => {
-      col.style.display = "none";
-    });
+  const tableHeader = `
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Driver Name</th>
+        <th>Vehicle Name</th>
+        <th>Vehicle Category</th>
+        <th>Vehicle Size</th>
+        <th>Vehicle No</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+  `;
 
-    const printContent = document.querySelector("table").outerHTML;
-    const WinPrint = window.open("", "", "width=1200,height=800");
+  const tableRows = filteredCarList.map((v, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${v.driver_name}</td>
+      <td>${v.vehicle_name}</td>
+      <td>${v.vehicle_category}</td>
+      <td>${v.vehicle_size}</td>
+      <td>${v.registration_zone} ${v.registration_number}</td>
+      <td>${v.status}</td>
+    </tr>
+  `).join("");
 
-    WinPrint.document.write(`
+  const printContent = `
+    <table border="1" cellspacing="0" cellpadding="6">
+      ${tableHeader}
+      <tbody>${tableRows}</tbody>
+    </table>
+  `;
+
+  const WinPrint = window.open("", "", "width=1200,height=800");
+  WinPrint.document.write(`
     <html>
-    <head>
-      <title>Print</title>
-      <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
-        th { background: #f0f0f0; }
-      </style>
-    </head>
+    <head><title>Print</title></head>
     <body>
       <h2 style="text-align:center;">Vehicle Full Details</h2>
       ${printContent}
@@ -165,19 +183,13 @@ const CarList = () => {
     </html>
   `);
 
-    WinPrint.document.close();
-    WinPrint.focus();
-    WinPrint.print();
-    WinPrint.close();
+  WinPrint.document.close();
+  WinPrint.focus();
+  WinPrint.print();
+  WinPrint.close();
+};
 
-    // Restore hidden columns
-    setTimeout(() => {
-      actionColumns.forEach((col) => {
-        col.style.display = "";
-      });
-    }, 500);
-  };
-  // view car by id
+  
   const handleViewCar = async (id) => {
     try {
       const response = await axios.get(
@@ -200,7 +212,7 @@ const CarList = () => {
     return (
       vehicle.vehicle_name?.toLowerCase().includes(term) ||
       vehicle.driver_name?.toLowerCase().includes(term) ||
-      vehicle.category?.toLowerCase().includes(term) ||
+      vehicle.vehicle_category?.toLowerCase().includes(term) ||
       vehicle.size?.toLowerCase().includes(term) ||
       vehicle.registration_number?.toLowerCase().includes(term) ||
       vehicle.registration_serial?.toLowerCase().includes(term) ||
@@ -219,18 +231,8 @@ const CarList = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.ceil(vehicles.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
-
+  const totalPages = Math.ceil(filteredCarList.length / itemsPerPage);
+ 
   return (
     <main className=" md:p-2">
       <Toaster />

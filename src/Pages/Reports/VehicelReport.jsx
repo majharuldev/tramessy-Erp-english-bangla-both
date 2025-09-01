@@ -258,7 +258,7 @@ export default function VehicleProfitReport() {
 
 useEffect(() => {
   calculateProfitByVehicle()
-  setCurrentPage(1)  // filter change হলে currentPage reset
+  setCurrentPage(1)  
 }, [tripData, purchaseData, stockOutData, selectedDate, fromDate, toDate, selectedVehicle])
 
 // চাইলে আলাদা আলাদা বের করতে পারেন
@@ -350,46 +350,79 @@ const exportToPDF = () => {
 }
 
 
-  const printTable = () => {
-  const printContent = document.getElementById("vehicleProfitTable");
-  const WinPrint = window.open("", "", "width=900,height=650");
-  
+ const printTable = () => {
+  const allRows = profitData.map((d) => `
+    <tr>
+      <td>${d.date}</td>
+      <td>${d.vehicle_no}</td>
+      <td>${d.trip_count}</td>
+      <td>${d.total_revenue.toLocaleString()}</td>
+      <td>${d.trip_expenses.toLocaleString()}</td>
+      <td>${d.parts_cost.toLocaleString()}</td>
+      <td>${d.fuel_cost.toLocaleString()}</td>
+      <td>${d.engine_oil_cost.toLocaleString()}</td>
+      <td>${d.net_profit.toLocaleString()}</td>
+    </tr>
+  `).join("")
+
+  const totalRow = `
+    <tr style="font-weight:bold; background-color:#f0f0f0;">
+      <td colspan="2" style="text-align:right;">Total:</td>
+      <td>${totalTrip}</td>
+      <td>${totalRevenue.toLocaleString()}</td>
+      <td>${totalTripCost.toLocaleString()}</td>
+      <td>${totalPartsCost.toLocaleString()}</td>
+      <td>${totalFuelCost.toLocaleString()}</td>
+      <td>${totalEngineOil.toLocaleString()}</td>
+      <td>${totalProfit.toLocaleString()}</td>
+    </tr>
+  `
+
+  const WinPrint = window.open("", "", "width=900,height=650")
   WinPrint.document.write(`
     <html>
       <head>
         <title>Vehicle Profit Report</title>
         <style>
-          table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-          }
-          th {
-            background-color: #11375B;
-            color: white;
-          }
-          tr:nth-child(even) {
-            background-color: #f2f2f2;
-          }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #11375B; color: white; }
+          tr:nth-child(even) { background-color: #f2f2f2; }
         </style>
       </head>
       <body>
         <h1>Vehicle Profit Report</h1>
         <p>Generated on: ${new Date().toLocaleDateString()}</p>
-        ${printContent.outerHTML}
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Vehicle No</th>
+              <th>Trips</th>
+              <th>Trip Rent</th>
+              <th>Trip Cost</th>
+              <th>Parts Cost</th>
+              <th>Fuel Cost</th>
+              <th>Engine Oil</th>
+              <th>Net Profit</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${allRows}
+          </tbody>
+          <tfoot>
+            ${totalRow}
+          </tfoot>
+        </table>
       </body>
     </html>
-  `);
-  
-  WinPrint.document.close();
-  WinPrint.focus();
-  WinPrint.print();
-  WinPrint.close();
+  `)
+  WinPrint.document.close()
+  WinPrint.focus()
+  WinPrint.print()
+  WinPrint.close()
 }
+
 
   return (
     <main className="md:p-2">

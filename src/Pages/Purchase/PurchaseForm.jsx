@@ -127,8 +127,8 @@ const PurchaseForm = () => {
   }));
 
   const supplyOptions = supplier.map((supply) => ({
-    value: supply.business_name,
-    label: supply.business_name,
+    value: supply.supplier_name,
+    label: supply.supplier_name,
   }));
 
   // Handle form submission for both add and update

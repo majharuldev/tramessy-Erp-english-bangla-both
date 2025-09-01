@@ -85,7 +85,7 @@ const handleView = (employee) => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.ceil(employee.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredEmployeeList.length / itemsPerPage);
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
   };

@@ -243,14 +243,6 @@ const MonthlyStatement = () => {
   window.location.reload(); // To restore the original state
 };
 
-// Update your print button
-<button
-  onClick={handlePrint}
-  className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer no-print"
->
-  <FaPrint /> Print
-</button>
-
     // pagination
   const [currentPage, setCurrentPage] = useState([1])
   const itemsPerPage = 10;
@@ -258,17 +250,6 @@ const MonthlyStatement = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
-
   // Calculate totals
   const calculateTotal = (key) => {
     return filteredData.reduce((sum, item) => sum + (item[key] || 0), 0);

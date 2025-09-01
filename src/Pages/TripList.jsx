@@ -285,16 +285,7 @@ const sortedTrips = [...trip].sort((a, b) => new Date(b.date) - new Date(a.date)
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentTrip = filteredTripList.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredTripList.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+
   return (
     <main className=" md:p-2">
       <Toaster />

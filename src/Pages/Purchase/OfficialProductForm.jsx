@@ -125,8 +125,8 @@ const OfficialProductForm = () => {
   }));
 
   const supplyOptions = supplier.map((supply) => ({
-    value: supply.business_name,
-    label: supply.business_name,
+    value: supply.supplier_name,
+    label: supply.supplier_name,
   }));
 
   // Handle form submission for both add and update
@@ -200,7 +200,7 @@ const OfficialProductForm = () => {
     <div className="mt-10 md:p-2">
       <Toaster />
       <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
-        {isEditMode ? "Update Maintenance Purchase " : "Add Maintenance Purchase"}
+        {isEditMode ? "Update Official Purchase " : "Add Official Purchase"}
       </h3>
       <FormProvider {...methods}>
         <form

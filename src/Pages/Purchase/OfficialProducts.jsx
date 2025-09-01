@@ -211,21 +211,46 @@ const exportPDF = () => {
 
   // Print Function
  const printTable = () => {
-  const table = document.getElementById("purchaseTable").cloneNode(true);
+  // শুধু filtered data ব্যবহার
+  const tableHeader = `
+    <thead>
+      <tr>
+        <th>SL</th>
+        <th>Product ID</th>
+        <th>Supplier</th>
+        <th>Driver</th>
+        <th>Vehicle No</th>
+        <th>Category</th>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+  `;
 
-  // Action কলাম index বের করো
-  const actionIndex = Array.from(table.querySelector("thead tr").children).findIndex(
-    (th) => th.innerText.trim() === "Action"
-  );
+  const tableRows = filteredPurchase
+    .map(
+      (item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${item.id}</td>
+          <td>${item.supplier_name}</td>
+          <td>${item.driver_name !== "null" ? item.driver_name : "N/A"}</td>
+          <td>${item.vehicle_no !== "null" ? item.vehicle_no : "N/A"}</td>
+          <td>${item.category}</td>
+          <td>${item.item_name}</td>
+          <td>${item.quantity}</td>
+          <td>${item.unit_price}</td>
+          <td>${item.purchase_amount}</td>
+        </tr>
+      `
+    )
+    .join("");
 
-  // Action header remove
-  if (actionIndex > -1) {
-    table.querySelectorAll("tr").forEach((row) => {
-      row.children[actionIndex]?.remove();
-    });
-  }
+  const printContent = `<table>${tableHeader}<tbody>${tableRows}</tbody></table>`;
 
-  const printWindow = window.open("", "_blank");
+  const printWindow = window.open("", "", "width=1000,height=700");
   printWindow.document.write(`
     <html>
       <head>
@@ -238,38 +263,28 @@ const exportPDF = () => {
             background: linear-gradient(to right, #11375B, #1e4a7c);
             color: white;
           }
-          th, td { padding: 8px; border: 1px solid #ddd; }
-          th {
-            text-align: center;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-          }
-          td {
-            color: #11375B;
-          }
+          th, td { padding: 8px; border: 1px solid #ddd; text-align: center; }
+          td { color: #11375B; }
           tr:nth-child(even) { background-color: #f9f9f9; }
           tr:hover { background-color: #f1f5f9; }
           .footer { margin-top: 20px; text-align: right; font-size: 12px; color: #555; }
-          @media print {
-            body { margin: 0; }
-          }
+          @media print { body { margin: 0; } }
         </style>
       </head>
       <body>
         <h2>Purchase List</h2>
-        ${table.outerHTML}
+        ${printContent}
         <div class="footer">
           Printed on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
         </div>
       </body>
     </html>
   `);
-
   printWindow.document.close();
+  printWindow.focus();
   printWindow.print();
+  printWindow.close();
 };
-
   return (
     <div className=" md:p-2">
       <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-2 border border-gray-200">

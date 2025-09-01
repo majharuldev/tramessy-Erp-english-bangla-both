@@ -8,6 +8,10 @@ import { IoMdClose } from "react-icons/io";
 import { RiHomeOfficeLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import Pagination from "../../../components/Shared/Pagination";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Office = () => {
   const [office, setOffice] = useState([]);
@@ -79,17 +83,136 @@ const Office = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.ceil(office.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+  const totalPages = Math.ceil(filteredOfficeList.length / itemsPerPage);
+
+  // Export to Excel
+const exportOfficeToExcel = () => {
+  const tableData = filteredOfficeList.map((office, index) => ({
+    "SL.": index + 1,
+    Date: office.date,
+    Branch: office.branch_name,
+    Address: office.address,
+    "Opening Balance": office.opening_balance,
+    "Factory/Company": office.factory_name,
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(tableData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Offices");
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+  });
+
+  const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+  saveAs(data, "Office_data.xlsx");
+};
+
+// Export to PDF
+const exportOfficeToPDF = () => {
+  const doc = new jsPDF("landscape");
+
+  const tableColumn = [
+    "SL.",
+    "Date",
+    "Branch",
+    "Address",
+    "Opening Balance",
+    "Factory/Company",
+  ];
+
+  const tableRows = filteredOfficeList.map((office, index) => [
+    index + 1,
+    office.date,
+    office.branch_name,
+    office.address,
+    office.opening_balance,
+    office.factory_name,
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 20,
+    styles: { fontSize: 10, cellPadding: 3 },
+    headStyles: {
+      fillColor: [17, 55, 91],
+      textColor: [255, 255, 255],
+      halign: "left",
+    },
+    bodyStyles: { textColor: [17, 55, 91] },
+    alternateRowStyles: { fillColor: [240, 240, 240] },
+    theme: "grid",
+  });
+
+  doc.save("Office_data.pdf");
+};
+
+// Print
+const printOfficeTable = () => {
+  const tableHeader = `
+    <thead>
+      <tr>
+        <th>SL.</th>
+        <th>Date</th>
+        <th>Branch</th>
+        <th>Address</th>
+        <th>Opening Balance</th>
+        <th>Factory/Company</th>
+      </tr>
+    </thead>
+  `;
+
+  const tableRows = filteredOfficeList
+    .map(
+      (office, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${office.date || ""}</td>
+        <td>${office.branch_name || ""}</td>
+        <td>${office.address || ""}</td>
+        <td>${office.opening_balance || ""}</td>
+        <td>${office.factory_name || ""}</td>
+      </tr>
+    `
+    )
+    .join("");
+
+  const printContent = `
+    <table>
+      ${tableHeader}
+      <tbody>${tableRows}</tbody>
+    </table>
+  `;
+
+  const WinPrint = window.open("", "", "width=900,height=650");
+  WinPrint.document.write(`
+    <html>
+      <head>
+        <title>Office List</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h3 { text-align: center; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+          thead { background-color: #11375B; color: white; }
+          tbody tr:nth-child(odd) { background-color: #f3f4f6; }
+        </style>
+      </head>
+      <body>
+        <h3>Office List</h3>
+        ${printContent}
+      </body>
+    </html>
+  `);
+
+  WinPrint.document.close();
+  WinPrint.focus();
+  WinPrint.print();
+  WinPrint.close();
+};
+
   return (
     <div className=" md:p-2">
       <Toaster />
@@ -108,7 +231,28 @@ const Office = () => {
           </div>
         </div>
         <div className="md:flex justify-between items-center">
-          <div></div>
+          <div className="flex gap-1 md:gap-3 flex-wrap">
+            <button
+              onClick={exportOfficeToExcel}
+              className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer"
+            >
+              Excel
+            </button>
+
+            <button
+              onClick={exportOfficeToPDF}
+              className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer"
+            >
+              PDF
+            </button>
+
+            <button
+              onClick={printOfficeTable}
+              className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer"
+            >
+              Print
+            </button>
+          </div>
           {/* search */}
           <div className="mt-3 md:mt-0">
             <span className="text-primary font-semibold pr-3">Search: </span>

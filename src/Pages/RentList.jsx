@@ -50,76 +50,111 @@ const RentList = () => {
 
   // export
   const exportExcel = () => {
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, "Fuel Data");
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(data, "fuel_data.xlsx");
-  };
+  const worksheet = XLSX.utils.json_to_sheet(
+    filteredFuel.map((dt, index) => ({
+      "#": index + 1,
+      Driver: dt.vendor_name,
+      Vehicle: dt.vehicle_name_model,
+      Category: dt.vehicle_category,
+      Size: dt.vehicle_size_capacity,
+      RegiNo: dt.registration_number,
+      Status: dt.status,
+    }))
+  );
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Rent Data");
+
+  XLSX.writeFile(workbook, "rent_data.xlsx");
+};
+
+
   const exportPDF = () => {
-    const doc = new jsPDF();
+  const doc = new jsPDF("landscape");
 
-    const tableColumn = [
-      "#",
-      "ড্রাইভারের নাম",
-      "গাড়ির নাম",
-      "ফুয়েলের ধরন",
-      "ফুয়েলিং তারিখ",
-      "গ্যালন/লিটার",
-      "লিটার প্রতি খরচ",
-      "সকল খরচ",
-    ];
+  const tableColumn = [
+    "#",
+    "Vendor/Driver",
+    "Vehicle",
+    "Category",
+    "Size/Capacity",
+    "Regi.No",
+    "Status",
+  ];
 
-    const tableRows = fuel.map((dt, index) => [
-      index + 1,
-      dt.driver_name,
-      dt.driver_name,
-      dt.type,
-      dt.date_time,
-      dt.quantity,
-      dt.price,
-      dt.quantity * dt.price,
-    ]);
+  const tableRows = filteredFuel.map((dt, index) => [
+    index + 1,
+    dt.vendor_name,
+    dt.vehicle_name_model,
+    dt.vehicle_category,
+    dt.vehicle_size_capacity,
+    dt.registration_number,
+    dt.status,
+  ]);
 
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-    });
-
-    doc.save("fuel_data.pdf");
-  };
-  const printTable = () => {
-    // hide specific column
-    const actionColumns = document.querySelectorAll(".action_column");
-    actionColumns.forEach((col) => {
-      col.style.display = "none";
-    });
-    const printContent = document.querySelector("table").outerHTML;
-    const WinPrint = window.open("", "", "width=900,height=650");
-    WinPrint.document.write(`
-    <html>
-        <head>
-          <title>Print</title>
-          <style>
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
-          </style>
-        </head>
-        <body>${printContent}</body>
-      </html>
-  `);
-    WinPrint.document.close();
-    WinPrint.focus();
-    WinPrint.print();
-    WinPrint.close();
-    // fallback: just in case (immediate reset)
-  actionColumns.forEach((col) => {
-    col.style.display = "";
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 20,
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [17, 55, 91] },
   });
-  };
+
+  doc.save("rent_data.pdf");
+};
+
+
+  const printTable = () => {
+  const tableHeader = `
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Vendor/Driver</th>
+        <th>Vehicle</th>
+        <th>Category</th>
+        <th>Size/Capacity</th>
+        <th>Regi.No</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+  `;
+
+  const tableRows = filteredFuel.map((dt, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${dt.vendor_name}</td>
+      <td>${dt.vehicle_name_model}</td>
+      <td>${dt.vehicle_category}</td>
+      <td>${dt.vehicle_size_capacity}</td>
+      <td>${dt.registration_number}</td>
+      <td>${dt.status}</td>
+    </tr>
+  `).join("");
+
+  const printContent = `
+    <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%">
+      ${tableHeader}
+      <tbody>${tableRows}</tbody>
+    </table>
+  `;
+
+  const WinPrint = window.open("", "", "width=1200,height=800");
+  WinPrint.document.write(`
+    <html>
+      <head><title>Print</title></head>
+      <body>
+        <h2 style="text-align:center;">All Rent Vehicle</h2>
+        ${printContent}
+      </body>
+    </html>
+  `);
+
+  WinPrint.document.close();
+  WinPrint.focus();
+  WinPrint.print();
+  WinPrint.close();
+};
+
   // delete by id
   const handleDelete = async (id) => {
     try {

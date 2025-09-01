@@ -1,10 +1,13 @@
 
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import { MdOutlineArrowDropDown } from "react-icons/md";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaFilter } from "react-icons/fa6";
 import { IoIosRemoveCircle } from "react-icons/io";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const OfficeLedger = () => {
   const [branch, setBranch] = useState([]);
@@ -114,6 +117,128 @@ const closingBalance =
     ? branchDataWithBalance[branchDataWithBalance.length - 1].runningBalance
     : openingBalance;
 
+
+    // ================= Excel Export =================
+const exportExcel = () => {
+  const wsData = branchDataWithBalance.map((item, i) => ({
+    SL: i + 1,
+    Date: item.date,
+    Particulars: item.remarks || "--",
+    Mode: item.mode || "--",
+    Destination: item.unload_point || "--",
+    Due: item.due || "--",
+    CashIn: item.cash_in || "--",
+    CashOut: item.cash_out || "--",
+    Balance: item.runningBalance,
+    Ref: item.ref || "--",
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(wsData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Office Ledger");
+  XLSX.writeFile(wb, `Office_Ledger_${selectedBranch || "All"}.xlsx`);
+
+  toast.success("Excel file downloaded!");
+};
+
+// ================= PDF Export =================
+const exportPDF = () => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text(`Office Ledger - ${selectedBranch}`, 14, 15);
+
+  autoTable(doc, {
+    head: [[
+      "SL", "Date", "Particulars", "Mode", "Destination", "Due",
+      "CashIn", "CashOut", "Balance", "Ref"
+    ]],
+    body: branchDataWithBalance.map((item, i) => [
+      i + 1,
+      item.date,
+      item.remarks || "--",
+      item.mode || "--",
+      item.unload_point || "--",
+      item.due || "--",
+      item.cash_in || "--",
+      item.cash_out || "--",
+      item.runningBalance,
+      item.ref || "--",
+    ]),
+    startY: 25,
+    theme: "grid",
+    headStyles: {
+      fillColor: [17, 55, 91],
+      textColor: 255,
+    },
+    styles: { fontSize: 8 },
+  });
+
+  doc.save(`Office_Ledger_${selectedBranch || "All"}.pdf`);
+  toast.success("PDF file downloaded!");
+};
+
+// ================= Print =================
+const printTable = () => {
+  const printWindow = window.open("", "", "width=900,height=650");
+  const tableHTML = `
+    <html>
+      <head>
+        <title>Office Ledger - ${selectedBranch}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h2 { color: #11375B; text-align: center; font-size: 20px; margin-bottom: 10px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+          thead tr { background: #11375B; color: white; }
+          th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
+          tr:nth-child(even) { background-color: #f9f9f9; }
+        </style>
+      </head>
+      <body>
+        <h2>Office Ledger - ${selectedBranch}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>SL</th>
+              <th>Date</th>
+              <th>Particulars</th>
+              <th>Mode</th>
+              <th>Destination</th>
+              <th>Due</th>
+              <th>CashIn</th>
+              <th>CashOut</th>
+              <th>Balance</th>
+              <th>Ref</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${branchDataWithBalance
+              .map(
+                (item, i) => `
+              <tr>
+                <td>${i + 1}</td>
+                <td>${item.date}</td>
+                <td>${item.remarks || "--"}</td>
+                <td>${item.mode || "--"}</td>
+                <td>${item.unload_point || "--"}</td>
+                <td>${item.due || "--"}</td>
+                <td>${item.cash_in || "--"}</td>
+                <td>${item.cash_out || "--"}</td>
+                <td>${item.runningBalance}</td>
+                <td>${item.ref || "--"}</td>
+              </tr>`
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `;
+  printWindow.document.write(tableHTML);
+  printWindow.document.close();
+  printWindow.print();
+};
+
   return (
     <main className=" md:p-2 overflow-hidden">
       <Toaster />
@@ -136,13 +261,13 @@ const closingBalance =
         {/* Export and Branch Selection */}
         <div className="md:flex items-center justify-between mb-4">
           <div className="flex gap-1 md:gap-3 flex-wrap">
-            <button className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={exportExcel} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
               Excel
             </button>
-            <button className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={exportPDF} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
               PDF
             </button>
-            <button className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={printTable} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
               Print
             </button>
           </div>
@@ -246,7 +371,7 @@ const closingBalance =
                     {dt.date}
                   </td>
                   <td className="border border-gray-700 px-2 py-1">
-                    {dt.remarks || "--"}
+                    {dt?.remarks || "--"}
                   </td>
                   <td className="border border-gray-700 px-2 py-1">
                     {dt.mode || "--"}

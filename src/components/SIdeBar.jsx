@@ -194,11 +194,24 @@ const Sidebar = () => {
                           <span>All Vendor List</span>
                         </Link>
                       </li>
+                      <li>
+                        <Link
+                          to="/tramessy/RentList"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
+                            isActive("/tramessy/RentList")
+                              ? "text-white bg-primary"
+                              : "text-gray-500 hover:text-primary"
+                          }`}
+                        >
+                          
+                          <span>Rent Vehicle List</span>
+                        </Link>
+                      </li>
                     </ul>
                   </div>
                 </li>
                 {/* Rent management */}
-                <li className="text-primary font-medium rounded-sm">
+                {/* <li className="text-primary font-medium rounded-sm">
                   <div
                     onClick={() => toggleMenu("rentVehicle")}
                     className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
@@ -237,7 +250,7 @@ const Sidebar = () => {
                       </li>
                     </ul>
                   </div>
-                </li>
+                </li> */}
                 {/* HR management */}
                 <li className="text-primary font-medium rounded-sm">
                   {/* HR main toggle */}

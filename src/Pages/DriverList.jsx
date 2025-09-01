@@ -92,7 +92,7 @@ const CarList = () => {
   };
   // export functionality
   const exportDriversToExcel = () => {
-    const tableData = currentDrivers.map((driver, index) => ({
+    const tableData = filteredDriver.map((driver, index) => ({
       "SL.": indexOfFirstItem + index + 1,
       Name: driver.driver_name,
       Mobile: driver.driver_mobile,
@@ -129,7 +129,7 @@ const CarList = () => {
       "Status",
     ];
 
-    const tableRows = currentDrivers.map((driver, index) => [
+    const tableRows = filteredDriver.map((driver, index) => [
       indexOfFirstItem + index + 1,
       driver.driver_name,
       driver.driver_mobile,
@@ -164,46 +164,105 @@ const CarList = () => {
 
     doc.save("drivers_data.pdf");
   };
-  const printDriversTable = () => {
-    // Hide Action column
-    const actionColumns = document.querySelectorAll(".action_column");
-    actionColumns.forEach((col) => {
-      col.style.display = "none";
-    });
+  // const printDriversTable = () => {
+  //   // Hide Action column
+  //   const actionColumns = document.querySelectorAll(".action_column");
+  //   actionColumns.forEach((col) => {
+  //     col.style.display = "none";
+  //   });
 
-    const printContent = document.querySelector("table").outerHTML;
-    const WinPrint = window.open("", "", "width=900,height=650");
+  //   const printContent = document.querySelector("table").outerHTML;
+  //   const WinPrint = window.open("", "", "width=900,height=650");
 
-    WinPrint.document.write(`
-    <html>
-    <head>
-      <title>Print</title>
-      <style>
-        table { width: 100%; border-collapse: collapse; font-family: Arial; }
-        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
-        thead { background-color: #11375B; color: white; }
-        tbody tr:nth-child(odd) { background-color: #f3f4f6; }
-      </style>
-    </head>
-    <body>
-      <h3>Driver List</h3>
-      ${printContent}
-    </body>
-    </html>
-  `);
+  //   WinPrint.document.write(`
+  //   <html>
+  //   <head>
+  //     <title>Print</title>
+  //     <style>
+  //       table { width: 100%; border-collapse: collapse; font-family: Arial; }
+  //       th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+  //       thead { background-color: #11375B; color: white; }
+  //       tbody tr:nth-child(odd) { background-color: #f3f4f6; }
+  //     </style>
+  //   </head>
+  //   <body>
+  //     <h3>Driver List</h3>
+  //     ${printContent}
+  //   </body>
+  //   </html>
+  // `);
 
-    WinPrint.document.close();
-    WinPrint.focus();
-    WinPrint.print();
-    WinPrint.close();
+  //   WinPrint.document.close();
+  //   WinPrint.focus();
+  //   WinPrint.print();
+  //   WinPrint.close();
 
-    // Restore Action column
-    actionColumns.forEach((col) => {
-      col.style.display = "";
-    });
-  };
+  //   // Restore Action column
+  //   actionColumns.forEach((col) => {
+  //     col.style.display = "";
+  //   });
+  // };
 
   // search
+  
+  const printDriversTable = () => {
+  const printWindow = window.open('', '', 'height=600,width=800');
+  
+  let printContent = `
+    <html>
+      <head>
+        <title>Driver Report</title>
+        <style>
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+          }
+          th {
+            background: #f2f2f2;
+          }
+        </style>
+      </head>
+      <body>
+        <h2>Driver Report</h2>
+        <table>
+          <thead>
+            <tr>
+                <th>Name</th>
+              <th>Mobile</th>
+              <th>Address</th>
+              <th>Emergency Contact</th>
+              <th>License</th>
+              <th>License Expire Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredDriver.map(d => `
+              <tr>
+               <td>${d.driver_name || ""}</td>
+                  <td>${d.driver_mobile || ""}</td>
+                  <td>${d.address || ""}</td>
+                  <td>${d.emergency_contact || ""}</td>
+                  <td>${d.license || ""}</td>
+                  <td>${d.license_expire_date || ""}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `;
+
+  printWindow.document.write(printContent);
+  printWindow.document.close();
+  printWindow.print();
+};
+
+
   const filteredDriver = drivers.filter((driver) => {
     const term = searchTerm.toLowerCase();
     return (
@@ -224,17 +283,8 @@ const CarList = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.ceil(drivers.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+  const totalPages = Math.ceil(filteredDriver.length / itemsPerPage);
+
   return (
     <main className=" md:p-2">
       <Toaster />
@@ -313,8 +363,8 @@ const CarList = () => {
                 <th className="p-2">SL.</th>
                 <th className="p-2">Name</th>
                 <th className="p-2">Mobile</th>
-                <th className="p-2">Address</th>
-                <th className="p-2">Emergency</th>
+                <th className="p-2 w-40">Address</th>
+                {/* <th className="p-2">Emergency</th> */}
                 <th className="p-2">License</th>
                 <th className="p-2">Expired</th>
                 <th className="p-2">Status</th>
@@ -339,7 +389,7 @@ const CarList = () => {
                   <td className="p-2">{driver.driver_name}</td>
                   <td className="p-2">{driver.driver_mobile}</td>
                   <td className="p-2">{driver.address}</td>
-                  <td className="p-2">{driver.emergency_contact}</td>
+                  {/* <td className="p-2">{driver.emergency_contact}</td> */}
                   <td className="p-2">{driver.license}</td>
                   <td className="p-2">{driver.license_expire_date}</td>
                   <td className="p-2">

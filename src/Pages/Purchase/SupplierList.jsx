@@ -42,7 +42,7 @@ const SupplierList = () => {
    const filteredSupply = supply.filter((dt) => {
     const term = searchTerm.toLowerCase();
     return (
-      dt.business_name?.toLowerCase().includes(term) ||
+      dt.supplier_name?.toLowerCase().includes(term) ||
       dt.phone?.toLowerCase().includes(term) ||
       dt.address?.toLowerCase().includes(term) ||
       dt.status?.toLowerCase().includes(term)
@@ -102,16 +102,7 @@ const SupplierList = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentSupplier = filteredSupply.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredSupply.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+ 
   if (loading) return <p className="text-center mt-16">Loading data...</p>;
   return (
     <div className=" md:p-2">
@@ -189,7 +180,7 @@ const SupplierList = () => {
                     {indexOfFirstItem + index + 1}.
                   </td>
                   <td className="p-2">{dt.date}</td>
-                  <td className="p-2">{dt.business_name}</td>
+                  <td className="p-2">{dt.supplier_name}</td>
                   <td className="p-2">{dt.business_category}</td>
                   <td className="p-2">{dt.phone}</td>
                   <td className="p-2">{dt.address}</td>
@@ -281,7 +272,7 @@ const SupplierList = () => {
               <ul className="flex border border-gray-300">
                 <li className="w-[428px] flex text-primary font-semibold text-sm px-3 py-2 border-r border-gray-300">
                   <p className="w-48">Business Name:</p>{" "}
-                  <p>{selectedSupply.business_name}</p>
+                  <p>{selectedSupply?.supplier_name}</p>
                 </li>
                 <li className="w-[428px] flex text-primary font-semibold text-sm px-3 py-2">
                   <p className="w-48">Phone:</p> <p>{selectedSupply.phone}</p>

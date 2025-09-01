@@ -124,72 +124,116 @@ const RoutePricing = () => {
     setIsModalOpen(true);
   };
 
-  //  Excel Export
-  const exportTripsToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(routePricing);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "RoutePricing");
-    XLSX.writeFile(workbook, "RoutePricing.xlsx");
-  };
-
-  //  PDF Export
-const exportTripsToPDF = () => {
-  const doc = new jsPDF();
-  doc.text("Route Pricing Report", 14, 10);
-  autoTable(doc, {
-    head: [["SL", "Customer", "Load Point", "Unload Point", "Rate"]],
-    body: routePricing.map((dt, index) => [
-      index + 1,
-      dt.customer_name || "-",
-      dt.vehicle_size,
-      dt.load_point,
-      dt.unload_point,
-      dt.rate,
-    ]),
-  });
-  doc.save("RoutePricing.pdf");
+  // Excel Export (filtered)
+const exportTripsToExcel = () => {
+  const worksheet = XLSX.utils.json_to_sheet(
+    filteredData.map((dt, index) => ({
+      SL: index + 1,
+      Customer: dt.customer_name,
+      "Vehicle Category": dt.vehicle_category,
+      Size: dt.vehicle_size,
+      "Load Point": dt.load_point,
+      "Unload Point": dt.unload_point,
+      Rate: dt.rate,
+    }))
+  );
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "RoutePricing");
+  XLSX.writeFile(workbook, "RoutePricing.xlsx");
 };
 
-  //  Print
-
-const printTripsTable = () => {
+// PDF Export (filtered)
+const exportTripsToPDF = () => {
   const doc = new jsPDF();
+  doc.setFontSize(18);
+  doc.text("Route Pricing Report", 14, 15);
 
-  const table = document.querySelector("#pricingTable table");
-  if (!table) {
-    console.error("Table not found!");
-    return;
-  }
-
-  const headers = [];
-  table.querySelectorAll("thead tr th").forEach((th) => {
-    if (th.innerText.trim() !== "Action") {
-      headers.push(th.innerText.trim());
-    }
-  });
-
-  const data = [];
-  table.querySelectorAll("tbody tr").forEach((row) => {
-    const rowData = [];
-    row.querySelectorAll("td").forEach((td, idx) => {
-      if (headers[idx]) {
-        rowData.push(td.innerText.trim());
-      }
-    });
-    if (rowData.length > 0) data.push(rowData);
-  });
+  // Table body
+  const tableData = filteredData.map((dt, index) => [
+    index + 1,
+    dt.customer_name || "-",
+    dt.vehicle_category,
+    dt.vehicle_size,
+    dt.load_point,
+    dt.unload_point,
+    dt.rate,
+  ]);
 
   autoTable(doc, {
-    head: [headers],
-    body: data,
+    head: [["SL", "Customer", "Vehicle Category", "Size", "Load Point", "Unload Point", "Rate"]],
+    body: tableData,
+    startY: 25,
     theme: "grid",
-    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-    styles: { halign: "center" },
+    headStyles: { fillColor: [17, 55, 91], textColor: 255 },
+    styles: { fontSize: 9, cellPadding: 2, halign: "center" },
   });
 
-  //  Save না করে সরাসরি Print Dialog ওপেন
-  doc.autoPrint();
-  window.open(doc.output("bloburl"), "_blank");
+  doc.save("RoutePricing.pdf");
+  toast.success("PDF downloaded!");
+};
+
+// Print Table (filtered)
+const printTripsTable = () => {
+  const printWindow = window.open("", "", "width=1000,height=700");
+  const tableRows = filteredData
+    .map(
+      (dt, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${dt.customer_name || "-"}</td>
+        <td>${dt.vehicle_category || "-"}</td>
+        <td>${dt.vehicle_size || "-"}</td>
+        <td>${dt.load_point || "-"}</td>
+        <td>${dt.unload_point || "-"}</td>
+        <td>${dt.rate || "-"}</td>
+      </tr>`
+    )
+    .join("");
+
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Route Pricing</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h2 { color: #11375B; text-align: center; font-size: 22px; margin-bottom: 10px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+          th, td { padding: 8px; border: 1px solid #ddd; text-align: center; }
+          th { background-color: #11375B; color: white; }
+          tr:nth-child(even) { background-color: #f9f9f9; }
+          tr:hover { background-color: #f1f5f9; }
+          .footer { margin-top: 20px; text-align: right; font-size: 12px; color: #555; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <h2>Route Pricing Report</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>SL</th>
+              <th>Customer</th>
+              <th>Vehicle Category</th>
+              <th>Size</th>
+              <th>Load Point</th>
+              <th>Unload Point</th>
+              <th>Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+        <div class="footer">
+          Printed on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+        </div>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
 };
 
 

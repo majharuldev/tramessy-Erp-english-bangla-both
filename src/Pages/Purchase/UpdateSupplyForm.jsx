@@ -18,7 +18,7 @@ const UpdateSupplyForm = () => {
     phone,
     address,
     due_amount,
-    business_name,
+    supplier_name,
     contact_person_name,
     business_category,
     status,
@@ -90,9 +90,9 @@ const UpdateSupplyForm = () => {
             </div>
             <div className="w-full">
               <InputField
-                name="business_name"
+                name="supplier_name"
                 label="Supplier Name"
-                defaultValue={business_name}
+                defaultValue={supplier_name}
               />
             </div>
             <div className="w-full">

@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext();
 
@@ -7,6 +7,31 @@ const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+
+    const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
+
+  // check expiration (24h = 86400000ms)
+  useEffect(() => {
+    if (user?.loginTime) {
+      const now = Date.now();
+      const diff = now - user.loginTime;
+
+      if (diff > 24 * 60 * 60 * 1000) {
+        logout();
+      } else {
+        // auto logout timer set করে দিচ্ছি
+        const remaining = 24 * 60 * 60 * 1000 - diff;
+        const timer = setTimeout(() => {
+          logout();
+        }, remaining);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [user]);
 
   const login = async (email, password) => {
     try {
@@ -19,8 +44,12 @@ const AuthProvider = ({ children }) => {
       const data = await res.json();
 
       if (res.ok) {
-        setUser(data);
-        localStorage.setItem("user", JSON.stringify(data));
+         const loginData = {
+          ...data,
+          loginTime: Date.now(),
+        };
+        setUser(loginData);
+        localStorage.setItem("user", JSON.stringify(loginData));
         return { success: true };
       } else {
         return { success: false, message: data?.message || "Login failed" };
@@ -28,11 +57,6 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       return { success: false, message: error.message };
     }
-  };
-  console.log("user", user);
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
   };
 
   const value = { user, login, logout };

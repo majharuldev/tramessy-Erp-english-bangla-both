@@ -206,18 +206,61 @@ const DriverReport = () => {
   };
 
   // Print
-  const printReport = () => {
-    const html = document.getElementById("driver-report").outerHTML;
-    const w = window.open("", "", "width=900,height=650");
-    w.document.write(
-      `<html><head><title>Driver Monthly Report</title>
-      <style>table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px}thead{background:#11375B;color:#fff}</style>
-      </head><body><h3>Driver Monthly Report</h3>${html}</body></html>`
-    );
-    w.document.close();
-    w.print();
-    w.close();
-  };
+  // Print full filtered report
+const printReport = () => {
+  // Generate table rows for all filtered data
+  const bodyRows = monthlyDriverStats.map((d, i) => `
+    <tr>
+      <td style="border:1px solid #ccc;padding:6px;text-align:center">${i + 1}</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:center">${d.month}</td>
+      <td style="border:1px solid #ccc;padding:6px">${d.name}</td>
+      <td style="border:1px solid #ccc;padding:6px">${d.mobile}</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:center">${d.totalTrips}</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:right">${d.totalRent}</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:right">${d.totalExp}</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:right;color:${d.totalProfit >= 0 ? 'green':'red'}">${d.totalProfit}</td>
+    </tr>
+  `).join("");
+
+  const totalRow = `
+    <tr style="font-weight:bold;background:#f0f0f0">
+      <td colspan="4" style="border:1px solid #ccc;padding:6px;text-align:right">Total:</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:center">${totalTrips}</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:right">${totalRent}</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:right">${totalExp}</td>
+      <td style="border:1px solid #ccc;padding:6px;text-align:right;color:${totalProfit >= 0 ? 'green':'red'}">${totalProfit}</td>
+    </tr>
+  `;
+
+  const html = `
+    <table style="width:100%;border-collapse:collapse">
+      <thead style="background:#11375B;color:white">
+        <tr>
+          <th style="border:1px solid #ccc;padding:6px">SL</th>
+          <th style="border:1px solid #ccc;padding:6px">Month</th>
+          <th style="border:1px solid #ccc;padding:6px">Driver</th>
+          <th style="border:1px solid #ccc;padding:6px">Mobile</th>
+          <th style="border:1px solid #ccc;padding:6px">Trips</th>
+          <th style="border:1px solid #ccc;padding:6px">Income</th>
+          <th style="border:1px solid #ccc;padding:6px">Expense</th>
+          <th style="border:1px solid #ccc;padding:6px">Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${bodyRows}
+      </tbody>
+      <tfoot>
+        ${totalRow}
+      </tfoot>
+    </table>
+  `;
+
+  const w = window.open("", "", "width=900,height=650");
+  w.document.write(`<html><head><title>Driver Monthly Report</title></head><body><h3>Driver Monthly Report</h3>${html}</body></html>`);
+  w.document.close();
+  w.print();
+  w.close();
+};
 
   // Grand Totals
 const totalTrips = monthlyDriverStats.reduce((sum, d) => sum + d.totalTrips, 0);
@@ -233,16 +276,6 @@ const totalProfit = monthlyDriverStats.reduce((sum, d) => sum + d.totalProfit, 0
     indexOfLastItem
   );
   const totalPages = Math.ceil(monthlyDriverStats.length / itemsPerPage);
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
 
   // Loading state
   if (loading)
