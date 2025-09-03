@@ -287,10 +287,10 @@ const exportPDF = () => {
 };
   return (
     <div className=" md:p-2">
-      <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-2 border border-gray-200">
+      <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-4 border border-gray-200">
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-primary flex items-center gap-3">
-            <FaUserSecret className="text-primary text-2xl" />
+          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
+            <FaUserSecret className="text-gray-800 text-2xl" />
            Official Products List
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
@@ -301,7 +301,7 @@ const exportPDF = () => {
               <FaFilter /> Filter
             </button>
             <Link to="/tramessy/Purchase/add-officialProduct">
-              <button className="bg-gradient-to-r from-primary to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
+              <button className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
                 <FaPlus />Official Product
               </button>
             </Link>
@@ -309,32 +309,32 @@ const exportPDF = () => {
         </div>
         {/* export */}
         <div className="md:flex justify-between items-center">
-          <div className="flex gap-1 md:gap-3 text-primary font-semibold rounded-md">
+          <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
             <button
               onClick={exportExcel}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 shadow hover:bg-primary bg-white hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               Excel
             </button>
             <button
               onClick={exportPDF}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 shadow hover:bg-primary bg-white hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               PDF
             </button>
             <button
               onClick={printTable}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 shadow hover:bg-primary bg-white hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               Print
             </button>
           </div>
           {/* search */}
           <div className="mt-3 md:mt-0">
-            <span className="text-primary font-semibold pr-3">Search: </span>
+            {/* <span className="text-primary font-semibold pr-3">Search: </span> */}
             <input
               type="text"
-              // value={searchTerm}
+              value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
@@ -386,7 +386,7 @@ const exportPDF = () => {
                   setVehicleFilter("");
                   setShowFilter(false);
                 }}
-                className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-2 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                className="bg-primary text-white px-2 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
                 <FaFilter /> Clear 
               </button>
@@ -395,7 +395,7 @@ const exportPDF = () => {
         )}
         <div id="purchaseTable" className="mt-5 overflow-x-auto rounded-xl">
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-primary text-white capitalize text-xs border border-gray-600">
+            <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr>
                 <th className="p-2">SL.</th>
                 <th className="p-2">Product ID</th>
@@ -410,7 +410,7 @@ const exportPDF = () => {
                 <th className="p-2">Action</th>
               </tr>
             </thead>
-            <tbody className="text-primary">
+            <tbody className="text-gray-700">
               { currentPurchase.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="text-center p-4 text-gray-500">

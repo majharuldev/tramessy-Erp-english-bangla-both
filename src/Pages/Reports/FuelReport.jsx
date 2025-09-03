@@ -277,20 +277,20 @@ const handlePrint = () => {
 
 
   return (
-    <div className="md:p-2">
+    <div className="p-2">
       <div 
         ref={reportRef}
         className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-8 border border-gray-200"
       >
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
+          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
             Fuel Cost Report from Trips
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <button
               onClick={() => setShowFilter(prev => !prev)}
-              className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               <FaFilter /> Filter
             </button>
@@ -299,22 +299,22 @@ const handlePrint = () => {
 
         {/* Export and Search */}
         <div className="md:flex justify-between items-center">
-          <div className="flex gap-1 md:gap-3 text-primary font-semibold rounded-md">
+          <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
             <button 
               onClick={handleExcelExport}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer flex items-center gap-2"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer flex items-center gap-2"
             >
               <FaFileExcel /> Excel
             </button>
             <button 
               onClick={handlePdfExport}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer flex items-center gap-2"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer flex items-center gap-2"
             >
               <FaFilePdf /> PDF
             </button>
             <button 
               onClick={handlePrint}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer flex items-center gap-2"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer flex items-center gap-2"
             >
               Print
             </button>
@@ -404,7 +404,7 @@ const handlePrint = () => {
         {!loading && (
           <div id="fuelReport" className="mt-5 overflow-x-auto rounded-xl">
             <table className="min-w-full text-sm text-left">
-              <thead className="bg-primary text-white capitalize text-xs">
+              <thead className="bg-gray-200 text-primary capitalize text-xs">
                 <tr>
                   <th className="p-3">Date</th>
                   <th className="p-3">Ref ID</th>
@@ -417,7 +417,7 @@ const handlePrint = () => {
                   {/* <th className="p-3">Fuel %</th> */}
                 </tr>
               </thead>
-              <tbody className="text-primary">
+              <tbody className="text-gray-700">
                 {currentItems.length > 0 ? (
                   currentItems.map((item, index) => (
                     <tr key={index} className="hover:bg-gray-50 transition-all border border-gray-200">

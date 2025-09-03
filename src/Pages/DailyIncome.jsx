@@ -176,12 +176,12 @@ const totalProfit = totalRent - totalExpense;
   const totalPages = Math.ceil(filteredIncome.length / itemsPerPage)
 
   return (
-    <main className="md:p-2">
+    <main className="p-2">
       <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-4 border border-gray-200">
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
-            <FaTruck className="text-[#11375B] text-2xl" />
+          <h1 className="text-xl font-bold text-gray-700 flex items-center gap-3">
+            <FaTruck className="text-gray-700 text-2xl" />
             Income List
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
@@ -195,32 +195,32 @@ const totalProfit = totalRent - totalExpense;
         </div>
         {/* Export & Search */}
         <div className="md:flex justify-between items-center">
-          <div className="flex flex-wrap md:flex-row gap-1 md:gap-3 text-primary font-semibold rounded-md">
+          <div className="flex flex-wrap md:flex-row gap-1 md:gap-3 text-gray-700 font-semibold rounded">
             <CSVLink
               data={csvData}
               headers={headers}
               filename={"dailyincome_data.csv"}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-cyan-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               CSV
             </CSVLink>
             <button
               onClick={exportExcel}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow   hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaFileExcel className="" />
               Excel
             </button>
             <button
               onClick={exportPDF}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow   hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaFilePdf className="" />
               PDF
             </button>
             <button
               onClick={printTable}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white  shadow hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaPrint className="" />
               Print
@@ -311,7 +311,7 @@ const totalProfit = totalRent - totalExpense;
         {/* Table */}
         <div className="mt-5 overflow-x-auto rounded-xl border border-gray-200">
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-[#11375B] text-white capitalize text-xs">
+            <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr>
                 <th className="px-4 py-3">#</th>
                 <th className="px-4 py-3">Date</th>

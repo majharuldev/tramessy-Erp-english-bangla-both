@@ -41,24 +41,15 @@ const totalAmount = payment.reduce(
     indexOfLastItem
   );
   const totalPages = Math.ceil(payment.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
+  
 
   if (loading) return <p className="text-center mt-16">Loading payment...</p>;
   return (
     <div className="md:p-2 ">
       <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-6 border border-gray-200">
         <div className="md:flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-primary flex items-center gap-2 ">
-                          <MdOutlineAirplaneTicket className="text-[#11375B] text-2xl" />
+          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 ">
+                          <MdOutlineAirplaneTicket className="text-gray-800 text-2xl" />
                           Vendor Payment
                         </h2>
           <div className="mt-3 md:mt-0 flex gap-2">
@@ -71,7 +62,7 @@ const totalAmount = payment.reduce(
         </div>
         <div className="mt-5 overflow-x-auto rounded-xl">
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-[#11375B] text-white capitalize text-xs">
+            <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr>
                 <th className="px-2 py-3">SL.</th>
                 <th className="px-2 py-3">Date</th>

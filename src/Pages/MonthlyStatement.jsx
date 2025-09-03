@@ -18,8 +18,6 @@ const MonthlyStatement = () => {
   const [selectedMonth, setSelectedMonth] = useState(""); // For month filter
   const [availableMonths, setAvailableMonths] = useState([]); 
 
-  
-
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -256,10 +254,10 @@ const MonthlyStatement = () => {
   };
 
   return (
-    <div className="md:p-2">
+    <div className="p-2">
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+        <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
           <SlCalender className="text-lg" />
           Monthly Profit/loss Statement
         </h2>
@@ -305,19 +303,19 @@ const MonthlyStatement = () => {
       <div className="flex gap-2 flex-wrap mb-4">
         <button
           onClick={exportToExcel}
-          className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+          className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow rounded  hover:text-white transition-all duration-300 cursor-pointer"
         >
           <FaFileExcel /> Excel
         </button>
         <button
           onClick={exportToPDF}
-          className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+          className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  rounded hover:text-white transition-all duration-300 cursor-pointer"
         >
           <FaFilePdf /> PDF
         </button>
         <button
           onClick={handlePrint}
-          className="flex items-center gap-2 py-2 px-5 no-print hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+          className="flex items-center gap-2 py-1 px-5 no-print hover:bg-primary bg-white  rounded shadow hover:text-white transition-all duration-300 cursor-pointer"
         >
           <FaPrint /> Print
         </button>
@@ -329,9 +327,9 @@ const MonthlyStatement = () => {
         <p className="text-center py-10 text-gray-500">No data available for selected filter</p>
       ) : (
         <>
-          <div className="mt-5 overflow-x-auto rounded-xl border border-gray-200 print-table">
+          <div className="mt-5 overflow-x-auto rounded-md border border-gray-200 print-table">
             <table className="min-w-full text-sm text-left">
-              <thead className="bg-primary text-white capitalize text-xs">
+              <thead className="bg-gray-200 text-primary capitalize text-xs">
                 <tr>
                   <th className="p-2 border">#</th>
                   <th className="p-2 border">Month</th>

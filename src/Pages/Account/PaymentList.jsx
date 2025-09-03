@@ -352,8 +352,8 @@ const PaymentList = () => {
       <Toaster />
       <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-4 border border-gray-200">
         <div className="md:flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-primary flex items-center gap-2 ">
-                <FaUserSecret className="text-[#11375B] text-2xl" />
+          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 ">
+                <FaUserSecret className="text-gray-800 text-2xl" />
                 Payment 
               </h2>
           <div className="mt-3 md:mt-0 flex gap-2">
@@ -367,11 +367,11 @@ const PaymentList = () => {
         </div>
         {/* export and search */}
         <div className="md:flex justify-between items-center">
-          <div className="flex flex-wrap md:flex-row gap-1 md:gap-3 text-primary font-semibold rounded-md">
+          <div className="flex flex-wrap md:flex-row gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
 
             <button
                 onClick={exportToExcel}
-                className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaFileExcel className="" />
                 Excel
@@ -379,7 +379,7 @@ const PaymentList = () => {
             
               <button
                 onClick={exportToPDF}
-                className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaFilePdf className="" />
                 PDF
@@ -387,7 +387,7 @@ const PaymentList = () => {
             
               <button
                 onClick={handlePrint}
-                className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaPrint className="" />
                 Print
@@ -395,7 +395,7 @@ const PaymentList = () => {
           </div>
           {/* search */}
           <div className="mt-3 md:mt-0">
-            <span className="text-primary font-semibold pr-3">Search: </span>
+            {/* <span className="text-primary font-semibold pr-3">Search: </span> */}
             <input
               type="text"
               value={searchTerm}
@@ -457,22 +457,22 @@ const PaymentList = () => {
           </div>
         )}
 
-        <div className="mt-5 overflow-x-auto rounded-xl border border-gray-200">
+        <div className="mt-5 overflow-x-auto rounded-md border border-gray-200">
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-[#11375B] text-white capitalize text-xs">
+            <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr>
-                <th className="px-1 py-2">SL.</th>
-                <th className="px-1 py-2">Date</th>
-                <th className="px-1 py-2">Supplier Name</th>
-                <th className="px-1 py-2">Category</th>
-                <th className="px-1 py-2">Item Name</th>
-                <th className="px-1 py-2">Quantity</th>
-                <th className="px-1 py-2">Unit Price</th>
-                <th className="px-1 py-2">Total Amount</th>
-                <th className="px-1 py-2">Pay Amount</th>
-                <th className="px-1 py-2">Due Amount</th>
-                <th className="px-1 py-2">Status</th>
-                <th className="px-1 py-2">Action</th>
+                <th className="px-1 py-4">SL.</th>
+                <th className="px-1 py-4">Date</th>
+                <th className="px-1 py-4">Supplier Name</th>
+                <th className="px-1 py-4">Category</th>
+                <th className="px-1 py-4">Item Name</th>
+                <th className="px-1 py-4">Quantity</th>
+                <th className="px-1 py-4">Unit Price</th>
+                <th className="px-1 py-4">Total Amount</th>
+                <th className="px-1 py-4">Pay Amount</th>
+                <th className="px-1 py-4">Due Amount</th>
+                <th className="px-1 py-4">Status</th>
+                <th className="px-1 py-4">Action</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">

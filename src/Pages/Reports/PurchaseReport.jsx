@@ -287,20 +287,20 @@ const totalAmountOverall = filteredPurchases.reduce(
   const totalPages = Math.ceil(filteredPurchases.length / itemsPerPage);
 
   return (
-    <div className="md:p-2">
+    <div className="p-2">
       <div 
         ref={reportRef}
         className="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-4 border border-gray-200"
       >
         {/* Title */}
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-primary flex items-center gap-3">
-            <FaUserSecret className="text-primary text-2xl" />
+          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
+            <FaUserSecret className="text-gray-800 text-2xl" />
             Purchase Report
           </h1>
           <button
             onClick={() => setShowFilter(prev => !prev)}
-            className="bg-gradient-to-r from-primary to-blue-800 text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2"
+            className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2"
           >
             <FaFilter /> Filter
           </button>
@@ -369,19 +369,19 @@ const totalAmountOverall = filteredPurchases.reduce(
           <div className="flex gap-2">
             <button 
               onClick={exportExcel} 
-              className="py-2 px-5 bg-gray-200 rounded hover:bg-primary hover:text-white flex items-center gap-2"
+              className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white flex items-center gap-2"
             >
               <FaFileExcel /> Excel
             </button>
             <button 
               onClick={exportPdf} 
-              className="py-2 px-5 bg-gray-200 rounded hover:bg-primary hover:text-white flex items-center gap-2"
+              className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white flex items-center gap-2"
             >
               <FaFilePdf /> PDF
             </button>
             <button 
               onClick={handlePrint} 
-              className="py-2 px-5 bg-gray-200 rounded hover:bg-primary hover:text-white flex items-center gap-2"
+              className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white flex items-center gap-2"
             >
               <FaPrint /> Print
             </button>
@@ -412,7 +412,7 @@ const totalAmountOverall = filteredPurchases.reduce(
         {/* Table */}
         <div id="purchaseReport" className="overflow-x-auto rounded-xl">
           <table className="min-w-full text-sm text-left ">
-            <thead className="bg-primary text-white ">
+            <thead className="bg-gray-200 text-primary">
               <tr>
                 <th className="p-2">#</th>
                 <th className="p-2">Date</th>
@@ -424,7 +424,7 @@ const totalAmountOverall = filteredPurchases.reduce(
                 <th className="p-2">Total</th>
               </tr>
             </thead>
-            <tbody className=" text-primary ">
+            <tbody className=" text-gray-700 ">
               {currentPurchase.map((p, i) => (
                 <tr key={p.id} className="">
                   <td className="p-2">{i + 1}</td>

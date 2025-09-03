@@ -224,12 +224,12 @@ const closingBalance =
   if (loading) return <p className="text-center mt-16">Loading data...</p>;
 
   return (
-    <main className=" md:p-2 overflow-hidden">
+    <main className="p-2 overflow-hidden">
       <Toaster />
       <div className="w-xs md:w-full overflow-hidden max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 border border-gray-200">
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold text-[#11375B] capitalize flex items-center gap-3">
+          <h1 className="text-xl font-bold text-gray-800 capitalize flex items-center gap-3">
             Supplier ledger
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2"></div>
@@ -237,19 +237,19 @@ const closingBalance =
 
         {/* Export and Supplier Filter */}
         <div className="md:flex items-center justify-between mb-4">
-          <div className="flex gap-1 md:gap-3 flex-wrap">
-            <button onClick={exportExcel} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+          <div className="flex gap-1 text-gray-700 md:gap-3 flex-wrap">
+            <button onClick={exportExcel} className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
               Excel
             </button>
-            <button onClick={exportPDF} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={exportPDF} className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
               PDF
             </button>
-            <button onClick={printTable} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={printTable} className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
               Print
             </button>
           </div>
           <div className="mt-3 md:mt-0 w-full md:w-64 relative">
-            <label className="text-primary text-sm font-semibold">
+            <label className="text-gray-700 text-sm font-semibold">
               Select Supplier Ledger
             </label>
             <select

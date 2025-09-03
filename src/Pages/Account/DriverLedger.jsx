@@ -466,14 +466,14 @@ const toNumber = (val) => {
       <div className="overflow-hidden overflow-x-auto max-w-5xl mx-auto">
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold text-[#11375B] capitalize flex items-center gap-3">
+          <h1 className="text-xl font-bold text-gray-800 capitalize flex items-center gap-3">
             Driver ledger : {selectedDriver || "All Drivers"}{" "}
             {selectedMonth && `(${selectedMonth})`}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <button
               onClick={() => setShowFilter((prev) => !prev)}
-              className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               <FaFilter /> Filter
             </button>
@@ -481,22 +481,22 @@ const toNumber = (val) => {
         </div>
         {/* Export and Driver Dropdown */}
         <div className="md:flex items-center justify-between mb-4">
-          <div className="flex gap-1 md:gap-3 flex-wrap font-semibold text-primary">
+          <div className="flex gap-1 md:gap-3 flex-wrap font-semibold text-gray-700">
             <button
               onClick={exportDriversToExcel}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-2 px-5 hover:bg-primary bg-white hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               Excel
             </button>
             <button
               onClick={exportDriversToPDF}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-2 px-5 hover:bg-primary bg-white hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               PDF
             </button>
             <button
               onClick={printDriversTable}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-2 px-5 hover:bg-primary bg-white hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               Print
             </button>
@@ -507,7 +507,7 @@ const toNumber = (val) => {
           <div className="flex flex-col md:flex-row gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
             <div className="w-full">
               <div className="relative w-full">
-                <label className="text-primary text-sm font-semibold">
+                <label className="text-gray-700 text-sm font-semibold">
                   Select Month
                 </label>
                 <select
@@ -527,7 +527,7 @@ const toNumber = (val) => {
             {/* Driver dropdown */}
             <div className="w-full">
               <div className="relative w-full">
-                <label className="text-primary text-sm font-semibold">
+                <label className="text-gray-700 text-sm font-semibold">
                   Select Driver
                 </label>
                 {/* <select
@@ -561,7 +561,7 @@ const toNumber = (val) => {
             {/* Helper dropdown */}
             <div className="w-full">
               <div className="relative w-full">
-                <label className="text-primary text-sm font-semibold">
+                <label className="text-gray-700 text-sm font-semibold">
                   Select Helper
                 </label>
                 <select
@@ -587,7 +587,7 @@ const toNumber = (val) => {
     setSelectedMonth("");   
     setShowFilter(false);    
   }}
-                className="w-full bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                className="w-full bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
                  Clear
               </button>

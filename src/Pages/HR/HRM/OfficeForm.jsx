@@ -48,10 +48,12 @@ const OfficeForm = () => {
   return (
     <div className="mt-10 p-2">
       <Toaster position="top-center" reverseOrder={false} />
-      <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
+     
+      <div className="mx-auto p-6 border-t-2 border-primary  rounded-md shadow">
+         <h3 className=" pb-4  text-primary font-semibold ">
         Office Form
       </h3>
-      <FormProvider {...methods} className="">
+        <FormProvider {...methods} className="">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-3 mx-auto rounded-md shadow"
@@ -71,10 +73,10 @@ const OfficeForm = () => {
                   }}
                   icon={
                     <span
-                      className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 bg-primary rounded-r"
+                      className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2  rounded-r"
                       onClick={() => dateRef.current?.showPicker?.()}
                     >
-                      <FiCalendar className="text-white cursor-pointer" />
+                      <FiCalendar className="text-gray-700 cursor-pointer" />
                     </span>
                   }
                 />
@@ -105,6 +107,7 @@ const OfficeForm = () => {
           </div>
         </form>
       </FormProvider>
+      </div>
     </div>
   );
 };

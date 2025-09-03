@@ -214,48 +214,48 @@ const printOfficeTable = () => {
 };
 
   return (
-    <div className=" md:p-2">
+    <div className=" p-2">
       <Toaster />
       <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-6 border border-gray-200">
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
-            <RiHomeOfficeLine className="text-[#11375B] text-2xl" />
+          <h1 className="text-xl font-bold text-gary-800 flex items-center gap-3">
+            <RiHomeOfficeLine className="text-gary-800 text-2xl" />
             Office
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <Link to="/tramessy/HR/HRM/OfficeForm">
-              <button className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
+              <button className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
                 <FaPlus /> Office
               </button>
             </Link>
           </div>
         </div>
         <div className="md:flex justify-between items-center">
-          <div className="flex gap-1 md:gap-3 flex-wrap">
+          <div className="flex gap-1 md:gap-3 text-gray-700 flex-wrap">
             <button
               onClick={exportOfficeToExcel}
-              className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer"
+              className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer"
             >
               Excel
             </button>
 
             <button
               onClick={exportOfficeToPDF}
-              className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer"
+              className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer"
             >
               PDF
             </button>
 
             <button
               onClick={printOfficeTable}
-              className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer"
+              className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer"
             >
               Print
             </button>
           </div>
           {/* search */}
           <div className="mt-3 md:mt-0">
-            <span className="text-primary font-semibold pr-3">Search: </span>
+            {/* <span className="text-primary font-semibold pr-3">Search: </span> */}
             <input
               type="text"
               value={searchTerm}
@@ -280,9 +280,9 @@ const printOfficeTable = () => {
     )}
           </div>
         </div>
-        <div className="mt-5 overflow-x-auto rounded-xl">
+        <div className="mt-5 overflow-x-auto rounded-md">
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-primary text-white capitalize text-xs">
+            <thead className="bg-gray-200 text-primary  capitalize text-xs">
               <tr>
                 <th className="p-2">SL.</th>
                 <th className="p-2">Date</th>
@@ -293,7 +293,7 @@ const printOfficeTable = () => {
                 <th className="p-2">Action</th>
               </tr>
             </thead>
-            <tbody className="text-primary ">
+            <tbody className="text-gray-700">
               { currentVehicles.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="text-center p-4 text-gray-500">

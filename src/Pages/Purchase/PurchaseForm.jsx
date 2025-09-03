@@ -199,12 +199,13 @@ const PurchaseForm = () => {
   }
 
   return (
-    <div className="mt-10 md:p-2">
+    <div className="mt-5 md:p-2">
       <Toaster />
-      <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
+      <div className="mx-auto p-6 border-t-2 border-primary  rounded-md shadow">
+          <h3 className=" pb-4 text-primary font-semibold">
         {isEditMode ? "Update Maintenance Purchase " : "Add Maintenance Purchase"}
       </h3>
-      <FormProvider {...methods}>
+        <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="mx-auto p-6 rounded-md shadow space-y-4"
@@ -231,10 +232,10 @@ const PurchaseForm = () => {
                 }}
                 icon={
                   <span
-                    className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 bg-primary rounded-r"
+                    className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 rounded-r"
                     onClick={() => purChaseDateRef.current?.showPicker?.()}
                   >
-                    <FiCalendar className="text-white cursor-pointer" />
+                    <FiCalendar className="text-gray-700 cursor-pointer" />
                   </span>
                 }
               />
@@ -335,7 +336,7 @@ const PurchaseForm = () => {
           
           <div className="md:flex justify-between gap-3">
             <div className="w-full">
-              <label className="text-primary text-sm font-semibold">
+              <label className="text-gray-700 text-sm font-semibold">
                 Bill Image {!isEditMode && "(Required)"}
               </label>
               <Controller
@@ -418,6 +419,7 @@ const PurchaseForm = () => {
           <BtnSubmit>{isEditMode ? "Update Purchase" : "Submit"}</BtnSubmit>
         </form>
       </FormProvider>
+      </div>
     </div>
   );
 };

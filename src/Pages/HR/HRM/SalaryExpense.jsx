@@ -344,13 +344,13 @@ const SalaryExpense = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
-    <div className=" min-h-screen">
+    <div className="p-2 min-h-screen">
       <Toaster />
       <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 p-4">
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
-            <FaTruck className="text-[#11375B] text-2xl" />
+          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
+            <FaTruck className="text-gray-800 text-2xl" />
             Salary Expense
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
@@ -370,18 +370,18 @@ const SalaryExpense = () => {
 
         {/* Controls */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 gap-4">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap text-gray-700 gap-2">
 
             <button
               onClick={exportCSV}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-cyan-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-white shadow hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               <FiFileText size={16} />
               CSV
             </button>
             <button
               onClick={exportExcel}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               <FaFileExcel className="" />
               Excel
@@ -389,7 +389,7 @@ const SalaryExpense = () => {
 
             <button
               onClick={exportPDF}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               <FaFilePdf className="" />
               PDF
@@ -397,7 +397,7 @@ const SalaryExpense = () => {
 
             <button
               onClick={printTable}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-white shadow hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               <FaPrint className="" />
               Print
@@ -405,7 +405,7 @@ const SalaryExpense = () => {
           </div>
 
           <div className=" gap-2">
-            <span className="text-sm font-medium text-gray-700">Search:</span>
+            {/* <span className="text-sm font-medium text-gray-700">Search:</span> */}
             <input
               type="text"
               className="px-3 py-2 border border-gray-300 rounded-md text-sm w-48 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -469,7 +469,7 @@ const SalaryExpense = () => {
         {/* Table */}
         <div className="mt-5 overflow-x-auto rounded-xl border border-gray-200" ref={printRef}>
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-primary text-white capitalize text-xs">
+            <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr className="">
                 <th className="px-3 py-3 text-left text-sm font-semibold w-16">SL</th>
                 <th className="px-3 py-3 text-left text-sm font-semibold">Date</th>
@@ -481,7 +481,7 @@ const SalaryExpense = () => {
                 <th className="px-3 py-3 text-left text-sm font-semibold w-24 action_column">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-gray-700">
               {loading ? (
                 <tr>
                   <td colSpan="7" className="px-3 py-10 text-center text-gray-500">

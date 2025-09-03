@@ -76,12 +76,12 @@ const HelperForm = () => {
   };
 
   return (
-    <div className="mt-10 p-2">
+    <div className="mt-5 p-2">
       <Toaster />
-      <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
+      <div className="mx-auto p-6 border-t-2 border-primary rounded-md shadow">
+        <h3 className="pb-4 text-primary font-semibold ">
         {isEditMode ? "Update Helper" : "Create Helper"}
       </h3>
-      <div className="mx-auto p-6  rounded-md shadow">
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Name & Contact */}

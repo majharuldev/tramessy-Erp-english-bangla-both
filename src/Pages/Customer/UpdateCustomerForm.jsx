@@ -49,12 +49,12 @@ const UpdateCustomerForm = () => {
   };
 
   return (
-    <div className="mt-10 p-2">
-      <Toaster />
-      <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
+    <div className="mt-5 p-2">
+      <Toaster />   
+      <div className="mx-auto p-6 border-t-2 border-primary rounded-md shadow">
+         <h3 className="pb-4 text-primary font-semibold ">
        Update Customer information
       </h3>
-      <div className="mx-auto p-6  rounded-md shadow">
         <FormProvider {...methods} className="">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="md:flex justify-between gap-3">
@@ -70,10 +70,10 @@ const UpdateCustomerForm = () => {
                   }}
                   icon={
                     <span
-                      className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 bg-primary rounded-r"
+                      className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 rounded-r"
                       onClick={() => dateRef.current?.showPicker?.()}
                     >
-                      <FiCalendar className="text-white cursor-pointer" />
+                      <FiCalendar className="text-gray-700 cursor-pointer" />
                     </span>
                   }
                 />

@@ -328,7 +328,7 @@ const VendorLedger = () => {
       <div className="border border-gray-200 md:p-4 rounded-xl">
         <div className="overflow-x-auto max-w-5xl mx-auto">
           <div className="md:flex items-center justify-between mb-6">
-            <h1 className="text-xl font-bold text-[#11375B] capitalize">
+            <h1 className="text-xl font-bold text-gray-800 capitalize">
               Vendor Ledger: {selectedVendor || "All Vendors"}
             </h1>
             <div className="mt-3 md:mt-0 flex gap-2">
@@ -341,24 +341,24 @@ const VendorLedger = () => {
             </div>
           </div>
           <div className="md:flex items-center justify-between mb-4">
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap text-gray-700">
               <button
                 onClick={exportToExcel}
-                className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow font-semibold hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaFileExcel className="" />
                 Excel
               </button>
               <button
                 onClick={exportToPDF}
-                className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow font-semibold hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaFilePdf className="" />
                 PDF
               </button>
               <button
                 onClick={printTable}
-                className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow font-semibold hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaPrint className="" />
                 Print
@@ -371,7 +371,7 @@ const VendorLedger = () => {
               <div className="md:flex gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
                 <div className="w-[50%]">
                   <div className="relative w-full">
-                    <label className="text-primary text-sm font-semibold">
+                    <label className="text-gray-700 text-sm font-semibold">
                       Select Month
                     </label>
                     <select
@@ -397,7 +397,7 @@ const VendorLedger = () => {
                 </div>
                 {/* select vendor */}
                 <div className="mt-3 md:mt-0 relative w-[50%]">
-                  <label className="text-primary text-sm font-semibold">
+                  <label className="text-gray-700 text-sm font-semibold">
                     Select Vendor
                   </label>
                   <select
@@ -423,7 +423,7 @@ const VendorLedger = () => {
                       setSelectedMonth("");
                       setShowFilter(false);
                     }}
-                    className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                    className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
                   >
                     Clear
                   </button>

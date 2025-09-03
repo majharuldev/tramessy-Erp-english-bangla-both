@@ -72,12 +72,12 @@ const UpdateDriverForm = () => {
   };
 
   return (
-    <div className="mt-10 p-2">
+    <div className="mt-5 p-2">
       <Toaster />
-      <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
+      <div className="mx-auto p-6 border-t-2 border-primary  rounded-md shadow">
+         <h3 className="pb-4 text-primary font-semibold ">
         Update Driver
       </h3>
-      <div className="mx-auto p-6  rounded-md shadow">
         <FormProvider {...methods} className="">
           <form onSubmit={handleSubmit(onSubmit)} className="">
             {/* Name & Contact */}

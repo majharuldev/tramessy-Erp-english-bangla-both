@@ -293,7 +293,7 @@ const totalProfit = monthlyDriverStats.reduce((sum, d) => sum + d.totalProfit, 0
   return (
     <div className="md:p-2">
       <div className="p-4 max-w-7xl mx-auto bg-white shadow rounded-lg border border-gray-200">
-        <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+        <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
           <FaUser className="text-lg" />
           Driver Monthly Performance Report
         </h2>
@@ -303,21 +303,21 @@ const totalProfit = monthlyDriverStats.reduce((sum, d) => sum + d.totalProfit, 0
           <div className="flex flex-wrap md:flex-row gap-3">
             <button
               onClick={exportExcel}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaFileExcel />
               Excel
             </button>
             <button
               onClick={exportPDF}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaFilePdf />
               PDF
             </button>
             <button
               onClick={printReport}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaPrint />
               Print
@@ -383,7 +383,7 @@ const totalProfit = monthlyDriverStats.reduce((sum, d) => sum + d.totalProfit, 0
         {/* Report Table */}
         <div className="mt-5 overflow-x-auto rounded-xl border border-gray-200">
           <table id="driver-report" className="min-w-full text-sm text-left">
-            <thead className="bg-[#11375B] text-white capitalize text-xs">
+            <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr>
                 <th className="px-2 py-3">SL</th>
                 <th className="px-2 py-3">Month</th>

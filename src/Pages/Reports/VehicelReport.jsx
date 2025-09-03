@@ -425,11 +425,11 @@ const exportToPDF = () => {
 
 
   return (
-    <main className="md:p-2">
+    <main className="p-2">
       <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-4 border border-gray-200">
         {/* Header and filter section remains the same */}
         <div className="md:flex items-center justify-between mb-6">
-           <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
+           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
              Vehicle Performance Report
            </h1>
            <div className="mt-3 md:mt-0 flex gap-2">
@@ -449,22 +449,22 @@ const exportToPDF = () => {
           </div>
         </div>
 
-        <div className="flex gap-1 md:gap-3 text-primary font-semibold rounded-md">
+        <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
             <button
               onClick={exportToExcel}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
               Excel
             </button>
             <button
               onClick={exportToPDF}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
               PDF
             </button>
             <button
               onClick={printTable}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
               Print
             </button>
@@ -531,7 +531,7 @@ const exportToPDF = () => {
 
         <div id="vehicleProfitTable" className="mt-5 overflow-x-auto rounded-xl border border-gray-200">
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-[#11375B] text-white capitalize text-xs">
+            <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr>
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Vehicle No</th>

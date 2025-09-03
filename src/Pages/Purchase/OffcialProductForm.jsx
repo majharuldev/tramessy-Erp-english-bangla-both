@@ -106,215 +106,218 @@ const PurchaseForm = () => {
   };
 
   return (
-    <div className="mt-10 md:p-2">
+    <div className="mt-5 p-2">
       <Toaster />
-      <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
-        Add Purchase Information
-      </h3>
-      <FormProvider {...methods} className="">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mx-auto p-6  rounded-md shadow space-y-4"
-        >
-          <h5 className="text-2xl font-bold text-center text-[#EF9C07]">
-              {selectedCategory=== "fuel"
-                ? "Fuel Purchase": selectedCategory === "engine_oil" || selectedCategory === "parts"? "Maintenance": "Office Purchase"}
+      <div className="mx-auto p-6 border-t-2 border-primary rounded-md shadow">
+        <h3 className=" pb-4 bg-primary text-primary font-semibold rounded-t-md">
+          Add Purchase Information
+        </h3>
+        <FormProvider {...methods} className="">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="mx-auto p-6  rounded-md shadow space-y-4"
+          >
+            <h5 className="text-2xl font-bold text-center text-[#EF9C07]">
+              {selectedCategory === "fuel"
+                ? "Fuel Purchase" : selectedCategory === "engine_oil" || selectedCategory === "parts" ? "Maintenance" : "Office Purchase"}
             </h5>
-          {/*  */}
-          <div className="md:flex justify-between gap-3">
-            <div className="w-full">
-              <InputField
-                name="date"
-                label="Purchase Date"
-                type="date"
-                required
-                inputRef={(e) => {
-                  register("date").ref(e);
-                  purChaseDateRef.current = e;
-                }}
-                icon={
-                  <span
-                    className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 bg-primary rounded-r"
-                    onClick={() => purChaseDateRef.current?.showPicker?.()}
-                  >
-                    <FiCalendar className="text-white cursor-pointer" />
-                  </span>
-                }
-              />
+            {/*  */}
+            <div className="md:flex justify-between gap-3">
+              <div className="w-full">
+                <InputField
+                  name="date"
+                  label="Purchase Date"
+                  type="date"
+                  required
+                  inputRef={(e) => {
+                    register("date").ref(e);
+                    purChaseDateRef.current = e;
+                  }}
+                  icon={
+                    <span
+                      className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 rounded-r"
+                      onClick={() => purChaseDateRef.current?.showPicker?.()}
+                    >
+                      <FiCalendar className="text-gray-700 cursor-pointer" />
+                    </span>
+                  }
+                />
+              </div>
+              <div className="w-full">
+                <SelectField
+                  name="category"
+                  label="Category"
+                  required
+                  options={[
+                    { value: "fuel", label: "Fuel" },
+                    { value: "engine_oil", label: "Engine Oil" },
+                    { value: "parts", label: "Parts" },
+                    { value: "It item", label: "It item" },
+                    { value: "Stationary", label: "Stationary" },
+                    { value: "Snacks", label: "Snacks" },
+                    { value: "Electronics", label: "Electronics" },
+                    { value: "Furniture", label: "Furniture" },
+                  ]}
+                />
+              </div>
+              <div className="w-full">
+                <InputField name="item_name" label="Item Name" />
+              </div>
             </div>
-            <div className="w-full">
-              <SelectField
-                name="category"
-                label="Category"
-                required
-                options={[
-                  { value: "fuel", label: "Fuel" },
-                  { value: "engine_oil", label: "Engine Oil" },
-                  { value: "parts", label: "Parts" },
-                  { value: "It item", label: "It item" },
-                  { value: "Stationary", label: "Stationary" },
-                  { value: "Snacks", label: "Snacks" },
-                  { value: "Electronics", label: "Electronics" },
-                  { value: "Furniture", label: "Furniture" },
-                ]}
-              />
-            </div>
-            <div className="w-full">
-              <InputField name="item_name" label="Item Name"  />
-            </div>
-          </div>
-          {/* Engine Oil category */}
-          {(selectedCategory === "fuel" || selectedCategory === "parts") && (
+            {/* Engine Oil category */}
+            {(selectedCategory === "fuel" || selectedCategory === "parts") && (
+              <div className="md:flex justify-between gap-3">
+                <div className="w-full">
+                  <SelectField
+                    name="driver_name"
+                    label="Driver Name"
+                    required={true}
+                    options={driverOptions}
+                    control={control}
+                  />
+                </div>
+                <div className="w-full">
+                  <SelectField
+                    name="vehicle_no"
+                    label="Vehicle No."
+                    required={true}
+                    options={vehicleOptions}
+                    control={control}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/*  */}
             <div className="md:flex justify-between gap-3">
               <div className="w-full">
                 <SelectField
-                  name="driver_name"
-                  label="Driver Name"
+                  name="branch_name"
+                  label="Branch Name"
                   required={true}
-                  options={driverOptions}
+                  options={branchOptions}
                   control={control}
                 />
               </div>
               <div className="w-full">
                 <SelectField
-                  name="vehicle_no"
-                  label="Vehicle No."
+                  name="supplier_name"
+                  label="Supplier Name"
                   required={true}
-                  options={vehicleOptions}
+                  options={supplyOptions}
                   control={control}
                 />
               </div>
+              <div className="w-full">
+                <InputField
+                  name="quantity"
+                  label="Quantity"
+                  type="number"
+                  required
+                />
+              </div>
             </div>
-          )}
+            {/*  */}
+            <div className="md:flex justify-between gap-3">
+              <div className="w-full">
+                <InputField
+                  name="unit_price"
+                  label="Unit Price"
+                  type="number"
+                  required
+                />
+              </div>
+              <div className="w-full">
+                <InputField
+                  name="purchase_amount"
+                  label="Total"
+                  readOnly
+                  defaultValue={totalPrice}
+                  value={totalPrice}
+                  required
+                />
+              </div>
+              <div className="w-full">
+                <InputField name="remarks" label="Remark" />
+              </div>
+              <div className="w-full">
+                <InputField name="priority" label="priority" />
+              </div>
+            </div>
+            <div className="md:flex justify-between gap-3">
+              <div className="w-full">
+                <label className="text-primary text-sm font-semibold">
+                  Bill Image
+                </label>
+                <Controller
+                  name="bill_image"
+                  control={control}
+                  rules={{ required: "This field is required" }}
+                  render={({
+                    field: { onChange, ref },
+                    fieldState: { error },
+                  }) => (
+                    <div className="relative">
+                      <label
+                        htmlFor="bill_image"
+                        className="border p-2 rounded w-[50%] block bg-white text-gray-300 text-sm cursor-pointer"
+                      >
+                        {previewImage ? "Image selected" : "Choose image"}
+                      </label>
+                      <input
+                        id="bill_image"
+                        type="file"
+                        accept="image/*"
+                        ref={ref}
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            const url = URL.createObjectURL(file);
+                            setPreviewImage(url);
+                            onChange(file);
+                          } else {
+                            setPreviewImage(null);
+                            onChange(null);
+                          }
+                        }}
+                      />
+                      {error && (
+                        <span className="text-red-600 text-sm">
+                          {error.message}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
+            {/* Preview */}
+            {previewImage && (
+              <div className="mt-3 relative flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPreviewImage(null);
+                    document.getElementById("bill_image").value = "";
+                  }}
+                  className="absolute top-2 right-2 text-red-600 bg-white shadow rounded-sm hover:text-white hover:bg-secondary transition-all duration-300 cursor-pointer font-bold text-xl p-[2px]"
+                  title="Remove image"
+                >
+                  <IoMdClose />
+                </button>
+                <img
+                  src={previewImage}
+                  alt="License Preview"
+                  className="max-w-xs h-auto rounded border border-gray-300"
+                />
+              </div>
+            )}
+            <BtnSubmit>Submit</BtnSubmit>
+          </form>
+        </FormProvider>
+      </div>
 
-          {/*  */}
-          <div className="md:flex justify-between gap-3">
-            <div className="w-full">
-              <SelectField
-                name="branch_name"
-                label="Branch Name"
-                required={true}
-                options={branchOptions}
-                control={control}
-              />
-            </div>
-            <div className="w-full">
-              <SelectField
-                name="supplier_name"
-                label="Supplier Name"
-                required={true}
-                options={supplyOptions}
-                control={control}
-              />
-            </div>
-            <div className="w-full">
-              <InputField
-                name="quantity"
-                label="Quantity"
-                type="number"
-                required
-              />
-            </div>
-          </div>
-          {/*  */}
-          <div className="md:flex justify-between gap-3">
-            <div className="w-full">
-              <InputField
-                name="unit_price"
-                label="Unit Price"
-                type="number"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <InputField
-                name="purchase_amount"
-                label="Total"
-                readOnly
-                defaultValue={totalPrice}
-                value={totalPrice}
-                required
-              />
-            </div>
-            <div className="w-full">
-              <InputField name="remarks" label="Remark" />
-            </div>
-            <div className="w-full">
-              <InputField name="priority" label="priority" />
-            </div>
-          </div>
-          <div className="md:flex justify-between gap-3">
-            <div className="w-full">
-              <label className="text-primary text-sm font-semibold">
-                Bill Image
-              </label>
-              <Controller
-                name="bill_image"
-                control={control}
-                rules={{ required: "This field is required" }}
-                render={({
-                  field: { onChange, ref },
-                  fieldState: { error },
-                }) => (
-                  <div className="relative">
-                    <label
-                      htmlFor="bill_image"
-                      className="border p-2 rounded w-[50%] block bg-white text-gray-300 text-sm cursor-pointer"
-                    >
-                      {previewImage ? "Image selected" : "Choose image"}
-                    </label>
-                    <input
-                      id="bill_image"
-                      type="file"
-                      accept="image/*"
-                      ref={ref}
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          const url = URL.createObjectURL(file);
-                          setPreviewImage(url);
-                          onChange(file);
-                        } else {
-                          setPreviewImage(null);
-                          onChange(null);
-                        }
-                      }}
-                    />
-                    {error && (
-                      <span className="text-red-600 text-sm">
-                        {error.message}
-                      </span>
-                    )}
-                  </div>
-                )}
-              />
-            </div>
-          </div>
-          {/* Preview */}
-          {previewImage && (
-            <div className="mt-3 relative flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setPreviewImage(null);
-                  document.getElementById("bill_image").value = "";
-                }}
-                className="absolute top-2 right-2 text-red-600 bg-white shadow rounded-sm hover:text-white hover:bg-secondary transition-all duration-300 cursor-pointer font-bold text-xl p-[2px]"
-                title="Remove image"
-              >
-                <IoMdClose />
-              </button>
-              <img
-                src={previewImage}
-                alt="License Preview"
-                className="max-w-xs h-auto rounded border border-gray-300"
-              />
-            </div>
-          )}
-          <BtnSubmit>Submit</BtnSubmit>
-        </form>
-      </FormProvider>
     </div>
   );
 };

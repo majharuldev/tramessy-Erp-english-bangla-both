@@ -257,14 +257,14 @@ const printTripsTable = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
-    <main className="md:p-2">
+    <main className="p-2">
       <Toaster />
       <div className="w-full max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-6 border border-gray-200">
 
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
-            <FaUsers className="text-[#11375B] text-2xl" />
+          <h1 className="text-xl font-extrabold text-gray-800 flex items-center gap-3">
+            <FaUsers className="text-gray-800 text-2xl" />
             Customer Route Pricing 
           </h1>
           <button
@@ -276,22 +276,22 @@ const printTripsTable = () => {
         </div>
         {/* Filter and Search */}
          <div className="md:flex justify-between items-center mb-5">
-          <div className="flex gap-1 md:gap-3 text-primary font-semibold rounded-md">
+          <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
             <button
               onClick={exportTripsToExcel}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary shadow bg-white hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               Excel
             </button>
             <button
               onClick={exportTripsToPDF}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary shadow bg-white hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               PDF
             </button>
             <button
               onClick={printTripsTable}
-              className="py-2 px-5 hover:bg-primary bg-gray-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary shadow bg-white hover:text-white rounded-md transition-all duration-300 cursor-pointer"
             >
               Print
             </button>
@@ -331,7 +331,7 @@ const printTripsTable = () => {
         {/* Table */}
         <div id="pricingTable" className="overflow-x-auto rounded-xl">
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-primary text-white">
+            <thead className="bg-gray-200 text-primary">
               <tr>
                 <th className="p-2">SL.</th>
                 <th className="p-2">Customer</th>
@@ -344,7 +344,7 @@ const printTripsTable = () => {
                 <th className="p-2">Action</th>
               </tr>
             </thead>
-            <tbody className=" text-primary">
+            <tbody className=" text-gray-700">
               {currentCustomer.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="text-center p-4 text-gray-500">
@@ -353,13 +353,13 @@ const printTripsTable = () => {
                 </tr>
               ) : currentCustomer.map((dt, index) => (
                 <tr key={index} className="hover:bg-gray-50 border border-gray-200">
-                  <td className="p-2 font-bold">{indexOfFirstItem + index + 1}</td>
-                  <td className="p-2">{dt.customer_name}</td>
-                  <td className="p-2">{dt.vehicle_category}</td>
-                  <td className="p-2">{dt.vehicle_size}</td>
-                  <td className="p-2">{dt.load_point}</td>
-                  <td className="p-2">{dt.unload_point}</td>
-                  <td className="p-2">{dt.rate}</td>
+                  <td className="px-2 py-4 font-bold">{indexOfFirstItem + index + 1}</td>
+                  <td className="px-2 py-4">{dt.customer_name}</td>
+                  <td className="px-2 py-4">{dt.vehicle_category}</td>
+                  <td className="px-2 py-4">{dt.vehicle_size}</td>
+                  <td className="px-2 py-4">{dt.load_point}</td>
+                  <td className="px-2 py-4">{dt.unload_point}</td>
+                  <td className="px-2 py-4">{dt.rate}</td>
                   {/* <td className="p-2">{dt.vat}</td> */}
                   <td className="p-2 flex gap-1">
                 

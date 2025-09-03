@@ -4,7 +4,6 @@ import { format, isAfter, isBefore, isEqual, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
 import { FaFilter, FaPen, FaPlus, FaTrashAlt } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
-import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { Link } from "react-router-dom";
 import Pagination from "../../components/Shared/Pagination";
 
@@ -75,18 +74,6 @@ const totalAmount = filteredPayment.reduce(
   const currentPayments = filteredPayment.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredPayment.length / itemsPerPage);
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
-
   // filter clear func
   const handleClearFilter = () => {
     setStartDate("");
@@ -102,7 +89,7 @@ const totalAmount = filteredPayment.reduce(
     <div className="md:p-2">
       <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-6 border border-gray-200">
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
+          <h1 className="text-xl font-extrabold text-gray-800 flex items-center gap-3">
             Payment Receive
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
@@ -115,7 +102,7 @@ const totalAmount = filteredPayment.reduce(
                                     </button>
                                   </div>
             <Link to="/tramessy/account/PaymentReceiveForm">
-              <button className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
+              <button className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
                 <FaPlus /> Recieve
               </button>
             </Link>
@@ -147,7 +134,7 @@ const totalAmount = filteredPayment.reduce(
                             <div className=" mt-5">
                               <button
                                 onClick={handleClearFilter}
-                                className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                                className="bg-primary text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
                               >
                                 <FiFilter/> Clear
                               </button>
@@ -157,7 +144,7 @@ const totalAmount = filteredPayment.reduce(
         
         <div className="mt-5 overflow-x-auto rounded-xl">
           <table className="min-w-full text-sm text-left">
-            <thead className="bg-[#11375B] text-white capitalize text-sm">
+            <thead className="bg-gray-200 text-primary capitalize text-sm">
               <tr>
                 <th className="p-2">SL.</th>
                 <th className="p-2">Date</th>
@@ -172,7 +159,7 @@ const totalAmount = filteredPayment.reduce(
                 <th className="p-2">Action</th>
               </tr>
             </thead>
-            <tbody className="text-primary">
+            <tbody className="text-gray-700">
               {currentPayments?.map((dt, index) => (
                 <tr key={dt.id} className="hover:bg-gray-50 transition-all border border-gray-200">
                   <td className="px-2 py-1 font-bold">{indexOfFirstItem + index + 1}.</td>
