@@ -5,6 +5,7 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { IoIosRemoveCircle } from "react-icons/io";
 
 
 const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
@@ -62,15 +63,6 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
 totals.due = totals.rent  - totals.rec_amount;
 
   const grandDue =  totals.due+dueAmount;
-
-  // Pagination logic
-  // const pageCount = Math.ceil(filteredLedger.length / itemsPerPage);
-  // const offset = currentPage * itemsPerPage;
-  // const currentItems = filteredLedger.slice(offset, offset + itemsPerPage);
-
-  // const handlePageClick = ({ selected }) => {
-  //   setCurrentPage(selected);
-  // };
 
   const totalRent = filteredLedger.reduce(
     (sum, entry) => sum + parseFloat(entry.rec_amount || 0),
@@ -166,22 +158,22 @@ totals.due = totals.rent  - totals.rec_amount;
         </div>
 
         <div className="flex justify-between mb-4">
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-gray-700">
             <button
               onClick={exportToExcel}
-              className="flex items-center gap-2 py-2 px-5 bg-gray-50 hover:bg-primary text-primary hover:text-white rounded-md shadow-md shadow-green-200 transition-all duration-300"
+              className="flex items-center gap-2 py-1 px-5 bg-white hover:bg-primary hover:text-white rounded shadow  transition-all duration-300"
             >
               <FaFileExcel /> Excel
             </button>
             <button
               onClick={exportToPDF}
-              className="flex items-center gap-2 py-2 px-5 bg-gray-50 hover:bg-primary text-primary hover:text-white rounded-md shadow-md shadow-amber-200 transition-all duration-300"
+              className="flex items-center gap-2 py-1 px-5 bg-white hover:bg-primary hover:text-white rounded shadow  transition-all duration-300"
             >
               <FaFilePdf /> PDF
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 py-2 px-5 bg-gray-50 hover:bg-primary text-primary hover:text-white rounded-md shadow-md shadow-blue-200 transition-all duration-300"
+              className="flex items-center gap-2 py-1 px-5 bg-white hover:bg-primary hover:text-white rounded shadow transition-all duration-300"
             >
               <FaPrint /> Print
             </button>
@@ -247,6 +239,18 @@ totals.due = totals.rent  - totals.rec_amount;
                 </button>
               )}
             </div>
+            <div className="w-xs">
+                          <button
+                            onClick={() => {
+                              setStartDate("");
+                              setEndDate("");
+                              setShowFilter(false);
+                            }}
+                            className="bg-primary w-full text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                          >
+                            <IoIosRemoveCircle /> Clear 
+                          </button>
+                        </div>
           </div>
         )}
 

@@ -8,6 +8,7 @@ import pdfMake from "pdfmake/build/pdfmake"
 import pdfFonts from "pdfmake/build/vfs_fonts"
 import Pagination from "../../components/Shared/Pagination"
 import CreatableSelect from "react-select/creatable"
+import { IoIosRemoveCircle } from "react-icons/io"
 
 pdfMake.vfs = pdfFonts.vfs
 
@@ -55,9 +56,9 @@ const Bill = () => {
   }, [])
 
   const customerOptions = customerList.map((customer) => ({
-  value: customer.customer_name,
-  label: customer.customer_name,
-}))
+    value: customer.customer_name,
+    label: customer.customer_name,
+  }))
 
   // Handle click outside the customer search input to close suggestions
   useEffect(() => {
@@ -146,7 +147,7 @@ const Bill = () => {
     setSelectedCustomer(customerName)
     setCustomerSearchTerm(customerName)
     setShowCustomerSuggestions(false)
-    setCurrentPage(1) 
+    setCurrentPage(1)
   }
 
   const numberToWords = (num) => {
@@ -363,8 +364,8 @@ const Bill = () => {
             </thead>
             <tbody>
               ${selectedData
-                .map(
-                  (dt, i) => `
+        .map(
+          (dt, i) => `
                 <tr>
                   <td class="text-center">${dt.id}</td>
                   <td class="text-center">${dt.date}</td>
@@ -374,8 +375,8 @@ const Bill = () => {
                   <td class="text-right">${dt.d_total || 0}</td>
                   <td class="text-right">${(Number.parseFloat(dt.total_rent) || 0) + (Number.parseFloat(dt.d_total) || 0)}</td>
                 </tr>`,
-                )
-                .join("")}
+        )
+        .join("")}
             </tbody>
             <tfoot>
               <tr>
@@ -401,8 +402,8 @@ const Bill = () => {
 
   const handleSubmit = async () => {
     const selectedData = filteredTrips.filter(
-    (dt, i) => selectedRows[dt.id] && dt.status === "Pending"
-  );
+      (dt, i) => selectedRows[dt.id] && dt.status === "Pending"
+    );
     if (!selectedData.length) {
       return toast.error("Please select at least one row for Not submitted.", {
         position: "top-right",
@@ -505,12 +506,12 @@ const Bill = () => {
     }
   }
 
-  const [currentPage, setCurrentPage] = useState(1) 
-const itemsPerPage = 10
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
   const indexOfLastItem = currentPage * itemsPerPage
-const indexOfFirstItem = indexOfLastItem - itemsPerPage
-const currentItems = filteredTrips.slice(indexOfFirstItem, indexOfLastItem)
-const totalPages = Math.ceil(filteredTrips.length / itemsPerPage)
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = filteredTrips.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(filteredTrips.length / itemsPerPage)
 
   if (loading) return <p className="text-center mt-16">Loading...</p>
 
@@ -519,8 +520,8 @@ const totalPages = Math.ceil(filteredTrips.length / itemsPerPage)
       <Toaster />
       <div className="w-xs md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 md:p-6 border border-gray-200">
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-extrabold text-[#11375B] flex items-center gap-3">
-            <HiCurrencyBangladeshi className="text-[#11375B] text-2xl" />
+          <h1 className="text-xl font-extrabold text-gray-800 flex items-center gap-3">
+            <HiCurrencyBangladeshi className="text-gray-800 text-2xl" />
             Billing
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
@@ -535,98 +536,31 @@ const totalPages = Math.ceil(filteredTrips.length / itemsPerPage)
 
         {/* export and search */}
         <div className="md:flex justify-between items-center">
-          <div className="flex flex-wrap md:flex-row gap-1 md:gap-3 text-primary font-semibold rounded-md">
+          <div className="flex flex-wrap md:flex-row gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
             <button
               onClick={exportToExcel}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-green-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded  transition-all duration-300 cursor-pointer"
             >
               <FaFileExcel className="" />
               Excel
             </button>
             <button
               onClick={exportToPDF}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-amber-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded  transition-all duration-300 cursor-pointer"
             >
               <FaFilePdf className="" />
               PDF
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 py-2 px-5 hover:bg-primary bg-gray-50 shadow-md shadow-blue-200 hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+              className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaPrint className="" />
               Print
             </button>
           </div>
 
-          {/* Customer Search Input */}
-          <div className="mt-3 md:mt-0">
-            {/* <div className="relative mt-3 md:mt-0" ref={customerSearchRef}>
-              <input
-                type="text"
-                placeholder="Search customer..."
-                value={customerSearchTerm}
-                onChange={(e) => {
-                  setCustomerSearchTerm(e.target.value)
-                  setCurrentPage(1)
-                }}
-                onFocus={() => {
-                  setShowCustomerSuggestions(true)
-                }}
-                onBlur={() => {
-                  setShowCustomerSuggestions(false)
-                }}
-                className="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-              {customerSearchTerm && (
-                <button
-                  onClick={() => {
-                    setCustomerSearchTerm("")
-                    setSelectedCustomer("")
-                    setShowCustomerSuggestions(false)
-                    setCurrentPage(1)
-                  }}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  type="button"
-                >
-                  ×
-                </button>
-              )}
-              {showCustomerSuggestions && (
-                <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                  {customerSearchTerm === "" ? (
-                    // Show all customers when input is empty
-                    customerList.length > 0 ? (
-                      customerList.map((customer, idx) => (
-                        <li
-                          key={idx}
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                          onMouseDown={() => handleCustomerSelect(customer.customer_name)}
-                        >
-                          {customer.customer_name}
-                        </li>
-                      ))
-                    ) : (
-                      <li className="px-4 py-2 text-gray-500">No customers available</li>
-                    )
-                  ) : // Show filtered customers when typing
-                  filteredCustomerSuggestions.length > 0 ? (
-                    filteredCustomerSuggestions.map((customer, idx) => (
-                      <li
-                        key={idx}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        onMouseDown={() => handleCustomerSelect(customer.customer_name)}
-                      >
-                        {customer.customer_name}
-                      </li>
-                    ))
-                  ) : (
-                    <li className="px-4 py-2 text-gray-500">No customers found</li>
-                  )}
-                </ul>
-              )}
-            </div> */}
-          </div>
+
         </div>
 
         {showFilter && (
@@ -679,24 +613,38 @@ const totalPages = Math.ceil(filteredTrips.length / itemsPerPage)
                 </button>
               )}
             </div>
+            {/* customer filter */}
             <div className="w-full relative">
-  <CreatableSelect
-    isClearable
-    placeholder="Select or create customer..."
-    value={selectedCustomer ? { value: selectedCustomer, label: selectedCustomer } : null}
-    options={customerOptions}
-    onChange={(newValue) => {
-      setSelectedCustomer(newValue ? newValue.value : "")
-      setCurrentPage(1)
-    }}
-    onCreateOption={(inputValue) => {
-      const newCustomer = { value: inputValue, label: inputValue }
-      setCustomerList((prev) => [...prev, { customer_name: inputValue }])
-      setSelectedCustomer(inputValue)
-    }}
-    className="text-sm"
-  />
-</div>
+              <CreatableSelect
+                isClearable
+                placeholder="Select or create customer..."
+                value={selectedCustomer ? { value: selectedCustomer, label: selectedCustomer } : null}
+                options={customerOptions}
+                onChange={(newValue) => {
+                  setSelectedCustomer(newValue ? newValue.value : "")
+                  setCurrentPage(1)
+                }}
+                onCreateOption={(inputValue) => {
+                  const newCustomer = { value: inputValue, label: inputValue }
+                  setCustomerList((prev) => [...prev, { customer_name: inputValue }])
+                  setSelectedCustomer(inputValue)
+                }}
+                className="text-sm"
+              />
+            </div>
+            <div className="w-xs ">
+                          <button
+                            onClick={() => {
+                              setStartDate("");
+                              setEndDate("");
+                              setShowFilter(false);
+                              setSelectedCustomer("")
+                            }}
+                            className="w-full bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                          >
+                            <IoIosRemoveCircle /> Clear
+                          </button>
+                        </div>
           </div>
         )}
 
@@ -743,26 +691,26 @@ const totalPages = Math.ceil(filteredTrips.length / itemsPerPage)
                     ) : (
                       <span className="inline-block px-2 py-1 text-xs text-green-700 rounded">Submitted</span>
                     )} */}
-                    <td className="border border-gray-700 p-1 text-center ">
-  <div className="flex items-center">
-    <input
-    type="checkbox"
-    className="w-4 h-4"
-    checked={!!selectedRows[dt.id]}
+                  <td className="border border-gray-700 p-1 text-center ">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4"
+                        checked={!!selectedRows[dt.id]}
                         onChange={() => handleCheckBox(dt.id)}
-    disabled={false} 
-  />
-  {dt.status === "Pending" && (
-    <span className=" inline-block px-2  text-xs text-yellow-600 rounded">
-      Not Submitted
-    </span>
-  )}
-  {dt.status === "Approved" && (
-    <span className=" inline-block px-2  text-xs text-green-700 rounded">
-      Submitted
-    </span>
-  )}
-  </div>
+                        disabled={false}
+                      />
+                      {dt.status === "Pending" && (
+                        <span className=" inline-block px-2  text-xs text-yellow-600 rounded">
+                          Not Submitted
+                        </span>
+                      )}
+                      {dt.status === "Approved" && (
+                        <span className=" inline-block px-2  text-xs text-green-700 rounded">
+                          Submitted
+                        </span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -787,13 +735,13 @@ const totalPages = Math.ceil(filteredTrips.length / itemsPerPage)
 
           {/* Pagination */}
           {filteredTrips.length > 0 && totalPages >= 1 && (
-  <Pagination
-    currentPage={currentPage}
-    totalPages={totalPages}
-    onPageChange={(page) => setCurrentPage(page)}
-    maxVisible={8}
-  />
-)}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+              maxVisible={8}
+            />
+          )}
 
           <div className="flex justify-end mt-5">
             <button

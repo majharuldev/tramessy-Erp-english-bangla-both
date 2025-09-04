@@ -75,10 +75,11 @@ const AddUserForm = () => {
   return (
     <div className="mt-10 md:p-2">
       <Toaster />
-      <h3 className="px-6 py-2 bg-primary text-white font-semibold rounded-t-md">
+      
+      <div className="mx-auto p-6 border-t-2 border-primary rounded-md shadow">
+        <h3 className="pb-4 text-primary font-semibold rounded-t-md">
         {isEditMode ? "Update User" : "Add User"}
       </h3>
-      <div className="mx-auto p-6 bg-gray-100 rounded-md shadow">
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Row 1 */}

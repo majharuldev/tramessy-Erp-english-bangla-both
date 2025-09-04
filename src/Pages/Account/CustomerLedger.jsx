@@ -42,7 +42,7 @@ const CustomerLedger = () => {
           </h1>
           <div className="mt-3 md:mt-0 w-full md:w-72">
             <div className="relative w-full">
-              <label className="text-primary text-sm font-semibold">
+              <label className="text-gray-700 text-sm font-semibold">
                 Select Customer Ledger
               </label>
               <select

@@ -79,7 +79,7 @@ const SalesChart = () => {
   console.log("chartData", chartData);
   return (
     <div className="bg-white rounded-xl mt-5 pt-5 border border-gray-200 shadow-md">
-      <h3 className="text-lg font-bold text-primary border-b border-gray-200 md:mx-5 pb-2">
+      <h3 className="text-lg font-bold text-gray-700 border-b border-gray-200 md:mx-5 pb-2">
         Monthly Sales Chart By Customer
       </h3>
       <ResponsiveContainer width="100%" height={400}>

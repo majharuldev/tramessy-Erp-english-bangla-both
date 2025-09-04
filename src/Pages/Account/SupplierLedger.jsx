@@ -259,8 +259,8 @@ const closingBalance =
             >
               <option value="">Select supplier</option>
               {supplies.map((supply, idx) => (
-                <option key={idx} value={supply.business_name}>
-                  {supply.business_name} 
+                <option key={idx} value={supply.supplier_name}>
+                  {supply.supplier_name} 
                   {/* (Due: {supply.due_amount}) */}
                 </option>
               ))}

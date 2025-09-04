@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa6";
 import { FaUsersCog } from "react-icons/fa";
 import { MdShop } from "react-icons/md";
-import logo from "../assets/tramessy.png";
+import logo from "../assets/AJ_Logo.png";
 // import avatar from "../assets/ms.png";
 import { Link, useLocation } from "react-router-dom";
 import useAdmin from "../hooks/useAdmin";
@@ -45,7 +45,7 @@ const Sidebar = () => {
         {/* Logo */}
         <div className="py-[15px] flex justify-center border-b border-gray-300">
           <Link to="/tramessy">
-            <img src={logo} alt="Logo" className="w-28" />
+            <img src={logo} alt="Logo" className="w-11" />
           </Link>
         </div>
 

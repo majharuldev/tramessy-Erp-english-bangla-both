@@ -51,13 +51,13 @@ const StatisticsCard = () => {
   return (
     <div className="">
       <div className="bg-white rounded-xl shadow-md p-4 border border-gray-200">
-        <h3 className="text-xl font-bold text-primary border-b border-gray-200 pb-2 mb-4">
+        <h3 className="text-xl font-bold text-gray-700 border-b border-gray-200 pb-2 mb-4">
           Document Reminder
         </h3>
         {expiringDocs.length > 0 ? (
           <div className="overflow-x-auto max-h-56 overflow-y-auto hide-scrollbar">
             <table className="min-w-full text-sm text-left border border-gray-200">
-              <thead className="bg-gray-100 text-primary">
+              <thead className="bg-gray-100 text-gray-700">
                 <tr>
                   <th className="p-2">SL.</th>
                   <th className="p-2">Vehicle Number</th>

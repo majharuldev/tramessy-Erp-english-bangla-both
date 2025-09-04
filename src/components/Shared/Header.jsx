@@ -29,7 +29,7 @@ const Header = ({ setMobileSidebarOpen }) => {
         </h3>
         <div>
           <h1 className="text-xl font-bold text-primary">
-            Transport Management Software
+            Transport Management System
           </h1>
           <p className="text-xs text-gray-600">
             Smart solutions in a changing world

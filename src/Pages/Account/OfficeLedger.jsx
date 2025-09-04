@@ -245,13 +245,13 @@ const printTable = () => {
       <div className="w-xs md:w-full overflow-hidden max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-2 py-10 border border-gray-200">
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold text-[#11375B] capitalize flex items-center gap-3">
+          <h1 className="text-xl font-bold text-gray-800 capitalize flex items-center gap-3">
             OFFICE LEDGER: {selectedBranch}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <button
               onClick={() => setShowFilter((prev) => !prev)}
-              className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               <FaFilter /> Filter
             </button>
@@ -260,20 +260,20 @@ const printTable = () => {
 
         {/* Export and Branch Selection */}
         <div className="md:flex items-center justify-between mb-4">
-          <div className="flex gap-1 md:gap-3 flex-wrap">
-            <button onClick={exportExcel} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+          <div className="flex gap-1 md:gap-3 text-gray-700 flex-wrap">
+            <button onClick={exportExcel} className="py-1 px-5 bg-white shadow  font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
               Excel
             </button>
-            <button onClick={exportPDF} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={exportPDF} className="py-1 px-5 bg-white shadow  font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
               PDF
             </button>
-            <button onClick={printTable} className="py-2 px-5 bg-gray-200 text-primary font-semibold rounded-md hover:bg-primary hover:text-white transition-all cursor-pointer">
+            <button onClick={printTable} className="py-1 px-5 bg-white shadow  font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
               Print
             </button>
           </div>
           <div className="mt-3 md:mt-0">
             <div className="relative w-full">
-              <label className="text-primary text-sm font-semibold">
+              <label className="text-gray-700 text-sm font-semibold">
                 Select Branch Ledger
               </label>
               <select
@@ -322,9 +322,9 @@ const printTable = () => {
                   setEndDate("");
                   setShowFilter(false);
                 }}
-                className="bg-gradient-to-r from-[#11375B] to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                className="w-full bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <IoIosRemoveCircle /> Clear Filter
+                <IoIosRemoveCircle /> Clear
               </button>
             </div>
           </div>
