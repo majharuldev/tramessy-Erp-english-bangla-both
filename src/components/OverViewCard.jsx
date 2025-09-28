@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
+import api from "../../utils/axiosConfig";
 const OverViewCard = () => {
   const [tripCost, setTripCost] = useState(0);
   const [tripCommission, setTripCommission] = useState(0);
   const [tripLabor, setTripLabor] = useState(0);
   const [tripOtherCost, setTripOtherCost] = useState(0);
-  const [dailySales, setDailySales] = useState({});
+  const [dailySales, setDailySales] = useState(0  );
   const [otherExpense, setOtherExpense] = useState(0);
   const [totalTodayExpense, setTotalTodayExpense] = useState(0);
   const [totalDispatch, setTotalDispatch] = useState(0);
@@ -15,27 +16,29 @@ const OverViewCard = () => {
   const [todayTripCount, setTodayTripCount] = useState(0);
   // daily trip
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/trip/list`)
+    api
+      .get(`/trip`)
       .then((res) => {
-        const allTrips = res.data.data;
+        const allTrips = res.data;
         // Get today's date in YYYY-MM-DD format
         const today = new Date().toISOString().split("T")[0];
-        // Filter trips matching today's date
-        const todayTrips = allTrips.filter((trip) => trip.date === today);
+        // Only today's approved trips
+    const todayApprovedTrips = allTrips.filter(
+      (trip) => trip.date === today && trip.status === "Approved"
+    );
         // Set today's trip count
-        setTodayTripCount(todayTrips.length);
+        setTodayTripCount(todayApprovedTrips.length);
       });
   }, []);
   // daily sales
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/trip/list`)
+    api
+      .get(`/trip`)
       .then((response) => {
-        const data = response.data.data;
+        const data = response.data;
         const today = new Date().toISOString().split("T")[0];
         const sale = data
-          .filter((item) => item.date === today)
+          .filter((item) => item.date === today && item.status === "Approved")
           .reduce((sum, trip) => sum + parseFloat(trip.total_rent || 0), 0);
 
         setDailySales(sale);
@@ -49,8 +52,8 @@ const OverViewCard = () => {
     const fetchTodayExpenses = async () => {
       try {
         // Fetch Purchase
-        const purchaseRes = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/purchase/list`
+        const purchaseRes = await api.get(
+          `/purchase`
         );
         const purchases = purchaseRes.data?.data || [];
         const todayPurchases = purchases.filter((item) => item.date === today);
@@ -61,11 +64,11 @@ const OverViewCard = () => {
         }, 0);
 
         // Fetch Trips
-        const tripRes = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/trip/list`
+        const tripRes = await api.get(
+          `/trip`
         );
-        const trips = tripRes.data?.data || [];
-        const todayTrips = trips.filter((item) => item.date === today);
+        const trips = tripRes.data || [];
+        const todayTrips = trips.filter((item) => item.date === today && item.status === "Approved");
 
         let commission = 0;
         let labor = 0;
@@ -123,8 +126,8 @@ const OverViewCard = () => {
   useEffect(() => {
     const fetchDispatch = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/account/list`
+        const response = await api.get(
+          `/account`
         );
         const data = response.data?.data || [];
         const total = data
@@ -141,8 +144,8 @@ const OverViewCard = () => {
   useEffect(() => {
     const fetchAmount = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/paymentRecived/list`
+        const response = await api.get(
+          `/paymentRecived`
         );
         const data = response.data?.data || [];
         const total = data

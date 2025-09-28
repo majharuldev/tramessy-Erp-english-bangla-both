@@ -33,7 +33,9 @@ const handleView = (employee) => {
     api
       .get(`/employee`)
       .then((response) => {
+        if (response.data.success) {
           setEmployee(response.data.data);
+        }
         setLoading(false);
       })
       .catch((error) => {

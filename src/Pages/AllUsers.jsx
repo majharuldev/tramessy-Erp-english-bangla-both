@@ -12,6 +12,7 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { saveAs } from "file-saver";
+import api from "../../utils/axiosConfig";
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,12 +25,12 @@ const AllUsers = () => {
   // search
   const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/users`)
+    api
+      .get(`/user`)
       .then((response) => {
-        if (response.data.status === "success") {
-          setUsers(response.data.data);
-        }
+        // if (response.data.message === "successful") {
+          setUsers(response.data.user);
+        // }
         setLoading(false);
       })
       .catch((error) => {
@@ -42,14 +43,14 @@ const AllUsers = () => {
   // delete by id
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/users/delete/${id}`,
+      const response = await api.delete(
+        `/users/${id}`,
         {
           method: "DELETE",
         }
       );
 
-      if (!response.ok) {
+      if (!response.data.user.success) {
         throw new Error("Failed to delete user");
       }
       // Remove car from local list
@@ -70,7 +71,7 @@ const AllUsers = () => {
     }
   };
   // search
-  const filteredUsers = users.filter(
+  const filteredUsers = users?.filter(
     (user) =>
       user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -233,7 +234,7 @@ const AllUsers = () => {
               <tr>
                 <th className="px-2 py-4">#</th>
                 <th className="px-2 py-4">Name</th>
-                <th className="px-2 py-4">Mobile</th>
+                {/* <th className="px-2 py-4">Mobile</th> */}
                 <th className="px-2 py-4">Email</th>
                 <th className="px-2 py-4">Role</th>
                 <th className="px-2 py-4">Status</th>
@@ -255,7 +256,7 @@ const AllUsers = () => {
                     {indexOfFirstItem + index + 1}
                   </td>
                   <td className="p-2">{user.name}</td>
-                  <td className="p-2">{user.phone}</td>
+                  {/* <td className="p-2">{user.phone}</td> */}
                   <td className="p-2">{user.email}</td>
                   <td className="p-2">{user.role}</td>
                   <td className="p-2">{user.status}</td>

@@ -48,8 +48,8 @@ const Customer = () => {
   // delete by id
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/customer/${id}`,
+      const response = await api.delete(
+        `/customer/${id}`,
         {
           method: "DELETE",
         }
@@ -166,7 +166,7 @@ const Customer = () => {
                   <td className="p-2">{dt.email}</td>
                   <td className="p-2">{dt.address}</td>
                   <td className="p-2">{dt.rate}</td>
-                  <td className="p-2">{dt.due}</td>
+                  <td className="p-2">{dt.opening_balance}</td>
                   <td className="p-2">{dt.status}</td>
                   <td className="px-2 action_column">
                     <div className="flex gap-1">

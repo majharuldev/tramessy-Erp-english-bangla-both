@@ -11,7 +11,6 @@ import autoTable from "jspdf-autotable";
 //
 import toast, { Toaster } from "react-hot-toast";
 import { IoIosRemoveCircle, IoMdClose } from "react-icons/io";
-import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { FaTruck } from "react-icons/fa6";
 import Pagination from "../components/Shared/Pagination";
 import api from "../../utils/axiosConfig";
@@ -34,11 +33,11 @@ const RentList = () => {
   // Fetch rent vehicle data
   useEffect(() => {
     api
-      .get(`/rent`)
+      .get(`/rentVehicle`)
       .then((response) => {
-        // if (response.data.status === "Success") {
-          setFuel(response.data);
-        // }
+        if (response.data.success) {
+          setFuel(response.data.data);
+        }
         setLoading(false);
       })
       .catch((error) => {
@@ -159,14 +158,14 @@ const RentList = () => {
   // delete by id
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/rent/delete/${id}`,
+      const response = await api.delete(
+        `/rent/${id}`,
         {
           method: "DELETE",
         }
       );
 
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error("Failed to delete trip");
       }
       // Remove fuel from local list
@@ -239,19 +238,19 @@ const RentList = () => {
           <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
             <button
               onClick={exportExcel}
-              className="py-2 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
               Excel
             </button>
             <button
               onClick={exportPDF}
-              className="py-2 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
               PDF
             </button>
             <button
               onClick={printTable}
-              className="py-2 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
               Print
             </button>

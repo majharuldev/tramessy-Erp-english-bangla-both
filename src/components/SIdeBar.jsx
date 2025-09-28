@@ -9,7 +9,7 @@ import {
   FaTruck,
   FaNewspaper,
 } from "react-icons/fa6";
-import { FaUsersCog } from "react-icons/fa";
+import { FaTruckPickup, FaUsersCog } from "react-icons/fa";
 import { MdShop } from "react-icons/md";
 import logo from "../assets/AJ_Logo.png";
 // import avatar from "../assets/ms.png";
@@ -81,8 +81,39 @@ const Sidebar = () => {
               </Link>
             </li>
               <>
+               
+                    <ul className=" text-sm mt-2">
+                      <li>
+                        <Link
+                          to="/tramessy/TripList"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
+                            isActive("/tramessy/TripList")
+                              ? "text-white bg-primary"
+                              : "text-gray-700 hover:text-primary"
+                          }`}
+                        >
+                          <FaTruckPickup />
+                          <span>Trip Management</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/CarList"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
+                            isActive("/tramessy/CarList")
+                              ? "text-white bg-primary"
+                              : "text-gray-700 hover:text-primary"
+                          }`}
+                        >
+                          <FaCarRear />
+                          <span>Vehicle Info</span>
+                        </Link>
+                      </li>
+                      
+                    </ul>
+              
                 {/* Fleet Management */}
-                <li className="text-gray-700 font-medium rounded-sm">
+                {/* <li className="text-gray-700 font-medium rounded-sm">
                   <div
                     role="button"
                     tabIndex={0}
@@ -102,60 +133,8 @@ const Sidebar = () => {
                     </span>
                   </div>
 
-                  <div
-                    className={`transition-all duration-900 ease-in-out overflow-hidden ${
-                      openMenu.fleet ? "max-h-[200px]" : "max-h-0"
-                    }`}
-                  >
-                    <ul className="px-2 text-sm mt-2">
-                      <li>
-                        <Link
-                          to="/tramessy/CarList"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/CarList")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
-                          }`}
-                        >
-                          
-                          <span>Vehicle</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/tramessy/TripList"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/TripList")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
-                          }`}
-                        >
-                          
-                          <span>Trip</span>
-                        </Link>
-                      </li>
-                      {/* <li>
-                        <Link
-                          to="/tramessy/Maintenance"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/Maintenance")
-                              ? "text-white bg-primary"
-                              : "text-gray-500 hover:text-primary"
-                          }`}
-                        >
-                          <div
-                            className={`w-[6px] h-[6px] rounded-full bg-primary ${
-                              isActive("/tramessy/Maintenance")
-                                ? "bg-white"
-                                : "bg-primary"
-                            }`}
-                          ></div>
-                          <span>Maintenance</span>
-                        </Link>
-                      </li> */}
-                    </ul>
-                  </div>
-                </li>
+                  
+                </li> */}
                 {/* Vendor management */}
                 <li className="text-gray-700 font-medium rounded-sm">
                   <div

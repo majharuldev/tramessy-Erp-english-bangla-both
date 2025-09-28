@@ -23,9 +23,9 @@ const AddUserForm = () => {
       const fetchUserData = async () => {
         try {
           const response = await api.get(
-            `/users/${id}`
+            `/user/${id}`
           );
-          const userData = response.data.data;
+          const userData = response.data;
           
           // Set form values with fetched data
           Object.keys(userData).forEach(key => {
@@ -48,24 +48,24 @@ const AddUserForm = () => {
       const { confirmPassword, ...submitData } = data;
 
       const url = isEditMode 
-        ? `${import.meta.env.VITE_BASE_URL}/users/${id}`
-        : `${import.meta.env.VITE_BASE_URL}/users`;
+        ? `/user/${id}`
+        : `/register`;
 
       const method = isEditMode ? 'put' : 'post';
 
       const response = await api[method](url, submitData);
       const resData = response.data;
 
-      // if (resData.status === "success") {
+      if (resData.data.message === "successful") {
         toast.success(
           `User ${isEditMode ? 'updated' : 'created'} successfully!`, 
           { position: "top-right" }
         );
         if (!isEditMode) reset();
         navigate("/tramessy/AllUsers")
-      // } else {
-      //   toast.error("Server error: " + (resData.message || "Unknown issue"));
-      // }
+      } else {
+        toast.error("Server error: " + (resData.message || "Unknown issue"));
+      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || error.message || "Unknown error";
@@ -88,16 +88,17 @@ const AddUserForm = () => {
               <div className="w-full">
                 <InputField name="name" label="Name" required={!isEditMode} />
               </div>
-              <div className="w-full">
+              {/* <div className="w-full">
                 <InputField name="phone" label="Phone" type="number" required={!isEditMode} />
+              </div> */}
+              <div className="w-full">
+                <InputField name="email" label="Email" type="email" required={!isEditMode} />
               </div>
             </div>
 
             {/* Row 2 */}
             <div className="md:flex justify-between gap-3">
-              <div className="w-full">
-                <InputField name="email" label="Email" type="email" required={!isEditMode} />
-              </div>
+              
                   <div className="w-full">
                     <InputField
                       name="password"
@@ -109,7 +110,7 @@ const AddUserForm = () => {
                   </div>
                   <div className="w-full">
                     <InputField
-                      name="confirmPassword"
+                      name="password_confirmation"
                       label="Confirm Password"
                       type="password"
                       // required={!isEditMode}

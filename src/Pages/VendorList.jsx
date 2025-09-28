@@ -33,7 +33,7 @@ const VendorList = () => {
     api
       .get(`/vendor`)
       .then((response) => {       
-          setVendor(response.data);
+          setVendor(response.data.data);
         setLoading(false);
       })
       .catch((error) => {

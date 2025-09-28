@@ -2,7 +2,7 @@ const BtnSubmit = ({ children, loading }) => {
   return (
     <button
       type="submit"
-      className="mt-4 bg-primary text-white text-sm px-6 py-2 rounded hover:bg-secondary transition-all duration-300 cursor-pointer"
+      className="mt-4 bg-primary text-white text-sm px-6 py-2 rounded hover:bg-primary/80 transition-all duration-300 cursor-pointer"
     >
       {loading ? (
   <span className="flex items-center gap-2">

@@ -293,13 +293,9 @@ export const router = createBrowserRouter([
         path: "/tramessy/UpdateVendorForm/:id",
         element: (
           <PrivateRoute>
-            <UpdateVendorForm />
+            <AddVendorForm />
           </PrivateRoute>
         ),
-        loader: ({ params }) =>
-          fetch(
-            `${import.meta.env.VITE_BASE_URL}/vendor/show/${params.id}`
-          ),
       },
       {
         path: "/tramessy/RentList",
@@ -321,13 +317,9 @@ export const router = createBrowserRouter([
         path: "/tramessy/UpdateRentVehicleForm/:id",
         element: (
           <PrivateRoute>
-            <UpdateRentVehicleForm />
+            <AddRentVehicleForm />
           </PrivateRoute>
         ),
-        loader: ({ params }) =>
-          fetch(
-            `${import.meta.env.VITE_BASE_URL}/rent/show/${params.id}`
-          ),
       },
       {
         path: "/tramessy/DailyIncome",

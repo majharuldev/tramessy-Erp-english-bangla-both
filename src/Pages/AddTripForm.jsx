@@ -36,6 +36,7 @@ export default function AddTripForm() {
   const [unloadpoints, setUnloadpoints] = useState([]);
   const [branch, setBranch] = useState([]);
 
+  // Initialize react-hook-form
   const methods = useForm({
     defaultValues: {
       date: "",
@@ -81,7 +82,7 @@ export default function AddTripForm() {
   const { watch, handleSubmit, reset, setValue, control } = methods;
 
   const customerOptions = useMemo(() =>
-    customer.map((c) => ({
+    customer?.map((c) => ({
       value: c.customer_name,
       label: c.customer_name,
       mobile: c.mobile,
@@ -196,7 +197,7 @@ export default function AddTripForm() {
       try {
         // Fetch rates data first
         const ratesRes = await api.get(`/rate`);
-        const ratesData = await ratesRes.json();
+        const ratesData = ratesRes.data;
         setRates(ratesData.data);
 
         // Extract unique load points, unload points, vehicle categories and sizes from rates
@@ -229,47 +230,28 @@ export default function AddTripForm() {
           vendorRes,
           branchRes,
         ] = await Promise.all([
-          api.get(`${import.meta.env.VITE_BASE_URL}/vehicle`),
-          api.get(`${import.meta.env.VITE_BASE_URL}/driver`),
-          api.get(`${import.meta.env.VITE_BASE_URL}/rent`),
-          api.get(`${import.meta.env.VITE_BASE_URL}/rent`),
+          api.get(`/vehicle`),
+          api.get(`/driver`),
+          api.get(`/rentVehicle`),
+          api.get(`/rentVehicle`),
           api.get(`/customer`),
-          api.get(`${import.meta.env.VITE_BASE_URL}/vendor`),
-          fetch(`${import.meta.env.VITE_BASE_URL}/office`),
+          api.get(`/vendor`),
+          api.get(`/office`),
         ]);
-
-        const [
-          vehicleData,
-          driverData,
-          vendorVehicleData,
-          vendorDriversData,
-          customerData,
-          vendorData,
-          branchData,
-        ] = await Promise.all([
-          vehicleRes.json(),
-          driverRes.json(),
-          vendorVehicleRes.json(),
-          vendorDriversRes.json(),
-          customerRes.json(),
-          vendorRes.json(),
-          branchRes.json(),
-        ]);
-        console.log(customerData, 'cust')
-        setVehicle(vehicleData.data);
-        setDriver(driverData.data);
-        setVendorVehicle(vendorVehicleData.data);
-        setVendorDrivers(vendorDriversData.data);
-        setCustomer(customerData);
-        setVendors(vendorData.data);
-        setBranch(branchData.data);
+        setVehicle(vehicleRes.data);
+        setDriver(driverRes.data);
+        setVendorVehicle(vendorVehicleRes.data.data);
+        setVendorDrivers(vendorDriversRes.data.data);
+        setCustomer(customerRes.data);
+        setVendors(vendorRes.data.data);
+        setBranch(branchRes.data.data);
 
         if (id) {
           const tripRes = await api.get(
-            `${import.meta.env.VITE_BASE_URL}/trip/${id}`
+            `/trip/${id}`
           );
-          if (tripRes.ok) {
-            const { data: tripData } = await tripRes.json();
+          if (tripRes.data) {
+            const tripData = tripRes.data;
 
             if (tripData.date) {
               tripData.date = new Date(tripData.date).toISOString().split("T")[0];
@@ -300,8 +282,15 @@ export default function AddTripForm() {
             };
 
             reset(parsedTripData);
+            // if (!parsedTripData.sms_sent) {
+            //   setValue("sms_sent", "yes");
+            // }
             if (!parsedTripData.sms_sent) {
-              setValue("sms_sent", "yes");
+              if (isAdmin) {
+                setValue("sms_sent", "no"); // Admin হলে SMS বন্ধ
+              } else {
+                setValue("sms_sent", "yes");
+              }
             }
           }
         }
@@ -316,8 +305,8 @@ export default function AddTripForm() {
 
   // Generate options for dropdowns
   const vehicleOptions = vehicle.map((v) => ({
-    value: `${v.registration_zone} ${v.registration_serial} ${v.registration_number}`,
-    label: `${v.registration_zone} ${v.registration_serial} ${v.registration_number}`,
+    value: `${v.reg_zone} ${v.reg_serial} ${v.reg_no}`,
+    label: `${v.reg_zone} ${v.reg_serial} ${v.reg_no}`,
     category: v.vehicle_category,
     size: v.vehicle_size,
   }));
@@ -327,9 +316,9 @@ export default function AddTripForm() {
     label: d.driver_name,
     mobile: d.driver_mobile,
   }));
-
+console.log(vendorVehicle);
   const vendorVehicleOptions = vendorVehicle.map((v) => ({
-    value: `${v.registration_zone} ${v.registration_serial} ${v.registration_number}`,
+    value: `${v?.registration_zone} ${v?.registration_serial} ${v?.registration_number}`,
     label: `${v.registration_zone} ${v.registration_serial} ${v.registration_number}`,
     category: v.vehicle_category,
     size: v.vehicle_size,
@@ -434,22 +423,23 @@ export default function AddTripForm() {
     try {
       setLoading(true);
       const url = id
-        ? `${import.meta.env.VITE_BASE_URL}/trip/${id}`
-        : `${import.meta.env.VITE_BASE_URL}/trip`;
+        ? `/trip/${id}`
+        : `/trip`;
 
       if (!id) {
         data.ref_id = refId;
       }
 
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const res = id
+      ? await api.put(url, data, { headers: { "Content-Type": "application/json" } }) // update
+      : await api.post(url, data, { headers: { "Content-Type": "application/json" } }); // create
 
-      if (res.ok) {
+      if (res.data.success) {
         toast.success(id ? "Trip updated successfully!" : "Trip created successfully!");
+        if (id) {
         navigate("/tramessy/tripList");
+      }
+      reset();
       } else {
         throw new Error(id ? "Failed to update trip" : "Failed to create trip");
       }
@@ -487,7 +477,7 @@ export default function AddTripForm() {
                     inputRef={(e) => {
                       startDateRef.current = e
                     }}
-                    
+
                   />
                 </div>
                 <div className="relative w-full">
@@ -499,7 +489,7 @@ export default function AddTripForm() {
                     inputRef={(e) => {
                       endDateRef.current = e
                     }}
-                    
+
                   />
                 </div>
                 <SelectField
@@ -646,7 +636,7 @@ export default function AddTripForm() {
                   />
                 )}
 
-                <SelectField
+                {isFixedRateCustomer &&(<><SelectField
                   name="vehicle_category"
                   label="Vehicle Category"
                   options={vehicleCategoryOptions}
@@ -661,18 +651,18 @@ export default function AddTripForm() {
                   control={control}
                   required={!id}
                   isCreatable={!isFixedRateCustomer}
-                />
+                /></>)}
                 <InputField name="challan" label="Challan No." />
 
-                <div className="w-full">
+                <div className={`w-full ${isAdmin? "block": "hidden"}`}>
                   <InputField
                     hidden={isAdmin ? false : true}
                     name="total_rent"
                     label="Total Rent/Bill Amount"
                     type="number"
-                    required={id ? false : true}
+                    required={ false}
                     readOnly={isRateFound}
-                    className={isRateFound ? "bg-gray-100" : ""}
+                    className={`${isRateFound ? "bg-gray-100" : ""}`}
                   />
                 </div>
               </div>
@@ -690,22 +680,22 @@ export default function AddTripForm() {
                   {/* <InputField name="driver_commission" label="Driver Commission" type="number" /> */}
                   <InputField name="labor" label="Labour Cost" type="number" />
                   <InputField name="fuel_cost" label="Fuel Cost" type="number" />
+                  <InputField name="night_guard" label="Night Guard" type="number" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                  <InputField name="night_guard" label="Night Guard" type="number" />
+                  
                   <InputField name="toll_cost" label="Toll Cost" type="number" />
                   <InputField name="feri_cost" label="Feri Cost" type="number" />
                   <InputField name="police_cost" label="Police Cost" type="number" />
+                  <InputField name="chada" label="Chada" type="number" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                  <InputField name="chada" label="Chada" type="number" />
+                  
                   <InputField name="food_cost" label="Food Cost" type="number" />
                   <InputField name="others_cost" label="Other Costs" type="number" />
                   <InputField name="additional_cost" label="Additional Load Cost" type="number" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
                   <InputField name="total_exp" label="Total Expense" readOnly />
                 </div>
               </div>
@@ -724,7 +714,7 @@ export default function AddTripForm() {
                 </div>
               </div>
             )}
-            <div className="mt-4">
+            {!isAdmin &&<div className="mt-4">
               <h3 className="text-secondary font-medium mb-2">SMS Sent</h3>
               <div className="flex gap-6">
                 <label className="flex items-center gap-2">
@@ -744,7 +734,7 @@ export default function AddTripForm() {
                   No
                 </label>
               </div>
-            </div>
+            </div>}
 
 
             {/* Submit Button */}

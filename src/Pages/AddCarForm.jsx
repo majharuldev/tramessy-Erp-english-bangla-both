@@ -109,7 +109,7 @@ const vehicleSizes = {
         <Toaster position="top-center" reverseOrder={false} />  
         <div className="mx-auto p-6  rounded-md shadow-md border-t-2 border-primary">
            <h3 className="pt-1 pb-4 text-primary font-semibold rounded-t-md">
-          {id ? "Add Vehicle Information" : "Update Vehicle Information"}
+          {id ? "Update Vehicle Information " : "Add Vehicle Information"}
         </h3>
           {/* Vehicle & Driver Name */}
           <div className="md:flex justify-between gap-3">
@@ -123,14 +123,7 @@ const vehicleSizes = {
                     register("date").ref(e)
                     dateRef.current = e
                   }}
-                  icon={
-                    <span
-                      className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 rounded-r"
-                      onClick={() => dateRef.current?.showPicker?.()}
-                    >
-                      <FiCalendar className="text-gray-700 cursor-pointer" />
-                    </span>
-                  }
+                 
                 />
               </div>
             <div className="w-full">

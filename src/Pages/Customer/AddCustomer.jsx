@@ -34,33 +34,7 @@ const AddCustomer = () => {
     }
   }, [ id, reset]);
 
-  //Add & update customer handler
-  // const onSubmit = async (data) => {
-  //   try {
-  //     const formData = new FormData();
-  //     for (const key in data) {
-  //       formData.append(key, data[key]);
-  //     }
-  //     formData.append("ref_id", generateRefId());
-  //     const response = await api.post(
-  //       `${import.meta.env.VITE_BASE_URL}/customer`,
-  //       formData
-  //     );
-  //     const resData = response.data;
-  //     // if (resData.status === "Success") {
-  //       toast.success("Customer data saved successfully!", {
-  //         position: "top-right",
-  //       });
-  //       reset();
-  //       navigate("/tramessy/Customer")
-  //   } catch (error) {
-  //     console.error(error);
-  //     const errorMessage =
-  //       error.response?.data?.message || error.message || "Unknown error";
-  //     toast.error("Server Error: " + errorMessage);
-  //   }
-  // };
-
+  // Add & update handler function
    const onSubmit = async (data) => {
     try {
       const formData = new FormData();
