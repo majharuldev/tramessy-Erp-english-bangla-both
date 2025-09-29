@@ -29,12 +29,12 @@ const Office = () => {
   // Fetch office data
   useEffect(() => {
     api
-      .get(`/office/list`)
+      .get(`/office`)
       .then((response) => {
-        // if (response.data.status === "Success") {
-          const data = response.data;
+        if (response.data.success) {
+          const data = response.data.data;
           setOffice(data);
-        // }
+        }
         setLoading(false);
       })
       .catch((error) => {
@@ -310,7 +310,7 @@ const printOfficeTable = () => {
                   <td className="p-2 font-bold">
                     {indexOfFirstItem + index + 1}
                   </td>
-                  <td className="p-2">{tableFormatDate(dt.date)}</td>
+                  <td className="p-2">{tableFormatDate(dt.created_at)}</td>
                   <td className="p-2">{dt.branch_name}</td>
                   <td className="p-2">{dt.address}</td>
                   <td className="p-2">{dt.opening_balance}</td>
@@ -389,3 +389,6 @@ const printOfficeTable = () => {
 };
 
 export default Office;
+
+
+

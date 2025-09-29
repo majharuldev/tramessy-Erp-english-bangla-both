@@ -30,7 +30,7 @@ const HelperList = () => {
     api
       .get(`/helper`)
       .then((response) => {
-        if (response.data.status === "Success") {
+        if (response.data.success) {
           setHelper(response.data.data);
         }
         setLoading(false);
@@ -76,10 +76,10 @@ const HelperList = () => {
   // view Helper by id
   const handleView = async (id) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/helper/show/${id}`
+      const response = await api.get(
+        `/helper/${id}`
       );
-      if (response.data.status === "Success") {
+      if (response.data.success) {
         setSelectedHelper(response.data.data);
         setViewModalOpen(true);
       } else {

@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BtnSubmit from "../components/Button/BtnSubmit";
 import { InputField, SelectField } from "../components/Form/FormFields";
+import api from "../../utils/axiosConfig";
 
 const HelperForm = () => {
   const navigate = useNavigate()
@@ -21,8 +22,8 @@ const HelperForm = () => {
     if (isEditMode) {
       const fetchHelperData = async () => {
         try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_BASE_URL}/helper/${id}`
+          const response = await api.get(
+            `/helper/${id}`
           );
           const helperData = response.data.data;
           
@@ -49,15 +50,15 @@ const HelperForm = () => {
       }
 
       const url = isEditMode 
-        ? `${import.meta.env.VITE_BASE_URL}/helper/update/${id}`
-        : `${import.meta.env.VITE_BASE_URL}/helper/create`;
+        ? `/helper/${id}`
+        : `/helper`;
 
-      const method = isEditMode ? 'post' : 'post';
+      const method = isEditMode ? 'put' : 'post';
 
-      const response = await axios[method](url, formData);
+      const response = await api[method](url, formData);
       const resData = response.data;
 
-      if (resData.status === "Success") {
+      if (resData.success) {
         toast.success(
           `Helper ${isEditMode ? 'updated' : 'saved'} successfully`, 
           { position: "top-right" }

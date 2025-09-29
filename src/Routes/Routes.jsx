@@ -30,7 +30,6 @@ import AddVendorForm from "../Pages/AddVendorForm";
 import RentList from "../Pages/RentList";
 import AddRentVehicleForm from "../Pages/AddRentVehicleForm";
 import EmployeeList from "../Pages/HR/HRM/Employee-list";
-import AddEmployee from "../Pages/HR/HRM/AddEmployee";
 import Leave from "../Pages/HR/Leave";
 import LeaveForm from "../Pages/HR/LeaveForm";
 import PurchaseList from "../Pages/Purchase/PurchaseList";
@@ -89,6 +88,7 @@ import OfficialProduct from "../Pages/Purchase/OfficialProducts";
 import OfficialProductForm from "../Pages/Purchase/OfficialProductForm";
 import Bill from "../Pages/Billing/Bill";
 import SalarySheet from "../Pages/HR/Payroll/SalarySheet";
+import EmployeeForm from "../Pages/HR/HRM/AddEmployee";
 export const router = createBrowserRouter([
   {
     path: "/tramessy",
@@ -423,29 +423,22 @@ export const router = createBrowserRouter([
         path: "/tramessy/HR/HRM/UpdateOfficeForm/:id",
         element: (
           <PrivateRoute>
-            <UpdateOfficeForm />
+            <OfficeForm />
           </PrivateRoute>
         ),
-        loader: ({ params }) =>
-          fetch(
-            `${import.meta.env.VITE_BASE_URL}/office/show/${params.id}`
-          ),
+       
       },
       {
         path: "/tramessy/HR/HRM/AddEmployee",
-        element: <AddEmployee />,
+        element: <EmployeeForm />,
       },
       {
         path: "/tramessy/UpdateEmployeeForm/:id",
         element: (
           <PrivateRoute>
-            <UpdateEmployeeForm />
+            <EmployeeForm />
           </PrivateRoute>
         ),
-        loader: ({ params }) =>
-          fetch(
-            `${import.meta.env.VITE_BASE_URL}/employee/show/${params.id}`
-          ),
       },
       {
         path: "/tramessy/HR/Attendance",

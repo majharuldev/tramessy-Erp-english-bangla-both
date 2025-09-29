@@ -16,6 +16,7 @@ import { FiFileText, FiX } from "react-icons/fi"
 import Pagination from "../../../components/Shared/Pagination"
 import SalaryPaySlip from "./PaySlipPrint"
 import { useReactToPrint } from "react-to-print"
+import api from "../../../../utils/axiosConfig"
 
 
 const SalaryExpense = () => {
@@ -42,25 +43,23 @@ const SalaryExpense = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSlip, setSelectedSlip] = useState(null)
-const printSlipRef =useRef();
+  const printSlipRef = useRef();
   const salaryCategories = [
     "Salary",
-    "Advance"
   ];
 
-  //   branch api
+  //   branch api fetch data
   const [branches, setBranches] = useState([]);
-
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/office/list`);
-        if (response.data.status === "Success") {
+        const response = await api.get(`/office`);
+        if (response.data.success) {
           setBranches(response.data.data);
         }
       } catch (err) {
         console.error("Error fetching branches:", err);
-        toast.error("Failed to load branch list");
+        // toast.error("Failed to load branch list");
       }
     };
 
@@ -73,8 +72,8 @@ const printSlipRef =useRef();
     const fetchEmployees = async () => {
       try {
         setEmployeesLoading(true);
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/employee/list`);
-        if (response.data.status === "Success") {
+        const response = await api.get(`/employee`);
+        if (response.data.success) {
           setEmployees(response.data.data);
         }
       } catch (err) {
@@ -92,7 +91,7 @@ const printSlipRef =useRef();
   const showModal = async (record = null) => {
     if (record) {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/expense/${record.id}`)
+        const res = await api.get(`/expense/${record.id}`)
         const data = res.data?.data
         setFormData({
           date: data?.date || "",
@@ -135,13 +134,14 @@ const printSlipRef =useRef();
     setErrors({})
   }
 
+
+  // fetch expense salary
   useEffect(() => {
     fetchExpenses()
   }, [])
-
   const fetchExpenses = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/expense/list`)
+      const response = await api.get(`/expense`)
       const allExpenses = response.data?.data || [];
       const salaryExpenses = allExpenses.filter(expense =>
         expense.payment_category === 'Salary' || expense.payment_category === "Advance"
@@ -155,6 +155,7 @@ const printSlipRef =useRef();
     }
   }
 
+  // form validation
   const validateForm = () => {
     const newErrors = {}
     if (!formData.date) newErrors.date = "Date is required"
@@ -167,6 +168,7 @@ const printSlipRef =useRef();
     return Object.keys(newErrors).length === 0
   }
 
+  // submit data handler function
   const handleFormSubmit = async (e) => {
     e.preventDefault()
 
@@ -179,10 +181,10 @@ const printSlipRef =useRef();
       }
 
       if (editingId) {
-        await axios.post(`${import.meta.env.VITE_BASE_URL}/expense/update/${editingId}`, payload)
+        await api.post(`/expense/${editingId}`, payload)
         toast.success("Expense Data Update successful")
       } else {
-        await axios.post(`${import.meta.env.VITE_BASE_URL}/expense/save`, payload)
+        await api.post(`/expense`, payload)
         toast.success("Epense Added successful")
       }
 
@@ -196,6 +198,7 @@ const printSlipRef =useRef();
     }
   }
 
+  // filter and search
   const filteredData = expenses.filter((item) => {
     const itemDate = dayjs(item.date).format("YYYY-MM-DD");
 
@@ -219,32 +222,32 @@ const printSlipRef =useRef();
     return matchesSearch && matchesDate;
   })
 
-   // challan print func
-    const handlePrint = useReactToPrint({
-      contentRef: printRef,
-      documentTitle: "Invoice Print",
-      onAfterPrint: () => {
-        console.log("Print completed")
-        setSelectedSlip(null)
-      },
-      onPrintError: (error) => {
-        console.error("Print error:", error)
-      },
-    })
+  // challan print func
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Invoice Print",
+    onAfterPrint: () => {
+      console.log("Print completed")
+      setSelectedSlip(null)
+    },
+    onPrintError: (error) => {
+      console.error("Print error:", error)
+    },
+  })
 
-    const handlePrintClick = (item) => {
-      const formatted = {
-        date:item.date,
-        branch: item.branch_name,
-      }
-
-      setSelectedSlip(formatted)
-
-      // Use setTimeout to ensure the component is rendered before printing
-      setTimeout(() => {
-        handlePrint()
-      }, 100)
+  const handlePrintClick = (item) => {
+    const formatted = {
+      date: item.date,
+      branch: item.branch_name,
     }
+
+    setSelectedSlip(formatted)
+
+    // Use setTimeout to ensure the component is rendered before printing
+    setTimeout(() => {
+      handlePrint()
+    }, 100)
+  }
 
   // csv
   const exportCSV = () => {
@@ -382,7 +385,7 @@ const printSlipRef =useRef();
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
             <FaTruck className="text-gray-800 text-2xl" />
-            Salary Expense
+            Salary Dispatch
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             {/* <Link to="/tramessy/AddSallaryExpenseForm"> */}
@@ -585,10 +588,10 @@ const printSlipRef =useRef();
         )}
       </div>
 
-       {/* Hidden Component for Printing */}
-            <div style={{ display: "none" }} >
-              {selectedSlip && <SalaryPaySlip ref={printSlipRef} data={selectedSlip} />}
-            </div>
+      {/* Hidden Component for Printing */}
+      <div style={{ display: "none" }} >
+        {selectedSlip && <SalaryPaySlip ref={printSlipRef} data={selectedSlip} />}
+      </div>
 
       {/* Modal */}
       {isModalVisible && (

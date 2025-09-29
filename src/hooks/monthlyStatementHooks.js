@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
+import api from "../../utils/axiosConfig";
 
 const useMonthlyStatementData = () => {
   const [data, setData] = useState([]);
@@ -11,9 +12,9 @@ const useMonthlyStatementData = () => {
       try {
         setLoading(true);
         const [tripsRes, purchasesRes, expensesRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_BASE_URL}/trip/list`),
-          axios.get(`${import.meta.env.VITE_BASE_URL}/purchase/list`),
-          axios.get(`${import.meta.env.VITE_BASE_URL}/expense/list`)
+          api.get(`/trip`),
+          api.get(`/purchase`),
+          api.get(`/expense`)
         ]);
 
         const trips = tripsRes.data?.data || [];

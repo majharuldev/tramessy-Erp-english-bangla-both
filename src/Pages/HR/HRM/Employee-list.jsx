@@ -7,17 +7,18 @@ import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
 import Pagination from "../../../components/Shared/Pagination";
 import api from "../../../../utils/axiosConfig";
+import { tableFormatDate } from "../../../hooks/formatDate";
 
 const EmployeeList = () => {
   const [employee, setEmployee] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewModal, setViewModal] = useState(false);
-const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-const handleView = (employee) => {
-  setSelectedEmployee(employee);
-  setViewModal(true);
-};
+  const handleView = (employee) => {
+    setSelectedEmployee(employee);
+    setViewModal(true);
+  };
   // delete modal
   const [isOpen, setIsOpen] = useState(false);
   const toggleModal = () => setIsOpen(!isOpen);
@@ -75,7 +76,10 @@ const handleView = (employee) => {
   // search
   const filteredEmployeeList = employee.filter((dt) => {
     const term = searchTerm.toLowerCase();
-    return dt.full_name?.toLowerCase().includes(term);
+
+    // dt.full_name?.toLowerCase().includes(term) ||
+    return dt.email?.toLowerCase().includes(term) ||
+    dt.mobile?.toLowerCase().includes(term);
   });
   if (loading) return <p className="text-center mt-16">Loading employee...</p>;
   // pagination
@@ -121,17 +125,17 @@ const handleView = (employee) => {
               className="border border-gray-300 rounded-md outline-none text-xs py-2 ps-2 pr-5"
             />
             {/*  Clear button */}
-    {searchTerm && (
-      <button
-        onClick={() => {
-          setSearchTerm("");
-          setCurrentPage(1);
-        }}
-        className="absolute right-7 top-[6rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
-      >
-        ✕
-      </button>
-    )}
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setCurrentPage(1);
+                }}
+                className="absolute right-7 top-[6rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
         <div className="mt-5 overflow-x-auto rounded-md">
@@ -152,72 +156,72 @@ const handleView = (employee) => {
               {
                 currentEmployee.length === 0 ? (
                   <tr>
-                  <td colSpan="8" className="text-center p-4 text-gray-500">
-                    No Employee found
-                  </td>
+                    <td colSpan="8" className="text-center p-4 text-gray-500">
+                      No Employee found
+                    </td>
                   </tr>)
-              :(currentEmployee?.map((dt, index) => {
-                return (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-50 transition-all border border-gray-200"
-                  >
-                    <td className="px-2 py-1 font-bold">
-                      {indexOfFirstItem + index + 1}.
-                    </td>
-                    <td className="px-2 py-1">
-                      <img
-                        src={`${import.meta.env.VITE_BASE_URL}/public/uploads/employee/${dt.image}`}
-                        alt=""
-                        className="w-20 h-20 rounded-full"
-                      />
-                    </td>
-                    <td className="px-2 py-1">{dt.full_name}</td>
-                    <td className="px-2 py-1">{dt.email}</td>
-                    <td className="px-2 py-1">{dt.join_date}</td>
-                    <td className="px-2 py-1">{dt.designation}</td>
-                    <td className="px-2 py-1">{dt.mobile}</td>
-                    <td className="px-2 action_column">
-                      <div className="flex gap-1">
-                        <Link to={`/tramessy/UpdateEmployeeForm/${dt.id}`}>
-                          <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
-                            <FaPen className="text-[12px]" />
-                          </button>
-                        </Link>
-                        <button
-                           onClick={() => handleView(dt)}
-                          className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer"
-                        >
-                          <FaEye className="text-[12px]" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedEmployeeId(dt.id);
-                            setIsOpen(true);
-                          }}
-                          className="text-red-900 hover:text-white hover:bg-red-900 px-2 py-1 rounded shadow-md transition-all cursor-pointer"
-                        >
-                          <FaTrashAlt className="text-[12px]" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              }))
+                  : (currentEmployee?.map((dt, index) => {
+                    return (
+                      <tr
+                        key={index}
+                        className="hover:bg-gray-50 transition-all border border-gray-200"
+                      >
+                        <td className="px-2 py-1 font-bold">
+                          {indexOfFirstItem + index + 1}.
+                        </td>
+                        <td className="px-2 py-1">
+                          <img
+                            src={`${import.meta.env.VITE_BASE_URL}/public/uploads/employee/${dt.image}`}
+                            alt=""
+                            className="w-20 h-20 rounded-full"
+                          />
+                        </td>
+                        <td className="px-2 py-1">{dt.full_name}</td>
+                        <td className="px-2 py-1">{dt.email}</td>
+                        <td className="px-2 py-1">{tableFormatDate(dt.join_date)}</td>
+                        <td className="px-2 py-1">{dt.designation}</td>
+                        <td className="px-2 py-1">{dt.mobile}</td>
+                        <td className="px-2 action_column">
+                          <div className="flex gap-1">
+                            <Link to={`/tramessy/UpdateEmployeeForm/${dt.id}`}>
+                              <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
+                                <FaPen className="text-[12px]" />
+                              </button>
+                            </Link>
+                            <button
+                              onClick={() => handleView(dt)}
+                              className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer"
+                            >
+                              <FaEye className="text-[12px]" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedEmployeeId(dt.id);
+                                setIsOpen(true);
+                              }}
+                              className="text-red-500 hover:text-white hover:bg-red-500 px-2 py-1 rounded shadow-md transition-all cursor-pointer"
+                            >
+                              <FaTrashAlt className="text-[12px]" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }))
               }
             </tbody>
           </table>
         </div>
-      
+
         {/* Pagination */}
         {currentEmployee.length > 0 && totalPages >= 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-          maxVisible={8} 
-        />
-      )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+            maxVisible={8}
+          />
+        )}
 
       </div>
       {/* Delete modal */}
@@ -258,51 +262,51 @@ const handleView = (employee) => {
 
       {/* view modal */}
       {viewModal && selectedEmployee && (
-  <div className="fixed inset-0 flex items-center justify-center bg-[#000000ad] z-50">
-    <div className="relative bg-white rounded-lg shadow-lg p-6 w-[500px] max-w-2xl border border-gray-300">
-      <button
-        onClick={() => setViewModal(false)}
-        className="text-2xl absolute top-2 right-2 text-white bg-gray-200 hover:bg-red-700 cursor-pointer rounded-sm"
-      >
-        <IoMdClose />
-      </button>
+        <div className="fixed inset-0 flex items-center justify-center bg-[#000000ad] z-50">
+          <div className="relative bg-white rounded-lg shadow-lg p-6 w-[500px] max-w-2xl border border-gray-300">
+            <button
+              onClick={() => setViewModal(false)}
+              className="text-2xl absolute top-2 right-2 text-white bg-gray-200 hover:bg-red-700 cursor-pointer rounded-sm"
+            >
+              <IoMdClose />
+            </button>
 
-      <h2 className="text-xl font-bold text-center text-primary mb-4">
-        Employee Details
-      </h2>
+            <h2 className="text-xl font-bold text-center text-primary mb-4">
+              Employee Details
+            </h2>
 
-      <div className="flex items-center gap-4 mb-4">
-        <img
-          src={
-            selectedEmployee.image
-              ? `${import.meta.env.VITE_BASE_URL}/public/uploads/employee/${selectedEmployee.image}`
-              : "https://via.placeholder.com/100"
-          }
-          alt={selectedEmployee.full_name}
-          className="w-24 h-24 rounded-full border"
-        />
-        <div>
-          <p><span className="font-semibold">Name:</span> {selectedEmployee.full_name}</p>
-          <p><span className="font-semibold">Email:</span> {selectedEmployee.email}</p>
-          <p><span className="font-semibold">Mobile:</span> {selectedEmployee.mobile}</p>
-          <p><span className="font-semibold">Designation:</span> {selectedEmployee.designation}</p>
-          <p><span className="font-semibold">Join Date:</span> {selectedEmployee.join_date}</p>
+            <div className="flex items-center gap-4 mb-4">
+              <img
+                src={
+                  selectedEmployee.image
+                    ? `${import.meta.env.VITE_BASE_URL}/public/uploads/employee/${selectedEmployee.image}`
+                    : "https://via.placeholder.com/100"
+                }
+                alt={selectedEmployee.full_name}
+                className="w-24 h-24 rounded-full border"
+              />
+              <div>
+                <p><span className="font-semibold">Name:</span> {selectedEmployee.full_name}</p>
+                <p><span className="font-semibold">Email:</span> {selectedEmployee.email}</p>
+                <p><span className="font-semibold">Mobile:</span> {selectedEmployee.mobile}</p>
+                <p><span className="font-semibold">Designation:</span> {selectedEmployee.designation}</p>
+                <p><span className="font-semibold">Join Date:</span> {selectedEmployee.join_date}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <p><span className="font-semibold">Gender:</span> {selectedEmployee.gender}</p>
+              <p><span className="font-semibold">Blood Group:</span> {selectedEmployee.blood_group}</p>
+              <p><span className="font-semibold">NID:</span> {selectedEmployee.nid}</p>
+              <p><span className="font-semibold">Salary:</span> {selectedEmployee.salary}</p>
+              <p><span className="font-semibold">Branch:</span> {selectedEmployee.branch_name}</p>
+              <p><span className="font-semibold">Status:</span> {selectedEmployee.status}</p>
+            </div>
+
+            <p className="mt-4"><span className="font-semibold">Address:</span> {selectedEmployee.address}</p>
+          </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <p><span className="font-semibold">Gender:</span> {selectedEmployee.gender}</p>
-        <p><span className="font-semibold">Blood Group:</span> {selectedEmployee.blood_group}</p>
-        <p><span className="font-semibold">NID:</span> {selectedEmployee.nid}</p>
-        <p><span className="font-semibold">Salary:</span> {selectedEmployee.salary}</p>
-        <p><span className="font-semibold">Branch:</span> {selectedEmployee.branch_name}</p>
-        <p><span className="font-semibold">Status:</span> {selectedEmployee.status}</p>
-      </div>
-
-      <p className="mt-4"><span className="font-semibold">Address:</span> {selectedEmployee.address}</p>
-    </div>
-  </div>
-)}
+      )}
 
     </div>
   );
