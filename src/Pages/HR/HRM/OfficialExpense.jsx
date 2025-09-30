@@ -14,6 +14,7 @@ import BtnSubmit from "../../../components/Button/BtnSubmit"
 import { FiFileText, FiX } from "react-icons/fi"
 import { BiEdit } from "react-icons/bi"
 import Pagination from "../../../components/Shared/Pagination"
+import api from "../../../../utils/axiosConfig"
 
 
 const OfficialExpense = () => {
@@ -49,8 +50,8 @@ const OfficialExpense = () => {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/office/list`);
-        if (response?.data?.status === "Success") {
+        const response = await api.get(`/office`);
+        if (response?.data?.success) {
           setBranches(response?.data?.data);
         }
       } catch (err) {
@@ -66,7 +67,7 @@ const OfficialExpense = () => {
   const showModal = async (record = null) => {
     if (record) {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/expense/${record.id}`)
+        const res = await api.get(`/expense/${record.id}`)
         const data = res.data?.data
         setFormData({
           date: data?.date || "",
@@ -116,7 +117,7 @@ const OfficialExpense = () => {
   //   expense
   const fetchExpenses = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/expense/list`)
+      const response = await api.get(`/expense`)
       const allExpenses = response.data?.data || [];
       const utilityExpenses = allExpenses.filter(expense =>
         expense.payment_category === 'Utility'
@@ -154,10 +155,10 @@ const OfficialExpense = () => {
       }
 
       if (editingId) {
-        await axios.post(`${import.meta.env.VITE_BASE_URL}/expense/update/${editingId}`, payload)
+        await api.put(`/expense/${editingId}`, payload)
         toast.success("Expense Data Update successful")
       } else {
-        await axios.post(`${import.meta.env.VITE_BASE_URL}/expense/save`, payload)
+        await api.post(`/expense`, payload)
         toast.success("Epense Added successful")
       }
 

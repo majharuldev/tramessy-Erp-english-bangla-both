@@ -5,6 +5,7 @@ import axios from "axios";
 import jsPDF  from "jspdf";
 import autoTable from "jspdf-autotable";
 import Pagination from "../../components/Shared/Pagination";
+import api from "../../../utils/axiosConfig";
 
 const PurchaseReport = () => {
   const [purchases, setPurchases] = useState([]);
@@ -20,7 +21,7 @@ const PurchaseReport = () => {
 
   // Load purchase data
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_BASE_URL}/purchase/list`) 
+    api.get(`/purchase`) 
       .then(res => {
         if (res.data.status === "Success") {
           setPurchases(res.data.data);

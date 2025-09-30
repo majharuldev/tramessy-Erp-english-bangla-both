@@ -7,6 +7,7 @@ import { FiFilter } from "react-icons/fi";
 import Pagination from "../../components/Shared/Pagination";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import api from "../../../utils/axiosConfig";
 // Extend dayjs with isBetween plugin
 dayjs.extend(isBetween);
 
@@ -33,9 +34,9 @@ export default function FuelReport() {
   const fetchTripData = async () => {
     setLoading(true);
     try {
-      const tripRes = await axios.get(`${import.meta.env.VITE_BASE_URL}/trip/list`);
-      setTripData(tripRes.data.data || []);
-      generateFuelReport(tripRes.data.data);
+      const tripRes = await api.get(`/trip`);
+      setTripData(tripRes.data || []);
+      generateFuelReport(tripRes.data);
     } catch (error) {
       console.error("Error fetching trip data", error);
     }

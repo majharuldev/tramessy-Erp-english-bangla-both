@@ -9,6 +9,7 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Pagination from "../components/Shared/Pagination";
+import api from "../../utils/axiosConfig";
 
 const MonthlyStatement = () => {
   const [allData, setAllData] = useState([]); // Store all data
@@ -23,12 +24,15 @@ const MonthlyStatement = () => {
       setLoading(true);
       
       const [tripsRes, purchasesRes, expensesRes] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_BASE_URL}/trip/list`),
-        axios.get(`${import.meta.env.VITE_BASE_URL}/purchase/list`),
-        axios.get(`${import.meta.env.VITE_BASE_URL}/expense/list`)
+        api.get(`/trip`),
+        api.get(`/purchase`),
+        api.get(`/expense`)
       ]);
 
-      const trips = tripsRes.data?.data || [];
+      // Only approved trips
+const trips = (tripsRes.data?.data || []).filter(
+  (trip) => trip.status === "Approved"
+);
       const purchases = purchasesRes.data?.data || [];
       const expenses = expensesRes.data?.data || [];
 

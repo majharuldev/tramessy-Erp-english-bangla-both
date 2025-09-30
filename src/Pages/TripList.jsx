@@ -1058,6 +1058,8 @@ import api from "../../utils/axiosConfig"
 import { formatDate } from "../hooks/formatDate"
 import DatePicker from "react-datepicker"
 import { FiFilter } from "react-icons/fi"
+import { FcApproval } from "react-icons/fc";
+
 const TripList = () => {
   const [trip, setTrip] = useState([])
   const [loading, setLoading] = useState(true)
@@ -1847,7 +1849,7 @@ const TripList = () => {
                                     className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     disabled={isApproving}
                                   >
-                                    {isApproving ? "Approving..." : "Approve"}
+                                    <FcApproval className="mr-2 h-4 w-4"  />{isApproving ? "Approving..." : "Approved"}
                                   </button>
                                 )}
                               </div>

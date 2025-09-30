@@ -9,6 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
+import api from "../../../utils/axiosConfig";
 
 const PurchaseForm = () => {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ const PurchaseForm = () => {
   if (selectedVehicle) {
     const selectedVehicleData = vehicle.find(
       (v) =>
-        `${v.registration_zone} ${v.registration_serial} ${v.registration_number}`.trim() ===
+        `${v.reg_zone} ${v.reg_serial} ${v.reg_no}`.trim() ===
         selectedVehicle.trim()
     );
     if (selectedVehicleData) {
@@ -67,27 +68,23 @@ const PurchaseForm = () => {
   // Fetch data for dropdowns
   useEffect(() => {
     // Fetch drivers
-    fetch(`${import.meta.env.VITE_BASE_URL}/driver/list`)
-      .then((response) => response.json())
-      .then((data) => setDrivers(data.data))
+    api.get(`/driver`)
+      .then((res) => setDrivers(res.data))
       .catch((error) => console.error("Error fetching driver data:", error));
     
     // Fetch vehicles
-    fetch(`${import.meta.env.VITE_BASE_URL}/vehicle/list`)
-      .then((response) => response.json())
-      .then((data) => setVehicle(data.data))
+    api.get(`/vehicle`)
+      .then((res) => setVehicle(res.data))
       .catch((error) => console.error("Error fetching vehicle data:", error));
     
     // Fetch branches
-    fetch(`${import.meta.env.VITE_BASE_URL}/office/list`)
-      .then((response) => response.json())
-      .then((data) => setBranch(data.data))
+    api.get(`/office`)
+      .then((res) => setBranch(res.data.data))
       .catch((error) => console.error("Error fetching branch data:", error));
     
     // Fetch suppliers
-    fetch(`${import.meta.env.VITE_BASE_URL}/supply/list`)
-      .then((response) => response.json())
-      .then((data) => setSupplier(data.data))
+    api.get(`/supplier`)
+      .then((res) => setSupplier(res.data.data))
       .catch((error) => console.error("Error fetching supply data:", error));
   }, []);
 
@@ -96,8 +93,8 @@ const PurchaseForm = () => {
     if (isEditMode) {
       const fetchPurchaseData = async () => {
         try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_BASE_URL}/purchase/show/${id}`
+          const response = await api.get(
+            `/purchase/${id}`
           );
           const purchaseData = response.data.data;
           console.log("Fetched purchase data:", purchaseData);
@@ -118,11 +115,11 @@ const PurchaseForm = () => {
           setValue("priority", purchaseData.priority);
           
           // Set image preview if exists
-          if (purchaseData.bill_image) {
-            const imageUrl = `${import.meta.env.VITE_BASE_URL}/uploads/${purchaseData.bill_image}`;
-            setPreviewImage(imageUrl);
-            setExistingImage(purchaseData.bill_image); // existing image নাম সংরক্ষণ করুন
-          }
+          // if (purchaseData.bill_image) {
+          //   const imageUrl = `${import.meta.env.VITE_BASE_URL}/uploads/${purchaseData.bill_image}`;
+          //   setPreviewImage(imageUrl);
+          //   setExistingImage(purchaseData.bill_image); // existing image নাম সংরক্ষণ করুন
+          // }
           
           setIsLoading(false);
         } catch (error) {
@@ -142,8 +139,8 @@ const PurchaseForm = () => {
   }));
 
   const vehicleOptions = vehicle.map((dt) => ({
-    value: `${dt.registration_zone} ${dt.registration_serial} ${dt.registration_number} `,
-    label: `${dt.registration_zone} ${dt.registration_serial} ${dt.registration_number} `,
+    value: `${dt.reg_zone} ${dt.reg_serial} ${dt.reg_no} `,
+    label: `${dt.reg_zone} ${dt.reg_serial} ${dt.reg_no} `,
   }));
 
   const branchOptions = branch.map((branch) => ({
@@ -157,67 +154,100 @@ const PurchaseForm = () => {
   }));
 
   // Handle form submission for both add and update
-  const onSubmit = async (data) => {
-    try {
-      const purchaseFormData = new FormData();
+  // const onSubmit = async (data) => {
+  //   try {
+  //     const purchaseFormData = new FormData();
       
-      for (const key in data) {
-        // Handle file uploads separately
-        if (key === "bill_image") {
-          // যদি নতুন ফাইল সিলেক্ট করা হয়
-          if (typeof data[key] === "object") {
-            purchaseFormData.append(key, data[key]);
-          } 
-          // যদি এডিট মোডে থাকে এবং নতুন ফাইল সিলেক্ট না করা হয়
-          else if (isEditMode && existingImage && !data[key]) {
-            purchaseFormData.append(key, existingImage);
-          }
-        } else if (data[key] !== null && data[key] !== undefined) {
-          purchaseFormData.append(key, data[key]);
-        }
-      }
+  //     for (const key in data) {
+  //       // Handle file uploads separately
+  //       if (key === "bill_image") {
+  //         // যদি নতুন ফাইল সিলেক্ট করা হয়
+  //         if (typeof data[key] === "object") {
+  //           purchaseFormData.append(key, data[key]);
+  //         } 
+  //         // যদি এডিট মোডে থাকে এবং নতুন ফাইল সিলেক্ট না করা হয়
+  //         else if (isEditMode && existingImage && !data[key]) {
+  //           purchaseFormData.append(key, existingImage);
+  //         }
+  //       } else if (data[key] !== null && data[key] !== undefined) {
+  //         purchaseFormData.append(key, data[key]);
+  //       }
+  //     }
 
-      let response;
+  //     let response;
       
-      if (isEditMode) {
-        // Update existing purchase
-        response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/purchase/update/${id}`,
-          purchaseFormData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        toast.success("Purchase updated successfully!", {
-          position: "top-right",
-        });
-      } else {
-        // Create new purchase
-        response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/purchase/create`,
-          purchaseFormData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        toast.success("Purchase submitted successfully!", {
-          position: "top-right",
-        });
-      }
+  //     if (isEditMode) {
+  //       // Update existing purchase
+  //       response = await api.put(
+  //         `/purchase/${id}`,
+  //         purchaseFormData,
+  //         {
+  //           headers: {
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         }
+  //       );
+  //       toast.success("Purchase updated successfully!", {
+  //         position: "top-right",
+  //       });
+  //     } else {
+  //       // Create new purchase
+  //       response = await api.post(
+  //         `/purchase`,
+  //         purchaseFormData,
+  //         {
+  //           headers: {
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         }
+  //       );
+  //       toast.success("Purchase submitted successfully!", {
+  //         position: "top-right",
+  //       });
+  //     }
       
-      reset();
-      navigate("/tramessy/Purchase/maintenance");
-    } catch (error) {
-      console.error(error);
-      const errorMessage =
-        error.response?.data?.message || error.message || "Unknown error";
-      toast.error("Server issue: " + errorMessage);
-    }
-  };
+  //     reset();
+  //     navigate("/tramessy/Purchase/maintenance");
+  //   } catch (error) {
+  //     console.error(error);
+  //     const errorMessage =
+  //       error.response?.data?.message || error.message || "Unknown error";
+  //     toast.error("Server issue: " + errorMessage);
+  //   }
+  // };
+
+  const onSubmit = async (data) => {
+  try {
+    const payload = {
+      date: new Date(data.date).toISOString().split("T")[0],
+      category: data.category ?? "",
+      item_name: data.item_name ?? "",
+      driver_name: data.driver_name ?? "",
+      vehicle_no: data.vehicle_no ?? "",
+      vehicle_category: data.vehicle_category ?? "",
+      branch_name: data.branch_name ?? "",
+      supplier_name: data.supplier_name ?? "",
+      quantity: Number(data.quantity) || 0,
+      unit_price: Number(data.unit_price) || 0,
+      purchase_amount: Number(data.purchase_amount) || 0,
+      remarks: data.remarks ?? "",
+      priority: data.priority ?? "",
+      // bill_image: যদি backend JSON support করে, Base64 encode পাঠাও
+    };
+
+    const response = isEditMode
+      ? await api.put(`/purchase/${id}`, payload)   // JSON
+      : await api.post(`/purchase`, payload);
+
+    toast.success(isEditMode ? "Purchase updated!" : "Purchase submitted!");
+    navigate("/tramessy/Purchase/maintenance");
+  } catch (error) {
+    console.error(error);
+    toast.error(error.response?.data?.message || "Server error");
+  }
+};
+
+
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-64">Loading purchase data...</div>;
@@ -369,7 +399,7 @@ const PurchaseForm = () => {
             </div>
           </div>
           
-          <div className="md:flex justify-between gap-3">
+          {/* <div className="md:flex justify-between gap-3">
             <div className="w-full">
               <label className="text-gray-700 text-sm font-semibold">
                 Bill Image {!isEditMode && "(Required)"}
@@ -412,19 +442,19 @@ const PurchaseForm = () => {
                         {error.message}
                       </span>
                     )}
-                    {/* {isEditMode && existingImage && (
+                    {isEditMode && existingImage && (
                       <span className="text-green-600 text-sm">
                         Current image: {existingImage}
                       </span>
-                    )} */}
+                    )}
                   </div>
                 )}
               />
             </div>
-          </div>
+          </div> */}
           
           {/* Preview */}
-          {previewImage && (
+          {/* {previewImage && (
             <div className="mt-2 relative flex justify-end">
               <button
                 type="button"
@@ -450,7 +480,7 @@ const PurchaseForm = () => {
               />
             </div>
           )}
-          
+           */}
           <BtnSubmit>{isEditMode ? "Update Purchase" : "Submit"}</BtnSubmit>
         </form>
       </FormProvider>

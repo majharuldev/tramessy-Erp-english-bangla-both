@@ -7,7 +7,7 @@ import TextAreaField, { InputField, SelectField } from "../components/Form/FormF
 import useRefId from "../hooks/useRef";
 import BtnSubmit from "../components/Button/BtnSubmit";
 import { FiCalendar } from "react-icons/fi";
-import { add } from "date-fns";
+import { add, format } from "date-fns";
 import useAdmin from "../hooks/useAdmin";
 import api from "../../utils/axiosConfig";
 
@@ -316,7 +316,7 @@ export default function AddTripForm() {
     label: d.driver_name,
     mobile: d.driver_mobile,
   }));
-console.log(vendorVehicle);
+  console.log(vendorVehicle);
   const vendorVehicleOptions = vendorVehicle.map((v) => ({
     value: `${v?.registration_zone} ${v?.registration_serial} ${v?.registration_number}`,
     label: `${v.registration_zone} ${v.registration_serial} ${v.registration_number}`,
@@ -422,6 +422,16 @@ console.log(vendorVehicle);
 
     try {
       setLoading(true);
+      //Date formatting only if valid
+      const formatDate = (date) => {
+        if (!date) return null;
+        const parsed = new Date(date);
+        return isNaN(parsed) ? null : format(parsed, "yyyy-MM-dd");
+      };
+
+      // usage
+      data.start_date = formatDate(data.start_date);
+      data.end_date = formatDate(data.end_date);
       const url = id
         ? `/trip/${id}`
         : `/trip`;
@@ -431,15 +441,15 @@ console.log(vendorVehicle);
       }
 
       const res = id
-      ? await api.put(url, data, { headers: { "Content-Type": "application/json" } }) // update
-      : await api.post(url, data, { headers: { "Content-Type": "application/json" } }); // create
+        ? await api.put(url, data, { headers: { "Content-Type": "application/json" } }) // update
+        : await api.post(url, data, { headers: { "Content-Type": "application/json" } }); // create
 
       if (res.data.success) {
         toast.success(id ? "Trip updated successfully!" : "Trip created successfully!");
         if (id) {
-        navigate("/tramessy/tripList");
-      }
-      reset();
+          navigate("/tramessy/tripList");
+        }
+        reset();
       } else {
         throw new Error(id ? "Failed to update trip" : "Failed to create trip");
       }
@@ -636,7 +646,7 @@ console.log(vendorVehicle);
                   />
                 )}
 
-                {isFixedRateCustomer &&(<><SelectField
+                {isFixedRateCustomer && (<><SelectField
                   name="vehicle_category"
                   label="Vehicle Category"
                   options={vehicleCategoryOptions}
@@ -644,23 +654,23 @@ console.log(vendorVehicle);
                   required={!id}
                 />
 
-                <SelectField
-                  name="vehicle_size"
-                  label="Vehicle Size"
-                  options={vehicleSizeOptions}
-                  control={control}
-                  required={!id}
-                  isCreatable={!isFixedRateCustomer}
-                /></>)}
+                  <SelectField
+                    name="vehicle_size"
+                    label="Vehicle Size"
+                    options={vehicleSizeOptions}
+                    control={control}
+                    required={!id}
+                    isCreatable={!isFixedRateCustomer}
+                  /></>)}
                 <InputField name="challan" label="Challan No." />
 
-                <div className={`w-full ${isAdmin? "block": "hidden"}`}>
+                <div className={`w-full ${isAdmin ? "block" : "hidden"}`}>
                   <InputField
                     hidden={isAdmin ? false : true}
                     name="total_rent"
                     label="Total Rent/Bill Amount"
                     type="number"
-                    required={ false}
+                    required={false}
                     readOnly={isRateFound}
                     className={`${isRateFound ? "bg-gray-100" : ""}`}
                   />
@@ -684,7 +694,7 @@ console.log(vendorVehicle);
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                  
+
                   <InputField name="toll_cost" label="Toll Cost" type="number" />
                   <InputField name="feri_cost" label="Feri Cost" type="number" />
                   <InputField name="police_cost" label="Police Cost" type="number" />
@@ -692,7 +702,7 @@ console.log(vendorVehicle);
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                  
+
                   <InputField name="food_cost" label="Food Cost" type="number" />
                   <InputField name="others_cost" label="Other Costs" type="number" />
                   <InputField name="additional_cost" label="Additional Load Cost" type="number" />
@@ -714,7 +724,7 @@ console.log(vendorVehicle);
                 </div>
               </div>
             )}
-            {!isAdmin &&<div className="mt-4">
+            {!isAdmin && <div className="mt-4">
               <h3 className="text-secondary font-medium mb-2">SMS Sent</h3>
               <div className="flex gap-6">
                 <label className="flex items-center gap-2">

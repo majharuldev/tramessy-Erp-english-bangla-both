@@ -619,7 +619,7 @@ const SalaryExpense = () => {
                     />
                     {errors.date && <p className="text-red-500 text-xs mt-1">{errors.date}</p>}
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Paid To <span className="text-red-500">*</span></label>
                     <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value={formData.paid_to}
@@ -630,7 +630,7 @@ const SalaryExpense = () => {
                       {!employeesLoading && employees.map((employee) => (<option key={employee.id} value={employee.full_name}>
                         {employee.full_name} </option>))} </select>
                     {errors.paid_to && <p className="text-red-500 text-xs mt-1">{errors.paid_to}</p>}
-                  </div>
+                  </div> */}
 
                 </div>
 

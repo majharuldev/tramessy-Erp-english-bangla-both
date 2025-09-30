@@ -39,7 +39,6 @@ import AddStock from "../Pages/Inventory/AddStock";
 import StockOut from "../Pages/Inventory/StockOut";
 import StockOutForm from "../Pages/Inventory/StockOutForm";
 import SupplierList from "../Pages/Purchase/SupplierList";
-import AddSupply from "../Pages/Purchase/AddSupply";
 import AttendanceList from "../Pages/HR/HRM/AttendanceList";
 import AdvanceSalary from "../Pages/HR/Payroll/AdvanceSalary";
 import AdvanceSalaryForm from "../Pages/HR/Payroll/AdvanceSalaryForm";
@@ -89,6 +88,7 @@ import OfficialProductForm from "../Pages/Purchase/OfficialProductForm";
 import Bill from "../Pages/Billing/Bill";
 import SalarySheet from "../Pages/HR/Payroll/SalarySheet";
 import EmployeeForm from "../Pages/HR/HRM/AddEmployee";
+import SupplyForm from "../Pages/Purchase/AddSupply";
 export const router = createBrowserRouter([
   {
     path: "/tramessy",
@@ -521,19 +521,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "/tramessy/Purchase/AddSupply",
-        element: <AddSupply />,
+        element: <SupplyForm />,
       },
       {
         path: "/tramessy/UpdateSupplyForm/:id",
         element: (
           <PrivateRoute>
-            <UpdateSupplyForm />
+            <SupplyForm />
           </PrivateRoute>
         ),
-        loader: ({ params }) =>
-          fetch(
-            `${import.meta.env.VITE_BASE_URL}/supply/show/${params.id}`
-          ),
       },
       // Inventory
       {

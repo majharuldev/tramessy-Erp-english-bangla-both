@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
+import api from "../../../../utils/axiosConfig";
 
 const AttendanceForm = () => {
   const [employee, setEmployee] = useState([]);
@@ -12,10 +13,16 @@ const AttendanceForm = () => {
     const formattedDate = today.toISOString().split("T")[0];
     setCurrentDate(formattedDate);
 
-    fetch(`${import.meta.env.VITE_BASE_URL}/employee/list`)
-      .then((res) => res.json())
-      .then((data) => setEmployee(data.data))
-      .catch((err) => console.error("Error loading employees:", err));
+    const fetchEmployees = async () => {
+      try {
+        const res = await api.get(`/employee`);
+        setEmployee(res.data.data); // axios -> res.data
+      } catch (err) {
+        console.error("Error loading employees:", err);
+      }
+    };
+
+    fetchEmployees();
   }, []);
 
   // Handle checkbox toggle
@@ -34,10 +41,10 @@ const AttendanceForm = () => {
     });
 
     try {
-      const existingRes = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/attendance/list`
+      const existingRes = await api.get(
+        `/attendence`
       );
-      const existingData = await existingRes.json();
+      const existingData = existingRes.data;
 
       const alreadySubmittedIds = existingData.data
         .filter((item) => item.date === currentDate)
@@ -59,22 +66,14 @@ const AttendanceForm = () => {
 
         const payload = {
           employee_id: empId,
-          date: currentDate,
-          present: status === "present" ? "1" : "0",
-          absent: status === "absent" ? "1" : "0",
+          working_day: status === "present" ? 1 : 0,
+          month: new Date(currentDate).getMonth() + 1,
         };
 
-        const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/attendance/create`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
+        const res = await api.post(
+          `/attendence`, payload);
 
-        const result = await res.json();
-
+        const result = res.data;
         if (result.status === "Success") {
           submittedCount++;
         } else {
@@ -87,6 +86,7 @@ const AttendanceForm = () => {
           id: "attendance",
           position: "top-right",
         });
+        setAttendance({});
       } else {
         toast.dismiss("attendance");
       }

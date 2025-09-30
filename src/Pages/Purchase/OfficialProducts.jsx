@@ -11,6 +11,7 @@ import autoTable from "jspdf-autotable";
 import Pagination from "../../components/Shared/Pagination";
 import { tableFormatDate } from "../../hooks/formatDate";
 import DatePicker from "react-datepicker";
+import api from "../../../utils/axiosConfig";
 
 const PurchaseList = () => {
   const [purchase, setPurchase] = useState([]);
@@ -27,8 +28,8 @@ const PurchaseList = () => {
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/purchase/list`)
+    api
+      .get(`/purchase`)
       .then((response) => {
         if (response.data.status === "Success") {
           setPurchase(response.data.data);
@@ -86,8 +87,8 @@ const PurchaseList = () => {
   // view car by id
   const handleViewCar = async (id) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/purchase/show/${id}`
+      const response = await api.get(
+        `/purchase/${id}`
       );
       if (response.data.status === "Success") {
         setselectedPurchase(response.data.data);
@@ -110,16 +111,6 @@ const PurchaseList = () => {
     indexOfLastItem
   );
   const totalPages = Math.ceil(filteredPurchase.length / itemsPerPage);
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages)
-      setCurrentPage((currentPage) => currentPage + 1);
-  };
-  const handlePageClick = (number) => {
-    setCurrentPage(number);
-  };
 
   // Excel Export Function
   const exportExcel = () => {
@@ -422,14 +413,14 @@ const PurchaseList = () => {
                 <th className="p-2">Quantity</th>
                 <th className="p-2">Unit Price</th>
                 <th className="p-2">Total</th>
-                <th className="p-2">Bill Image</th>
+                {/* <th className="p-2">Bill Image</th> */}
                 <th className="p-2">Action</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
               {currentPurchase.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="text-center p-4 text-gray-500">
+                  <td colSpan="10" className="text-center p-4 text-gray-500">
                     No purchase found
                   </td>
                 </tr>)
@@ -450,13 +441,13 @@ const PurchaseList = () => {
                     <td className="p-2">{dt.quantity}</td>
                     <td className="p-2">{dt.unit_price}</td>
                     <td className="p-2">{dt.purchase_amount}</td>
-                    <td className="p-2">
+                    {/* <td className="p-2">
                       <img
                         src={`${import.meta.env.VITE_BASE_URL}/public/uploads/purchase/${dt.bill_image}`}
                         alt=""
                         className="w-20 h-20 rounded-xl"
                       />
-                    </td>
+                    </td> */}
                     <td className="px-2 action_column">
                       <div className="flex gap-1">
                         <Link
@@ -530,14 +521,14 @@ const PurchaseList = () => {
                 <span className="font-medium w-1/2">Total:</span>
                 <span>{selectedPurchase.purchase_amount}</span>
               </div>
-              <div className="flex flex-col items-start  p-2">
+              {/* <div className="flex flex-col items-start  p-2">
                 <span className="font-medium mb-2">Bill Image:</span>
                 <img
                   src={`${import.meta.env.VITE_BASE_URL}/public/uploads/purchase/${selectedPurchase.bill_image}`}
                   alt="Bill"
                   className="w-32 h-32 object-cover "
                 />
-              </div>
+              </div> */}
             </div>
 
             <div className="flex justify-end mt-5">

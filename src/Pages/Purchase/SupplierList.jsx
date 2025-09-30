@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaEye, FaPen, FaTrashAlt } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
-import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { IoMdClose } from "react-icons/io";
 import { MdShop } from "react-icons/md";
 import { Link } from "react-router-dom";
 import Pagination from "../../components/Shared/Pagination";
+import api from "../../../utils/axiosConfig";
+import { tableFormatDate } from "../../hooks/formatDate";
 
 const SupplierList = () => {
   const [supply, setSupply] = useState([]);
@@ -24,10 +25,10 @@ const SupplierList = () => {
   const [selectedSupply, setSelectedSupply] = useState(null);
   const toggleModal = () => setIsOpen(!isOpen);
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/supply/list`)
+    api
+      .get(`/supplier`)
       .then((response) => {
-        if (response.data.status === "Success") {
+        if (response.data.success) {
           setSupply(response.data.data);
         }
         setLoading(false);
@@ -52,8 +53,8 @@ const SupplierList = () => {
   // delete by id
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/supply/delete/${id}`,
+      const response = await api.delete(
+        `/supplier/${id}`,
         {
           method: "DELETE",
         }
@@ -82,8 +83,8 @@ const SupplierList = () => {
   // view driver by id
   const handleView = async (id) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/supply/show/${id}`
+      const response = await api.get(
+        `/supplier/${id}`
       );
       if (response.data.status === "Success") {
         setSelectedSupply(response.data.data);
@@ -179,7 +180,7 @@ const SupplierList = () => {
                   <td className="p-2 font-bold">
                     {indexOfFirstItem + index + 1}.
                   </td>
-                  <td className="p-2">{dt.date}</td>
+                  <td className="p-2">{tableFormatDate(dt.created_at)}</td>
                   <td className="p-2">{dt.supplier_name}</td>
                   <td className="p-2">{dt.business_category}</td>
                   <td className="p-2">{dt.phone}</td>
