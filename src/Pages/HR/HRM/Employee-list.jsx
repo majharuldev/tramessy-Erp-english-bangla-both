@@ -143,7 +143,7 @@ const EmployeeList = () => {
             <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr>
                 <th className="px-2 py-4">SL.</th>
-                <th className="px-2 py-4">Image</th>
+                {/* <th className="px-2 py-4">Image</th> */}
                 <th className="px-2 py-4">FullName</th>
                 <th className="px-2 py-4">Email</th>
                 <th className="px-2 py-4">JoinDate</th>
@@ -169,13 +169,13 @@ const EmployeeList = () => {
                         <td className="px-2 py-1 font-bold">
                           {indexOfFirstItem + index + 1}.
                         </td>
-                        <td className="px-2 py-1">
+                        {/* <td className="px-2 py-1">
                           <img
                             src={`${import.meta.env.VITE_BASE_URL}/public/uploads/employee/${dt.image}`}
                             alt=""
                             className="w-20 h-20 rounded-full"
                           />
-                        </td>
+                        </td> */}
                         <td className="px-2 py-1">{dt.full_name}</td>
                         <td className="px-2 py-1">{dt.email}</td>
                         <td className="px-2 py-1">{tableFormatDate(dt.join_date)}</td>

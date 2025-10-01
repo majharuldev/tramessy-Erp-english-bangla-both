@@ -6,6 +6,9 @@ import * as XLSX from "xlsx";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { IoIosRemoveCircle } from "react-icons/io";
+import api from "../../../utils/axiosConfig";
+import { tableFormatDate } from "../../hooks/formatDate";
+import DatePicker from "react-datepicker";
 
 
 const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
@@ -20,11 +23,9 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
 
   // Fetch customer list with dues
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_BASE_URL}/customer/list`)
+    api.get(`/customer`)
       .then(res => {
-        if (res.data.status === "Success") {
-          setCustomerList(res.data.data);
-        }
+        setCustomerList(res.data);
       })
       .catch(err => console.error(err));
   }, []);
@@ -37,9 +38,9 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
 
   // filter date 
   const filteredLedger = customer.filter((entry) => {
-    const entryDate = new Date(entry.bill_date).setHours(0,0,0,0);
-    const start = startDate ? new Date(startDate).setHours(0,0,0,0) : null;
-    const end = endDate ? new Date(endDate).setHours(0,0,0,0) : null;
+    const entryDate = new Date(entry.bill_date).setHours(0, 0, 0, 0);
+    const start = startDate ? new Date(startDate).setHours(0, 0, 0, 0) : null;
+    const end = endDate ? new Date(endDate).setHours(0, 0, 0, 0) : null;
 
     if (start && !end) {
       return entryDate === start;
@@ -57,12 +58,12 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
       acc.rec_amount += Number(item.rec_amount || 0);
       return acc;
     },
-    { rent: 0,  rec_amount: 0}
+    { rent: 0, rec_amount: 0 }
   );
   // Now calculate due from total trip - advance - pay_amount
-totals.due = totals.rent  - totals.rec_amount;
+  totals.due = totals.rent - totals.rec_amount;
 
-  const grandDue =  totals.due+dueAmount;
+  const grandDue = totals.due + dueAmount;
 
   const totalRent = filteredLedger.reduce(
     (sum, entry) => sum + parseFloat(entry.rec_amount || 0),
@@ -190,67 +191,44 @@ totals.due = totals.rent  - totals.rec_amount;
 
         {showFilter && (
           <div className="flex gap-4 border border-gray-300 rounded-md p-5 mb-5">
-            <div className="relative w-full">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  setCurrentPage(0);
-                }}
-                className="w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-              />
-              {startDate && (
-                <button
-                  onClick={() => {
-                    setStartDate("");
-                    setCurrentPage(0);
-                  }}
-                  className="absolute right-8 top-1.5 text-gray-600 hover:text-gray-900"
-                  aria-label="Clear start date"
-                  type="button"
-                >
-                  &times;
-                </button>
-              )}
-            </div>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
 
-            <div className="relative w-full">
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => {
-                  setEndDate(e.target.value);
-                  setCurrentPage(0);
-                }}
-                className="w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-              />
-              {endDate && (
-                <button
-                  onClick={() => {
-                    setEndDate("");
-                    setCurrentPage(0);
-                  }}
-                  className="absolute right-8 top-1.5 text-gray-600 hover:text-gray-900"
-                  aria-label="Clear end date"
-                  type="button"
-                >
-                  &times;
-                </button>
-              )}
-            </div>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
             <div className="w-xs">
-                          <button
-                            onClick={() => {
-                              setStartDate("");
-                              setEndDate("");
-                              setShowFilter(false);
-                            }}
-                            className="bg-primary w-full text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
-                          >
-                            <IoIosRemoveCircle /> Clear 
-                          </button>
-                        </div>
+              <button
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                  setShowFilter(false);
+                }}
+                className="bg-primary w-full text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                <IoIosRemoveCircle /> Clear
+              </button>
+            </div>
           </div>
         )}
 
@@ -261,85 +239,85 @@ totals.due = totals.rent  - totals.rec_amount;
             <table className="min-w-full text-sm text-left text-gray-900">
               <thead className="bg-gray-100 text-gray-800 font-bold">
                 <tr className="font-bold bg-gray-50">
-    <td colSpan={7} className="border border-black px-2 py-1 text-right">
-      Total 
-    </td>
-    <td className="border border-black px-2 py-1 text-right">
-      ৳{totals.rent}
-    </td>
-    <td className="border border-black px-2 py-1 text-right">
-      ৳{totals.rec_amount}
-    </td>
-    <td className="border border-black px-2 py-1 text-right">
-      ৳{totals.due}
-    </td>
-  </tr>
+                  <td colSpan={7} className="border border-black px-2 py-1 text-right">
+                    Total
+                  </td>
+                  <td className="border border-black px-2 py-1 text-right">
+                    ৳{totals.rent}
+                  </td>
+                  <td className="border border-black px-2 py-1 text-right">
+                    ৳{totals.rec_amount}
+                  </td>
+                  <td className="border border-black px-2 py-1 text-right">
+                    ৳{totals.due}
+                  </td>
+                </tr>
                 <tr>
-                <th className="border px-2 py-1">SL.</th>
-                <th className="border px-2 py-1">Date</th>
-                <th className="border px-2 py-1">Customer</th>
-                <th className="border px-2 py-1">Load</th>
-                <th className="border px-2 py-1">Unload</th>
-                <th className="border px-2 py-1">Vehicle</th>
-                <th className="border px-2 py-1">Driver</th>
-                <th className="border px-2 py-1">Bill Amount</th>
-            
-                <th className="border px-2 py-1">Recieved Amount</th>
-                <th className="border border-gray-700 px-2 py-1">
+                  <th className="border px-2 py-1">SL.</th>
+                  <th className="border px-2 py-1">Date</th>
+                  <th className="border px-2 py-1">Customer</th>
+                  <th className="border px-2 py-1">Load</th>
+                  <th className="border px-2 py-1">Unload</th>
+                  <th className="border px-2 py-1">Vehicle</th>
+                  <th className="border px-2 py-1">Driver</th>
+                  <th className="border px-2 py-1">Bill Amount</th>
+
+                  <th className="border px-2 py-1">Recieved Amount</th>
+                  <th className="border border-gray-700 px-2 py-1">
                     {selectedCustomerName && (
                       <p className="text-sm font-medium text-gray-800">
                         Opening Amount: ৳{dueAmount?.toFixed(2)}
                       </p>
                     )}
-                    Due 
+                    Due
                   </th>
-              </tr>
+                </tr>
               </thead>
               <tbody>
-  {(() => {
-    let cumulativeDue = dueAmount; // Opening balance
-    return filteredLedger.map((item, idx) => {
-      const billAmount = parseFloat(item.bill_amount || 0);
-      const receivedAmount = parseFloat(item.rec_amount || 0);
+                {(() => {
+                  let cumulativeDue = dueAmount; // Opening balance
+                  return filteredLedger.map((item, idx) => {
+                    const billAmount = parseFloat(item.bill_amount || 0);
+                    const receivedAmount = parseFloat(item.rec_amount || 0);
 
-      cumulativeDue += billAmount;
-      cumulativeDue -= receivedAmount;
+                    cumulativeDue += billAmount;
+                    cumulativeDue -= receivedAmount;
 
-      return (
-        <tr key={idx}>
-          <td className="border px-2 py-1">{idx + 1 }</td>
-          <td className="border px-2 py-1">{item.bill_date}</td>
-          <td className="border px-2 py-1">{item.customer_name}</td>
-          <td className="border px-2 py-1">
-            {item.load_point || <span className="flex justify-center items-center">--</span>}
-          </td>
-          <td className="border px-2 py-1">
-            {item.unload_point || <span className="flex justify-center items-center">--</span>}
-          </td>
-          <td className="border px-2 py-1">
-            {item.vehicle_no || <span className="flex justify-center items-center">--</span>}
-          </td>
-          <td className="border px-2 py-1">
-            {item.driver_name || <span className="flex justify-center items-center">--</span>}
-          </td>
-          <td className="border px-2 py-1">
-            {billAmount ? billAmount : "--"}
-          </td>
-          <td className="border px-2 py-1">
-            {receivedAmount ? receivedAmount : "--"}
-          </td>
-          <td className="border px-2 py-1">
-            {cumulativeDue}
-          </td>
-        </tr>
-      );
-    });
-  })()}
-</tbody>
+                    return (
+                      <tr key={idx}>
+                        <td className="border px-2 py-1">{idx + 1}</td>
+                        <td className="border px-2 py-1">{tableFormatDate(item.bill_date)}</td>
+                        <td className="border px-2 py-1">{item.customer_name}</td>
+                        <td className="border px-2 py-1">
+                          {item.load_point || <span className="flex justify-center items-center">--</span>}
+                        </td>
+                        <td className="border px-2 py-1">
+                          {item.unload_point || <span className="flex justify-center items-center">--</span>}
+                        </td>
+                        <td className="border px-2 py-1">
+                          {item.vehicle_no || <span className="flex justify-center items-center">--</span>}
+                        </td>
+                        <td className="border px-2 py-1">
+                          {item.driver_name || <span className="flex justify-center items-center">--</span>}
+                        </td>
+                        <td className="border px-2 py-1">
+                          {billAmount ? billAmount : "--"}
+                        </td>
+                        <td className="border px-2 py-1">
+                          {receivedAmount ? receivedAmount : "--"}
+                        </td>
+                        <td className="border px-2 py-1">
+                          {cumulativeDue}
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
+              </tbody>
 
-             <tfoot>
-  
-  {/* <tr className="font-bold bg-blue-100">
+              <tfoot>
+
+                {/* <tr className="font-bold bg-blue-100">
     <td colSpan={9} className="border border-black px-2 py-1 text-right">
       Final Due (Opening Due +)
     </td>
@@ -347,7 +325,7 @@ totals.due = totals.rent  - totals.rec_amount;
       ৳{grandDue?.toFixed(2)}
     </td>
   </tr> */}
-</tfoot>
+              </tfoot>
 
             </table>
 

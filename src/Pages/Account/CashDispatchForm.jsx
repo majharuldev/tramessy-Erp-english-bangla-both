@@ -6,6 +6,7 @@ import axios from "axios"
 import { useEffect, useRef, useState } from "react"
 import { FiCalendar } from "react-icons/fi"
 import { useParams, useNavigate } from "react-router-dom"
+import api from "../../../utils/axiosConfig"
 
 const CashDispatchForm = () => {
   const { id } = useParams()
@@ -28,7 +29,7 @@ const CashDispatchForm = () => {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/account/show/${id}`)
+      const response = await api.get(`/fundTransfer/${id}`)
       const data = response.data.data
 
       // Set form values
@@ -52,9 +53,8 @@ const CashDispatchForm = () => {
 
   // select branch from api
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/office/list`)
-      .then((response) => response.json())
-      .then((data) => setBranch(data.data))
+    api.get(`/office`)
+      .then((response) => setBranch(response.data.data))
       .catch((error) => console.error("Error fetching branch name:", error))
   }, [])
 
@@ -65,9 +65,8 @@ const CashDispatchForm = () => {
 
   // select branch from api
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/employee/list`)
-      .then((response) => response.json())
-      .then((data) => setEmployee(data.data))
+    api.get(`/employee`)
+      .then((response) => setEmployee(response.data.data))
       .catch((error) => console.error("Error fetching employee name:", error))
   }, [])
 
@@ -104,12 +103,12 @@ const CashDispatchForm = () => {
 
       // Use update or create endpoint based on mode
       const endpoint = isEditing
-        ? `${import.meta.env.VITE_BASE_URL}/account/update/${id}`
-        : `${import.meta.env.VITE_BASE_URL}/account/create`
+        ? `/fundTransfer/${id}`
+        : `/fundTransfer`
 
-      const method = isEditing ? "post" : "post"
+      const method = isEditing ? "put" : "post"
 
-      const response = await axios[method](endpoint, formData)
+      const response = await api[method](endpoint, formData)
       const responseData = response.data
 
       if (responseData.success) {

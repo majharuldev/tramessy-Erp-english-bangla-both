@@ -7,6 +7,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import api from "../../../utils/axiosConfig";
+import { tableFormatDate } from "../../hooks/formatDate";
 
 const VendorLedger = () => {
   const [vendorData, setVendorData] = useState([]);
@@ -18,10 +20,9 @@ const VendorLedger = () => {
 
   // Fetch vendor list (for opening balance)
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/vendor/list`)
+    api.get(`/vendor`)
       .then((res) => {
-        if (res.data.status === "Success") {
+        if (res.data.success) {
           setVendorList(res.data.data);
         }
       })
@@ -30,8 +31,7 @@ const VendorLedger = () => {
 
   // Fetch vendor ledger data
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/vendorLedger/list`)
+    api.get(`/vendorLedger`)
       .then((res) => {
         if (res.data.status === "Success") {
           // Filter out entries without a vendor name early if needed, or handle nulls in calculations
@@ -259,6 +259,7 @@ const VendorLedger = () => {
     doc.save(`Vendor_Ledger_${selectedVendor || "All"}.pdf`);
   };
 
+  // print function
   const printTable = () => {
     const content = document.getElementById("vendor-ledger-table").innerHTML;
     const style = `
@@ -480,10 +481,10 @@ const VendorLedger = () => {
                   return (
                     <tr key={idx}>
                       <td className="border px-2 py-1">{idx + 1}</td>
-                      <td className="border px-2 py-1">{item.date}</td>
+                      <td className="border px-2 py-1">{tableFormatDate(item.date)}</td>
                       <td className="border px-2 py-1">{item.vendor_name}</td>
                       <td className="border px-2 py-1">
-                        {item.load_point || (
+                        {item?.load_point || (
                           <span className="flex justify-center items-center">
                             --
                           </span>

@@ -8,21 +8,24 @@ import { HiCurrencyBangladeshi } from "react-icons/hi2";
 import { Link } from "react-router-dom";
 import { format, parseISO, isAfter, isBefore, isEqual } from "date-fns";
 import Pagination from "../../components/Shared/Pagination";
+import api from "../../../utils/axiosConfig";
+import DatePicker from "react-datepicker";
+import { tableFormatDate } from "../../hooks/formatDate";
 
 const CashDispatch = () => {
   const [account, setAccount] = useState([]);
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
   // Fetch office data
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/account/list`)
+    api
+      .get(`/fundTransfer`)
       .then((response) => {
-        if (response.data.status === "Success") {
+        if (response.data.status = "Success") {
           const data = response.data.data;
           setAccount(data);
         }
@@ -35,37 +38,37 @@ const CashDispatch = () => {
   }, []);
 
   const filteredAccounts = useMemo(() => {
-  return account.filter((item) => {
-    if (!item.date) return false;
-    const itemDate = parseISO(item.date);
+    return account.filter((item) => {
+      if (!item.date) return false;
+      const itemDate = parseISO(item.date);
 
-    // If only startDate is set, match exactly that date
-    if (startDate && !endDate) {
-      return isEqual(itemDate, parseISO(startDate));
-    }
+      // If only startDate is set, match exactly that date
+      if (startDate && !endDate) {
+        return isEqual(itemDate, parseISO(startDate));
+      }
 
-    // If only endDate is set, match exactly that date
-    if (!startDate && endDate) {
-      return isEqual(itemDate, parseISO(endDate));
-    }
+      // If only endDate is set, match exactly that date
+      if (!startDate && endDate) {
+        return isEqual(itemDate, parseISO(endDate));
+      }
 
-    // If both startDate and endDate are set, filter range
-    if (startDate && endDate) {
-      return (
-        (isAfter(itemDate, parseISO(startDate)) || isEqual(itemDate, parseISO(startDate))) &&
-        (isBefore(itemDate, parseISO(endDate)) || isEqual(itemDate, parseISO(endDate)))
-      );
-    }
+      // If both startDate and endDate are set, filter range
+      if (startDate && endDate) {
+        return (
+          (isAfter(itemDate, parseISO(startDate)) || isEqual(itemDate, parseISO(startDate))) &&
+          (isBefore(itemDate, parseISO(endDate)) || isEqual(itemDate, parseISO(endDate)))
+        );
+      }
 
-    // If no date filter, include all
-    return true;
-  });
-}, [account, startDate, endDate]);
+      // If no date filter, include all
+      return true;
+    });
+  }, [account, startDate, endDate]);
 
 
   const totalAmount = useMemo(() => {
-  return filteredAccounts.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-}, [filteredAccounts]);
+    return filteredAccounts.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  }, [filteredAccounts]);
 
   // pagination
   const itemsPerPage = 10;
@@ -73,7 +76,7 @@ const CashDispatch = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCash = filteredAccounts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
- 
+
   if (loading) return <p className="text-center mt-16">Loading...</p>;
   return (
     <div className="p-2">
@@ -85,13 +88,13 @@ const CashDispatch = () => {
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <div className="md:mt-0 flex gap-2">
-                        <button
-                          onClick={() => setShowFilter((prev) => !prev)}
-                          className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
-                        >
-                          <FaFilter /> Filter
-                        </button>
-                      </div>
+              <button
+                onClick={() => setShowFilter((prev) => !prev)}
+                className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                <FaFilter /> Filter
+              </button>
+            </div>
             <Link to="/tramessy/account/CashDispatchForm">
               <button className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
                 <FaPlus /> Dispatch
@@ -101,41 +104,49 @@ const CashDispatch = () => {
         </div>
         {/* filter */}
         {showFilter && (
-                  <div className="md:flex items-center gap-5 justify-between border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
-                    <div className="relative w-full">
-                      <label className="block mb-1 text-sm font-medium">
-                        Start Date
-                      </label>
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-                      />
-                    </div>
-                    <div className="relative w-full">
-                      <label className="block mb-1 text-sm font-medium">End Date</label>
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-                      />
-                    </div>
-                    <div className=" mt-5">
-                      <button
-                        onClick={() => {
-                          setStartDate("");
-                          setEndDate("");
-                          setShowFilter(false);
-                        }}
-                        className="bg-gradient-to-r from-primary to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
-                      >
-                        <FiFilter/> Clear
-                      </button>
-                    </div>
-                  </div>
-                )}
+          <div className="md:flex items-center gap-5 justify-between border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                selectsStart
+                startDate={startDate}
+                endDate={endDate}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="DD/MM/YYYY"
+                locale="en-GB"
+                className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+                isClearable
+              />
+          
+              <DatePicker
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                selectsEnd
+                startDate={startDate}
+                endDate={endDate}
+                minDate={startDate}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="DD/MM/YYYY"
+                locale="en-GB"
+                className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+                isClearable
+              />
+          
+
+            <div className=" ">
+              <button
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                  setShowFilter(false);
+                }}
+                className="bg-gradient-to-r from-primary to-primary text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                <FiFilter /> Clear
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="mt-5 overflow-x-auto rounded-md">
           <table className="min-w-full text-sm text-left">
@@ -153,65 +164,65 @@ const CashDispatch = () => {
               </tr>
             </thead>
             <tbody className="text-gray-700">
-              { currentCash.length === 0?(
+              {currentCash.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="text-center p-4 text-gray-500">
                     No cash found
                   </td>
-                  </tr>
+                </tr>
               )
-              :(currentCash?.map((dt, i) => (
-                <tr
-                  key={i}
-                  className="hover:bg-gray-50 transition-all border border-gray-200"
-                >
-                  <td className="p-2 font-bold">{indexOfFirstItem + i + 1}</td>
-                  {dt.date ? format(parseISO(dt.date), "dd-MMMM-yyyy") : ""}
-                  <td className="p-2">{dt.branch_name}</td>
-                  <td className="p-2">{dt.person_name}</td>
-                  <td className="p-2">{dt.type}</td>
-                  <td className="p-2">{dt.amount}</td>
-                  <td className="p-2">{dt.bank_name}</td>
-                  {/* <td className="p-2">{dt.ref}</td> */}
-                  <td className="p-2 action_column">
-                    <div className="flex gap-1">
-                      <Link to={`/tramessy/account/update-CashDispatch/${dt.id}`}>
-                        <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
-                          <FaPen className="text-[12px]" />
-                        </button>
-                      </Link>
-                      {/* <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
+                : (currentCash?.map((dt, i) => (
+                  <tr
+                    key={i}
+                    className="hover:bg-gray-50 transition-all border border-gray-200"
+                  >
+                    <td className="p-2 font-bold">{indexOfFirstItem + i + 1}</td>
+                    {tableFormatDate(dt.date)}
+                    <td className="p-2">{dt.branch_name}</td>
+                    <td className="p-2">{dt.person_name}</td>
+                    <td className="p-2">{dt.type}</td>
+                    <td className="p-2">{dt.amount}</td>
+                    <td className="p-2">{dt.bank_name}</td>
+                    {/* <td className="p-2">{dt.ref}</td> */}
+                    <td className="p-2 action_column">
+                      <div className="flex gap-1">
+                        <Link to={`/tramessy/account/update-CashDispatch/${dt.id}`}>
+                          <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
+                            <FaPen className="text-[12px]" />
+                          </button>
+                        </Link>
+                        {/* <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
                         <FaEye className="text-[12px]" />
                       </button>
                       <button className="text-red-900 hover:text-white hover:bg-red-900 px-2 py-1 rounded shadow-md transition-all cursor-pointer">
                         <FaTrashAlt className="text-[12px]" />
                       </button> */}
-                    </div>
-                  </td>
-                </tr>
-              )))
+                      </div>
+                    </td>
+                  </tr>
+                )))
               }
             </tbody>
             {currentCash.length > 0 && (
-      <tfoot className="bg-gray-100 font-bold">
-        <tr>
-          <td colSpan="5" className="p-2 text-right">Total:</td>
-          <td className="p-2">{totalAmount}</td>
-          <td colSpan="2"></td>
-        </tr>
-      </tfoot>
-    )}
+              <tfoot className="bg-gray-100 font-bold">
+                <tr>
+                  <td colSpan="5" className="p-2 text-right">Total:</td>
+                  <td className="p-2">{totalAmount}</td>
+                  <td colSpan="2"></td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
         {/* pagination */}
         {currentCash.length > 0 && totalPages >= 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-          maxVisible={8} 
-        />
-      )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+            maxVisible={8}
+          />
+        )}
       </div>
     </div>
   );

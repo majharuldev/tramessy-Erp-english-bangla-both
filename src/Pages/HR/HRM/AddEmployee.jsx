@@ -334,9 +334,9 @@ const EmployeeForm = () => {
           if (res.data.success) {
             const employee = res.data.data;
             reset(employee); // form এর মধ্যে data বসানো
-            if (employee.image) {
-              setPreviewImage(employee.image); // server image preview
-            }
+            // if (employee.image) {
+            //   setPreviewImage(employee.image); // server image preview
+            // }
           } else {
             toast.error("Employee not found!");
           }
@@ -496,28 +496,28 @@ const EmployeeForm = () => {
               <div className="w-full">
                 <InputField name="designation" label="Designation" required />
               </div>
+              
               <div className="w-full">
-                <InputField name="salary" label="Salary" type="number" required />
+                <InputField name="address" label="Address" required />
               </div>
             </div>
 
             {/* Row 4: Image */}
             <div className="md:flex justify-between gap-3">
               <div className="w-full">
-                <InputField name="address" label="Address" required />
+                <InputField name="salary" label="Salary" type="number" required />
               </div>
               <div className="w-full">
-                <SelectField
-                  name="status"
-                  label="Status"
-                  required
-                  options={[
-                    { value: "Active", label: "Active" },
-                    { value: "Inactive", label: "Inactive" },
-                  ]}
-                />
+                <InputField name="basic" label="Basic" type="number" required />
               </div>
               <div className="w-full">
+                <InputField name="house_rent" label="House Rent" type="number" required />
+              </div>
+              <div className="w-full">
+                <InputField name="medical" label="Medical" type="number" required />
+              </div>
+              
+              {/* <div className="w-full">
                 <label className="text-gray-700 text-sm font-semibold">Image</label>
                 <div className="relative">
                   <Controller
@@ -550,11 +550,30 @@ const EmployeeForm = () => {
                     )}
                   />
                 </div>
+              </div> */}
+            </div>
+            <div className="md:flex justify-between gap-3">
+              <div className="w-full">
+                <InputField name="allowan" label="Allowan" type="number" required />
+              </div>
+              <div className="w-full">
+                <InputField name="conv" label="Conv" type="number" required />
+              </div>
+              <div className="w-full">
+                <SelectField
+                  name="status"
+                  label="Status"
+                  required
+                  options={[
+                    { value: "Active", label: "Active" },
+                    { value: "Inactive", label: "Inactive" },
+                  ]}
+                />
               </div>
             </div>
 
             {/* Preview */}
-            {previewImage && (
+            {/* {previewImage && (
               <div className="mt-3 relative flex justify-end">
                 <button
                   type="button"
@@ -573,7 +592,7 @@ const EmployeeForm = () => {
                   className="max-w-xs h-auto rounded border border-gray-300"
                 />
               </div>
-            )}
+            )} */}
 
             <BtnSubmit>{isEditMode ? "Update" : "Submit"}</BtnSubmit>
           </form>

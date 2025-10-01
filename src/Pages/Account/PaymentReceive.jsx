@@ -6,19 +6,22 @@ import { FaFilter, FaPen, FaPlus, FaTrashAlt } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Pagination from "../../components/Shared/Pagination";
+import api from "../../../utils/axiosConfig";
+import { tableFormatDate } from "../../hooks/formatDate";
+import DatePicker from "react-datepicker";
 
 const PaymentReceive = () => {
   const [payment, setPayment] = useState([]);
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   const [filteredPayment, setFilteredPayment] = useState([]);
-  
+
   // Fetch payment data
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/paymentRecived/list`)
+    api
+      .get(`/payment-recieve`)
       .then((response) => {
         if (response.data.status === "Success") {
           setPayment(response.data.data);
@@ -32,7 +35,7 @@ const PaymentReceive = () => {
       });
   }, []);
 
-   // filter logic
+  // filter logic
   useEffect(() => {
     if (!startDate && !endDate) {
       setFilteredPayment(payment);
@@ -62,10 +65,10 @@ const PaymentReceive = () => {
     setFilteredPayment(result);
   }, [startDate, endDate, payment]);
   // total amount footer
-const totalAmount = filteredPayment.reduce(
-  (sum, item) => sum + Number(item.amount || 0),
-  0
-);
+  const totalAmount = filteredPayment.reduce(
+    (sum, item) => sum + Number(item.amount || 0),
+    0
+  );
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -94,13 +97,13 @@ const totalAmount = filteredPayment.reduce(
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <div className=" md:mt-0 flex gap-2">
-                                    <button
-                                      onClick={() => setShowFilter((prev) => !prev)}
-                                      className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
-                                    >
-                                      <FaFilter /> Filter
-                                    </button>
-                                  </div>
+              <button
+                onClick={() => setShowFilter((prev) => !prev)}
+                className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                <FaFilter /> Filter
+              </button>
+            </div>
             <Link to="/tramessy/account/PaymentReceiveForm">
               <button className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
                 <FaPlus /> Recieve
@@ -108,40 +111,46 @@ const totalAmount = filteredPayment.reduce(
             </Link>
           </div>
         </div>
-           {/* filter */}
-                {showFilter && (
-                          <div className="md:flex items-center gap-5 justify-between border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
-                            <div className="relative w-full">
-                              <label className="block mb-1 text-sm font-medium">
-                                Start Date
-                              </label>
-                              <input
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-                              />
-                            </div>
-                            <div className="relative w-full">
-                              <label className="block mb-1 text-sm font-medium">End Date</label>
-                              <input
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-                              />
-                            </div>
-                            <div className=" mt-5">
-                              <button
-                                onClick={handleClearFilter}
-                                className="bg-primary text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
-                              >
-                                <FiFilter/> Clear
-                              </button>
-                            </div>
-                          </div>
-                        )}
-        
+        {/* filter */}
+        {showFilter && (
+          <div className="md:flex items-center gap-5 justify-between border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
+
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
+            <div className=" ">
+              <button
+                onClick={handleClearFilter}
+                className="bg-primary text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                <FiFilter /> Clear
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="mt-5 overflow-x-auto rounded-md">
           <table className="min-w-full text-sm text-left">
             <thead className="bg-gray-200 text-primary capitalize text-sm">
@@ -160,56 +169,80 @@ const totalAmount = filteredPayment.reduce(
               </tr>
             </thead>
             <tbody className="text-gray-700">
-              {currentPayments?.map((dt, index) => (
-                <tr key={dt.id} className="hover:bg-gray-50 transition-all border border-gray-200">
-                  <td className="px-2 py-1 font-bold">{indexOfFirstItem + index + 1}.</td>
-                  <td className="px-2 py-1">{dt.date ? format(parseISO(dt.date), "dd-MMMM-yyyy") : ""}</td>
-                  <td className="px-2 py-1">{dt.customer_name}</td>
-                  <td className="px-2 py-1">{dt.branch_name}</td>
-                  <td className="px-2 py-1">{dt.bill_ref}</td>
-                  <td className="px-2 py-1">{dt.amount}</td>
-                  <td className="px-2 py-1">{dt.cash_type}</td>
-                  <td className="px-2 py-1">{dt.remarks}</td>
-                  <td className="px-2 py-1">{dt.created_by}</td>
-                  <td className="px-2 py-1">{dt.status}</td>
-                  <td className="px-2 action_column">
-                    <div className="flex gap-1">
-                      <Link to={`/tramessy/account/update-PaymentReceiveForm/${dt.id}`}>
-                        <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
-                          <FaPen className="text-[12px]" />
-                        </button>
-                      </Link>
-                      {/* <button
+              {
+                currentPayments.length === 0 ? (
+                  <tr>
+                    <td colSpan="10" className="text-center py-10 text-gray-500 italic">
+                      <div className="flex flex-col items-center">
+                        <svg
+                          className="w-12 h-12 text-gray-300 mb-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9.75 9.75L14.25 14.25M9.75 14.25L14.25 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        No payment receive data found.
+                      </div>
+                    </td>
+                  </tr>
+                )
+                  :
+                  (currentPayments?.map((dt, index) => (
+                    <tr key={dt.id} className="hover:bg-gray-50 transition-all border border-gray-200">
+                      <td className="px-2 py-1 font-bold">{indexOfFirstItem + index + 1}.</td>
+                      <td className="px-2 py-1">{dt.date ? tableFormatDate(dt.date) : ""}</td>
+                      <td className="px-2 py-1">{dt.customer_name}</td>
+                      <td className="px-2 py-1">{dt.branch_name}</td>
+                      <td className="px-2 py-1">{dt.bill_ref}</td>
+                      <td className="px-2 py-1">{dt.amount}</td>
+                      <td className="px-2 py-1">{dt.cash_type}</td>
+                      <td className="px-2 py-1">{dt.remarks}</td>
+                      <td className="px-2 py-1">{dt.created_by}</td>
+                      <td className="px-2 py-1">{dt.status}</td>
+                      <td className="px-2 action_column">
+                        <div className="flex gap-1">
+                          <Link to={`/tramessy/account/update-PaymentReceiveForm/${dt.id}`}>
+                            <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
+                              <FaPen className="text-[12px]" />
+                            </button>
+                          </Link>
+                          {/* <button
                         className="text-red-900 hover:text-white hover:bg-red-900 px-2 py-1 rounded shadow-md transition-all cursor-pointer"
                       >
                         <FaTrashAlt className="text-[12px]" />
                       </button> */}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        </div>
+                      </td>
+                    </tr>
+                  )))}
             </tbody>
-              {/* ✅ মোট যোগফল row */}
-    {currentPayments.length > 0 && (
-      <tfoot className="bg-gray-100 font-bold">
-        <tr>
-          <td colSpan="5" className="text-right p-2">Total:</td>
-          <td className="p-2">{totalAmount}</td>
-          <td colSpan="5"></td>
-        </tr>
-      </tfoot>
-    )}
+            {/*  মোট যোগফল row */}
+            {currentPayments.length > 0 && (
+              <tfoot className="bg-gray-100 font-bold">
+                <tr>
+                  <td colSpan="5" className="text-right p-2">Total:</td>
+                  <td className="p-2">{totalAmount}</td>
+                  <td colSpan="5"></td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
         {/* pagination */}
         {currentPayments.length > 0 && totalPages >= 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-          maxVisible={8} 
-        />
-      )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+            maxVisible={8}
+          />
+        )}
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ const AddCustomer = () => {
           reset(customerData)
         } catch (error) {
           console.error(error);
-          toast.error("Failed to load customer data");
+          // toast.error("Failed to load customer data");
         }
       };
       fetchCustomer();

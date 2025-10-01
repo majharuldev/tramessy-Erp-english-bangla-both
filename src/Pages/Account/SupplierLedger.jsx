@@ -6,6 +6,7 @@ import { MdOutlineArrowDropDown } from "react-icons/md";
 import * as XLSX from "xlsx"; 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import api from "../../../utils/axiosConfig";
 
 const SupplierLedger = () => {
   const [supplies, setSupplies] = useState([]); // Supplier dropdown options
@@ -17,10 +18,9 @@ const SupplierLedger = () => {
 
   // Fetch supplies list
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/supply/list`)
+    api.get(`/supplier`)
       .then((response) => {
-        if (response.data.status === "Success") {
+        if (response.data.success) {
           setSupplies(response.data.data);
         }
       })
@@ -32,8 +32,7 @@ const SupplierLedger = () => {
   // Fetch full ledger on mount
   useEffect(() => {
     setLoading(true);
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/supplierLedger/list`)
+    api.get(`/supplierLedger`)
       .then((response) => {
         if (response.data.status === "Success") {
           setSupplierLedger(response.data.data);
@@ -62,8 +61,7 @@ const SupplierLedger = () => {
       }
 
       // Filter ledger data by selected supplier
-      axios
-        .get(`${import.meta.env.VITE_BASE_URL}/supplierLedger/list`)
+      api.get(`/supplierLedger`)
         .then((response) => {
           if (response.data.status === "Success") {
             const filtered = response.data.data.filter(
@@ -79,8 +77,7 @@ const SupplierLedger = () => {
       // Reset to show all ledger data when no supplier is selected
       setOpeningBalance(0);
       setCurrentBalance(0);
-      axios
-        .get(`${import.meta.env.VITE_BASE_URL}/supplierLedger/list`)
+      api.get(`/supplierLedger`)
         .then((response) => {
           if (response.data.status === "Success") {
             setSupplierLedger(response.data.data);

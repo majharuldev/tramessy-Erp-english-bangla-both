@@ -8,6 +8,7 @@ import useRefId from "../../hooks/useRef";
 import { FiCalendar } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../../../utils/axiosConfig";
 
 const PaymentReceiveForm = () => {
   const { id } = useParams();
@@ -29,8 +30,8 @@ const PaymentReceiveForm = () => {
   const fetchPaymentData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/paymentRecived/show/${id}`
+      const response = await api.get(
+        `/payment-recieve/${id}`
       );
       const data = response.data.data;
       
@@ -58,9 +59,8 @@ const PaymentReceiveForm = () => {
   // select customer from api
   const [customer, setCustomer] = useState([]);
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/customer/list`)
-      .then((response) => response.json())
-      .then((data) => setCustomer(data.data))
+    api.get(`/customer`)
+      .then((response) => setCustomer(response.data))
       .catch((error) => console.error("Error fetching customer data:", error));
   }, []);
 
@@ -72,9 +72,8 @@ const PaymentReceiveForm = () => {
   // select branch office from api
   const [branch, setBranch] = useState([]);
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/office/list`)
-      .then((response) => response.json())
-      .then((data) => setBranch(data.data))
+    api.get(`/office`)
+      .then((response) => setBranch(response.data.data))
       .catch((error) => console.error("Error fetching branch data:", error));
   }, []);
 
@@ -102,12 +101,12 @@ const PaymentReceiveForm = () => {
 
       // Use appropriate endpoint and method based on mode
       const endpoint = isEditing 
-        ? `${import.meta.env.VITE_BASE_URL}/paymentRecived/update/${id}`
-        : `${import.meta.env.VITE_BASE_URL}/paymentRecived/create`;
+        ? `/payment-recieve/update/${id}`
+        : `/payment-recieve`;
       
-      const method = isEditing ? "post" : "post";
+      const method = isEditing ? "put" : "post";
 
-      const paymentResponse = await axios[method](endpoint, formData);
+      const paymentResponse = await api[method](endpoint, formData);
       const paymentData = paymentResponse.data;
 
       if (paymentData.success) {

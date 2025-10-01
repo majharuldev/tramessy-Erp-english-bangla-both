@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom" 
 import { InputField, SelectField } from "../components/Form/FormFields"
 import BtnSubmit from "../components/Button/BtnSubmit"
+import api from "../../utils/axiosConfig"
 
 const VendorPaymentForm = () => {
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ const VendorPaymentForm = () => {
       const fetchPaymentData = async () => {
         try {
           // Assuming an API endpoint to fetch a single payment record by ID
-          const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/vendorBill/${id}`)
+          const response = await api.get(`/vendor-payment/${id}`)
           const data = response.data.data // Adjust based on your API response structure
           if (data) {
             // Pre-populate the form with fetched data
@@ -57,9 +58,8 @@ const VendorPaymentForm = () => {
   // select customer from api
   const [customer, setCustomer] = useState([])
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/customer/list`)
-      .then((response) => response.json())
-      .then((data) => setCustomer(data.data))
+    api.get(`/customer`)
+      .then((response) => setCustomer(response.data))
       .catch((error) => console.error("Error fetching customer data:", error))
   }, [])
   const customerOptions = customer.map((dt) => ({
@@ -69,9 +69,8 @@ const VendorPaymentForm = () => {
    // select vendor from api
   const [vendor, setVendor] = useState([])
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/vendor/list`)
-      .then((response) => response.json())
-      .then((data) => setVendor(data.data))
+    api.get(`/vendor`)
+      .then((response) => setVendor(response.data.data))
       .catch((error) => console.error("Error fetching vendor data:", error))
   }, [])
   const vendorOptions = vendor.map((dt) => ({
@@ -82,9 +81,8 @@ const VendorPaymentForm = () => {
   // select branch office from api
   const [branch, setBranch] = useState([])
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/office/list`)
-      .then((response) => response.json())
-      .then((data) => setBranch(data.data))
+    api.get(`/office`)
+      .then((response) => setBranch(response.data.data))
       .catch((error) => console.error("Error fetching branch data:", error))
   }, [])
   const branchOptions = branch.map((dt) => ({
@@ -106,7 +104,7 @@ const VendorPaymentForm = () => {
 
     if (id) {
       // Update existing vendor payment
-      paymentResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/vendorBill/update/${id}`, formData)
+      paymentResponse = await api.put(`/vendor-payment/${id}`, formData)
       paymentData = paymentResponse.data
 
       if (paymentData.success) {
@@ -117,7 +115,7 @@ const VendorPaymentForm = () => {
       }
     } else {
       // Create new vendor payment
-      paymentResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/vendorBill/create`, formData)
+      paymentResponse = await api.post(`/vendor-payment`, formData)
       paymentData = paymentResponse.data
 
       if (paymentData.success) {

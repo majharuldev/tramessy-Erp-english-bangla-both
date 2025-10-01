@@ -9,6 +9,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts"
 import Pagination from "../../components/Shared/Pagination"
 import CreatableSelect from "react-select/creatable"
 import { IoIosRemoveCircle } from "react-icons/io"
+import api from "../../../utils/axiosConfig"
+import { tableFormatDate } from "../../hooks/formatDate"
 
 pdfMake.vfs = pdfFonts.vfs
 
@@ -29,12 +31,9 @@ const Bill = () => {
 
   // fetch all trip data from server
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/trip/list`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status === "Success") {
-          setYamaha(data.data)
-        }
+    api.get(`/trip`)
+      .then((res) => {
+          setYamaha(res.data)
         setLoading(false)
       })
       .catch((error) => {
@@ -45,12 +44,9 @@ const Bill = () => {
 
   // Fetch customer list for the search dropdown
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/customer/list`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status === "Success") {
-          setCustomerList(data.data)
-        }
+    api.get(`/customer`)
+      .then((res) => {
+          setCustomerList(res.data)
       })
       .catch((error) => console.error("Error fetching customer list:", error))
   }, [])
@@ -414,7 +410,7 @@ const Bill = () => {
 
       // Create array of promises for all updates
       const updatePromises = selectedData.map((dt) =>
-        fetch(`${import.meta.env.VITE_BASE_URL}/customerLedger/create`, {
+        api.post(`/customerLedger`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -431,7 +427,7 @@ const Bill = () => {
             bill_amount: dt.total_rent,
           }),
         }).then(() =>
-          fetch(`${import.meta.env.VITE_BASE_URL}/trip/update/${dt.id}`, {
+          api.put(`/trip${dt.id}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -669,7 +665,7 @@ const Bill = () => {
               {currentItems.map((dt, index) => (
                 <tr key={index} className="hover:bg-gray-50 transition-all">
                   <td className="border border-gray-700 p-1 font-bold">{dt.id}.</td>
-                  <td className="border border-gray-700 p-1">{dt.date}</td>
+                  <td className="border border-gray-700 p-1">{tableFormatDate(dt.start_date)}</td>
                   <td className="border border-gray-700 p-1">{dt.driver_name}</td>
                   <td className="border border-gray-700 p-1">{dt.customer}</td>
                   <td className="border border-gray-700 p-1">{dt.vehicle_no}</td>

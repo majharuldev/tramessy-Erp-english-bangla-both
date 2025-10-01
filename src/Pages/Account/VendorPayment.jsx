@@ -5,14 +5,15 @@ import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { MdOutlineAirplaneTicket } from "react-icons/md";
 import { Link } from "react-router-dom";
 import Pagination from "../../components/Shared/Pagination";
+import api from "../../../utils/axiosConfig";
+import { tableFormatDate } from "../../hooks/formatDate";
 
 const VendorPayment = () => {
   const [payment, setPayment] = useState([]);
   const [loading, setLoading] = useState(true);
   // Fetch payment data
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/vendorBill/list`)
+    api.get(`/vendor-payment`)
       .then((response) => {
         if (response.data.status === "Success") {
           setPayment(response.data.data);
@@ -26,10 +27,10 @@ const VendorPayment = () => {
   }, []);
 
   // মোট যোগফল বের করা
-const totalAmount = payment.reduce(
-  (sum, item) => sum + Number(item.amount || 0),
-  0
-);
+  const totalAmount = payment.reduce(
+    (sum, item) => sum + Number(item.amount || 0),
+    0
+  );
 
   // pagination
   const [currentPage, setCurrentPage] = useState([1]);
@@ -41,7 +42,7 @@ const totalAmount = payment.reduce(
     indexOfLastItem
   );
   const totalPages = Math.ceil(payment.length / itemsPerPage);
-  
+
 
   if (loading) return <p className="text-center mt-16">Loading payment...</p>;
   return (
@@ -49,9 +50,9 @@ const totalAmount = payment.reduce(
       <div className="[22rem] md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-md p-2 py-10 md:p-4 border border-gray-200">
         <div className="md:flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 ">
-                          <MdOutlineAirplaneTicket className="text-gray-800 text-2xl" />
-                          Vendor Payment
-                        </h2>
+            <MdOutlineAirplaneTicket className="text-gray-800 text-2xl" />
+            Vendor Payment
+          </h2>
           <div className="mt-3 md:mt-0 flex gap-2">
             <Link to="/tramessy/account/add-vendor-payment">
               <button className="bg-primary text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
@@ -78,45 +79,45 @@ const totalAmount = payment.reduce(
             <tbody className="text-gray-700">
               {
                 currentPayment.length === 0 ? (
-    <tr>
-      <td colSpan="8" className="text-center py-10 text-gray-500 italic">
-        <div className="flex flex-col items-center">
-          <svg
-            className="w-12 h-12 text-gray-300 mb-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.75 9.75L14.25 14.25M9.75 14.25L14.25 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          No vehicle data found.
-        </div>
-      </td>
-    </tr>
-  )  :
-              (currentPayment?.map((dt, index) => (
-                <tr className="hover:bg-gray-50 transition-all border border-gray-200">
-                  <td className="p-2 font-bold">{index + 1}.</td>
-                  <td className="p-2">{dt.date}</td>
-                  <td className="p-2">{dt.vendor_name}</td>
-                  <td className="p-2">{dt.bill_ref}</td>
-                  <td className="p-2">{dt.amount}</td>
-                  <td className="p-2">{dt.cash_type}</td>
-                  {/* <td className="p-2">{dt.created_by}</td> */}
-                  <td className="p-2">{dt.status}</td>
-                  <td className="px-2 action_column">
-                    <div className="flex gap-1">
-                      {dt.status === "Unpaid" && <Link to={`/tramessy/account/update-vendor-payment/${dt.id}`}>
-                        <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
-                          <FaPen className="text-[12px]" />
-                        </button>
-                      </Link>}
-                      {/* <button
+                  <tr>
+                    <td colSpan="8" className="text-center py-10 text-gray-500 italic">
+                      <div className="flex flex-col items-center">
+                        <svg
+                          className="w-12 h-12 text-gray-300 mb-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9.75 9.75L14.25 14.25M9.75 14.25L14.25 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        No vehicle data found.
+                      </div>
+                    </td>
+                  </tr>
+                ) :
+                  (currentPayment?.map((dt, index) => (
+                    <tr className="hover:bg-gray-50 transition-all border border-gray-200">
+                      <td className="p-2 font-bold">{index + 1}.</td>
+                      <td className="p-2">{tableFormatDate(dt.date)}</td>
+                      <td className="p-2">{dt.vendor_name}</td>
+                      <td className="p-2">{dt.bill_ref}</td>
+                      <td className="p-2">{dt.amount}</td>
+                      <td className="p-2">{dt.cash_type}</td>
+                      {/* <td className="p-2">{dt.created_by}</td> */}
+                      <td className="p-2">{dt.status}</td>
+                      <td className="px-2 action_column">
+                        <div className="flex gap-1">
+                          {dt.status === "Unpaid" && <Link to={`/tramessy/account/update-vendor-payment/${dt.id}`}>
+                            <button className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer">
+                              <FaPen className="text-[12px]" />
+                            </button>
+                          </Link>}
+                          {/* <button
                         // onClick={() => {
                         //   setSelectedEmployeeId(dt.id);
                         //   setIsOpen(true);
@@ -125,33 +126,33 @@ const totalAmount = payment.reduce(
                       >
                         <FaTrashAlt className="text-[12px]" />
                       </button> */}
-                    </div>
-                  </td>
-                </tr>
-              )))
+                        </div>
+                      </td>
+                    </tr>
+                  )))
               }
             </tbody>
             {/* ✅ মোট যোগফল row */}
-    {currentPayment.length > 0 && (
-      <tfoot className="bg-gray-100 font-bold">
-        <tr>
-          <td colSpan="4" className="text-right p-2">Total:</td>
-          <td className="p-2">{totalAmount}</td>
-          <td colSpan="3"></td>
-        </tr>
-      </tfoot>
-    )}
+            {currentPayment.length > 0 && (
+              <tfoot className="bg-gray-100 font-bold">
+                <tr>
+                  <td colSpan="4" className="text-right p-2">Total:</td>
+                  <td className="p-2">{totalAmount}</td>
+                  <td colSpan="3"></td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
         {/* pagination */}
-                  {currentPayment.length > 0 && totalPages >= 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-          maxVisible={8} 
-        />
-      )}
+        {currentPayment.length > 0 && totalPages >= 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+            maxVisible={8}
+          />
+        )}
       </div>
     </div>
   );

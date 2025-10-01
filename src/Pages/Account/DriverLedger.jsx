@@ -27,8 +27,8 @@ const DriverLedger = () => {
 
   useEffect(() => {
     // Fetch helpers data
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/helper/list`)
+    api
+      .get(`/helper`)
       .then((response) => {
         if (response.data.status === "Success") {
           // Store helpers data directly, assuming salary is part of each helper object
@@ -124,7 +124,7 @@ const toNumber = (val) => {
         tadaData[item.driver_name] = new Set();
       }
       // Extract just the date part (YYYY-MM-DD) without time
-      const dateOnly = item.date.split("T")[0];
+      const dateOnly = item.date?.split("T")[0];
       tadaData[item.driver_name].add(dateOnly);
     });
     const result = {};
