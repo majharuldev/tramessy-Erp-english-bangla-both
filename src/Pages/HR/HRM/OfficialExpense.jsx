@@ -31,7 +31,7 @@ const OfficialExpense = () => {
     pay_amount: "",
     payment_category: "",
     branch_name: "",
-    remarks: "",
+    particulars: "",
   })
   const [errors, setErrors] = useState({})
   // Date filter state
@@ -75,7 +75,7 @@ const OfficialExpense = () => {
           pay_amount: data?.pay_amount || "",
           payment_category: data?.payment_category || "",
           branch_name: data?.branch_name || "",
-          remarks: data?.remarks || "",
+          particulars: data?.particulars || "",
         })
         setEditingId(record.id)
       } catch (err) {
@@ -89,7 +89,7 @@ const OfficialExpense = () => {
         pay_amount: "",
         payment_category: "",
         branch_name: "",
-        remarks: "",
+        particulars: "",
       })
       setEditingId(null)
     }
@@ -103,7 +103,7 @@ const OfficialExpense = () => {
       pay_amount: "",
       payment_category: "",
       branch_name: "",
-      remarks: "",
+      particulars: "",
     })
     setEditingId(null)
     setIsModalVisible(false)

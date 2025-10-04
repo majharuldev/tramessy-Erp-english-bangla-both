@@ -4,10 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import BtnSubmit from "../../components/Button/BtnSubmit";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { InputField, SelectField } from "../../components/Form/FormFields";
-import { FiCalendar } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
-import axios from "axios";
-import { IoMdClose } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../../utils/axiosConfig";
 
@@ -15,7 +12,7 @@ const PurchaseForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id);
-  
+
   const methods = useForm();
   const { handleSubmit, register, watch, reset, setValue, control } = methods;
   const purChaseDateRef = useRef(null);
@@ -32,36 +29,66 @@ const PurchaseForm = () => {
   const quantity = parseFloat(watch("quantity") || 0);
   const unitPrice = parseFloat(watch("unit_price") || 0);
   const totalPrice = quantity * unitPrice;
-  
+
   useEffect(() => {
     const totalPrice = quantity * unitPrice;
     setValue("purchase_amount", totalPrice);
   }, [quantity, unitPrice, setValue]);
 
-   // Set vehicle category when vehicle is selected
- useEffect(() => {
-  if (selectedVehicle) {
-    const selectedVehicleData = vehicle.find(
-      (v) =>
-        `${v.reg_zone} ${v.reg_serial} ${v.reg_no}`.trim() ===
-        selectedVehicle.trim()
-    );
-    if (selectedVehicleData) {
-      console.log("Setting vehicle_category:", selectedVehicleData.vehicle_category); // Debug
-      setValue("vehicle_category", selectedVehicleData.vehicle_category, {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
+  // Set vehicle category when vehicle is selected
+  //  useEffect(() => {
+  //   if (selectedVehicle) {
+  //     const selectedVehicleData = vehicle.find(
+  //       (v) =>
+  //         `${v.reg_zone} ${v.reg_serial} ${v.reg_no}`.trim() ===
+  //         selectedVehicle.trim()
+  //     );
+  //     if (selectedVehicleData) {
+  //       console.log("Setting vehicle_category:", selectedVehicleData.vehicle_category); // Debug
+  //       setValue("vehicle_category", selectedVehicleData.vehicle_category, {
+  //         shouldValidate: true,
+  //         shouldDirty: true,
+  //       });
+  //     } else {
+  //       console.log("No vehicle data found, setting vehicle_category to empty"); // Debug
+  //       setValue("vehicle_category", "");
+  //     }
+  //   } else {
+  //     console.log("No vehicle selected, setting vehicle_category to empty"); // Debug
+  //     setValue("vehicle_category", "");
+  //   }
+  // }, [selectedVehicle, vehicle, setValue]);
+  // Vehicle select করলে auto Driver Name update হবে
+  useEffect(() => {
+    if (selectedVehicle) {
+      const selectedVehicleData = vehicle.find(
+        (v) =>
+          `${v.reg_zone} ${v.reg_serial} ${v.reg_no}`.trim() ===
+          selectedVehicle.trim()
+      );
+
+      if (selectedVehicleData) {
+        // Vehicle category বসাও
+        setValue("vehicle_category", selectedVehicleData.vehicle_category || "", {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+
+        // Driver Name auto বসাও
+        setValue("driver_name", selectedVehicleData.driver_name || "", {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      } else {
+        setValue("vehicle_category", "");
+        setValue("driver_name", "");
+      }
     } else {
-      console.log("No vehicle data found, setting vehicle_category to empty"); // Debug
       setValue("vehicle_category", "");
+      setValue("driver_name", "");
     }
-  } else {
-    console.log("No vehicle selected, setting vehicle_category to empty"); // Debug
-    setValue("vehicle_category", "");
-  }
-}, [selectedVehicle, vehicle, setValue]);
-  
+  }, [selectedVehicle, vehicle, setValue]);
+
   // Preview image
   const [previewImage, setPreviewImage] = useState(null);
 
@@ -71,17 +98,17 @@ const PurchaseForm = () => {
     api.get(`/driver`)
       .then((res) => setDrivers(res.data))
       .catch((error) => console.error("Error fetching driver data:", error));
-    
+
     // Fetch vehicles
     api.get(`/vehicle`)
       .then((res) => setVehicle(res.data))
       .catch((error) => console.error("Error fetching vehicle data:", error));
-    
+
     // Fetch branches
     api.get(`/office`)
       .then((res) => setBranch(res.data.data))
       .catch((error) => console.error("Error fetching branch data:", error));
-    
+
     // Fetch suppliers
     api.get(`/supplier`)
       .then((res) => setSupplier(res.data.data))
@@ -98,7 +125,7 @@ const PurchaseForm = () => {
           );
           const purchaseData = response.data.data;
           console.log("Fetched purchase data:", purchaseData);
-          
+
           // Set form values
           setValue("date", purchaseData.date);
           setValue("category", purchaseData.category);
@@ -113,14 +140,14 @@ const PurchaseForm = () => {
           setValue("purchase_amount", purchaseData.purchase_amount);
           setValue("remarks", purchaseData.remarks);
           setValue("priority", purchaseData.priority);
-          
+
           // Set image preview if exists
           // if (purchaseData.bill_image) {
           //   const imageUrl = `${import.meta.env.VITE_BASE_URL}/uploads/${purchaseData.bill_image}`;
           //   setPreviewImage(imageUrl);
           //   setExistingImage(purchaseData.bill_image); // existing image নাম সংরক্ষণ করুন
           // }
-          
+
           setIsLoading(false);
         } catch (error) {
           console.error("Error fetching purchase data:", error);
@@ -128,7 +155,7 @@ const PurchaseForm = () => {
           setIsLoading(false);
         }
       };
-      
+
       fetchPurchaseData();
     }
   }, [id, isEditMode, setValue]);
@@ -157,7 +184,7 @@ const PurchaseForm = () => {
   // const onSubmit = async (data) => {
   //   try {
   //     const purchaseFormData = new FormData();
-      
+
   //     for (const key in data) {
   //       // Handle file uploads separately
   //       if (key === "bill_image") {
@@ -175,7 +202,7 @@ const PurchaseForm = () => {
   //     }
 
   //     let response;
-      
+
   //     if (isEditMode) {
   //       // Update existing purchase
   //       response = await api.put(
@@ -205,7 +232,7 @@ const PurchaseForm = () => {
   //         position: "top-right",
   //       });
   //     }
-      
+
   //     reset();
   //     navigate("/tramessy/Purchase/maintenance");
   //   } catch (error) {
@@ -217,35 +244,35 @@ const PurchaseForm = () => {
   // };
 
   const onSubmit = async (data) => {
-  try {
-    const payload = {
-      date: new Date(data.date).toISOString().split("T")[0],
-      category: data.category ?? "",
-      item_name: data.item_name ?? "",
-      driver_name: data.driver_name ?? "",
-      vehicle_no: data.vehicle_no ?? "",
-      vehicle_category: data.vehicle_category ?? "",
-      branch_name: data.branch_name ?? "",
-      supplier_name: data.supplier_name ?? "",
-      quantity: Number(data.quantity) || 0,
-      unit_price: Number(data.unit_price) || 0,
-      purchase_amount: Number(data.purchase_amount) || 0,
-      remarks: data.remarks ?? "",
-      priority: data.priority ?? "",
-      // bill_image: যদি backend JSON support করে, Base64 encode পাঠাও
-    };
+    try {
+      const payload = {
+        date: new Date(data.date).toISOString().split("T")[0],
+        category: data.category ?? "",
+        item_name: data.item_name ?? "",
+        driver_name: data.driver_name ?? "",
+        vehicle_no: data.vehicle_no ?? "",
+        vehicle_category: data.vehicle_category ?? "",
+        branch_name: data.branch_name ?? "",
+        supplier_name: data.supplier_name ?? "",
+        quantity: Number(data.quantity) || 0,
+        unit_price: Number(data.unit_price) || 0,
+        purchase_amount: Number(data.purchase_amount) || 0,
+        remarks: data.remarks ?? "",
+        priority: data.priority ?? "",
+        // bill_image: যদি backend JSON support করে, Base64 encode পাঠাও
+      };
 
-    const response = isEditMode
-      ? await api.put(`/purchase/${id}`, payload)   // JSON
-      : await api.post(`/purchase`, payload);
+      const response = isEditMode
+        ? await api.put(`/purchase/${id}`, payload)   // JSON
+        : await api.post(`/purchase`, payload);
 
-    toast.success(isEditMode ? "Purchase updated!" : "Purchase submitted!");
-    navigate("/tramessy/Purchase/maintenance");
-  } catch (error) {
-    console.error(error);
-    toast.error(error.response?.data?.message || "Server error");
-  }
-};
+      toast.success(isEditMode ? "Purchase updated!" : "Purchase submitted!");
+      navigate("/tramessy/Purchase/maintenance");
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Server error");
+    }
+  };
 
 
 
@@ -257,149 +284,186 @@ const PurchaseForm = () => {
     <div className="mt-5 md:p-2">
       <Toaster />
       <div className="mx-auto p-6 border-t-2 border-primary  rounded-md shadow">
-          <h3 className=" pb-4 text-primary font-semibold">
-        {isEditMode ? "Update Maintenance Purchase " : "Add Maintenance Purchase"}
-      </h3>
+        <h3 className=" pb-4 text-primary font-semibold">
+          {isEditMode ? "Update Maintenance Purchase " : "Add Maintenance Purchase"}
+        </h3>
         <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mx-auto p-6 rounded-md shadow space-y-4"
-        >
-          <h5 className="text-2xl font-bold text-center text-[#EF9C07]">
-            {selectedCategory === "fuel"
-              ? "Fuel Purchase" 
-              : selectedCategory === "engine_oil" || selectedCategory === "parts" 
-                ? "Maintenance" 
-                : ""}
-          </h5>
-          
-          {/* Form fields */}
-          <div className="flex flex-col lg:flex-row justify-between gap-x-3">
-            <div className="w-full">
-              <InputField
-                name="date"
-                label="Purchase Date"
-                type="date"
-                required={!isEditMode} 
-                inputRef={(e) => {
-                  register("date").ref(e);
-                  purChaseDateRef.current = e;
-                }}
-                icon={
-                  <span
-                    className="py-[11px] absolute right-0 px-3 top-[22px] transform -translate-y-1/2 rounded-r"
-                    onClick={() => purChaseDateRef.current?.showPicker?.()}
-                  >
-                    <FiCalendar className="text-gray-700 cursor-pointer" />
-                  </span>
-                }
-              />
-            </div>
-            <div className="w-full">
-              <SelectField
-                name="category"
-                label="Category"
-                required={!isEditMode}
-                options={[
-                  { value: "engine_oil", label: "Engine Oil" },
-                  { value: "parts", label: "Parts" },
-                ]}
-              />
-            </div>
-            {selectedCategory === "parts" && (
-              <div className="w-full">
-                <InputField name="item_name" label="Item Name" required={!isEditMode} />
-              </div>
-            )}
-          </div>
-          
-          <div className="md:flex justify-between gap-x-3">
-            <div className="w-full">
-              <SelectField
-                name="driver_name"
-                label="Driver Name"
-                required={!isEditMode}
-                options={driverOptions}
-                control={control}
-              />
-            </div>
-            {/* Hidden field for vehicle category */}
-       <div className="w-full hidden">
-            <InputField
-              name="vehicle_category"
-              label="Vehicle Category"
-              value={watch("vehicle_category") || ""}
-              readOnly
-              {...register("vehicle_category")}
-            />
-          </div>
-            <div className="w-full">
-              <SelectField
-                name="vehicle_no"
-                label="Vehicle No."
-                required={!isEditMode}
-                options={vehicleOptions}
-                control={control}
-              />
-            </div>
-          </div>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="mx-auto p-6 space-y-4"
+          >
+            <h5 className="text-2xl font-bold text-center text-[#EF9C07]">
+              {selectedCategory === "fuel"
+                ? "Fuel Purchase"
+                : selectedCategory === "engine_oil" || selectedCategory === "parts"
+                  ? "Maintenance"
+                  : ""}
+            </h5>
 
-          <div className="flex flex-col lg:flex-row justify-between gap-x-3">
-            <div className="w-full">
-              <SelectField
-                name="branch_name"
-                label="Branch Name"
-                required={!isEditMode}
-                options={branchOptions}
-                control={control}
-              />
+            {/* Form fields */}
+            <div className="flex flex-col lg:flex-row justify-between gap-x-3">
+              <div className="w-full">
+                <InputField
+                  name="date"
+                  label="Purchase Date"
+                  type="date"
+                  required={!isEditMode}
+                  inputRef={(e) => {
+                    register("date").ref(e);
+                    purChaseDateRef.current = e;
+                  }}
+
+                />
+              </div>
+              <div className="w-full">
+                <SelectField
+                  name="branch_name"
+                  label="Branch Name"
+                  required={!isEditMode}
+                  options={branchOptions}
+                  control={control}
+                />
+              </div>
+              <div className="w-full">
+                <SelectField
+                  name="supplier_name"
+                  label="Supplier Name"
+                  required={!isEditMode}
+                  options={supplyOptions}
+                  control={control}
+                />
+              </div>
             </div>
-            <div className="w-full">
-              <SelectField
-                name="supplier_name"
-                label="Supplier Name"
-                required={!isEditMode}
-                options={supplyOptions}
-                control={control}
-              />
+
+            <div className="md:flex justify-between gap-x-3">
+              <div className="w-full">
+                <SelectField
+                  name="category"
+                  label="Category"
+                  required={!isEditMode}
+                  options={[
+                    { value: "engine_oil", label: "Engine Oil" },
+                    { value: "parts", label: "Parts" },
+                  ]}
+                />
+              </div>
+              {selectedCategory === "parts" && (
+                <div className="w-full">
+                  <InputField name="item_name" label="Item Name" required={!isEditMode} />
+                </div>
+              )}
+              <div className="w-full hidden">
+                <InputField
+                  name="driver_name"
+                  label="Driver Name"
+                  required={!isEditMode}
+                  // options={driverOptions}
+                  control={control}
+                />
+              </div>
+              {/* Hidden field for vehicle category */}
+              <div className="w-full hidden">
+                <InputField
+                  name="vehicle_category"
+                  label="Vehicle Category"
+                  value={watch("vehicle_category") || ""}
+                  readOnly
+                  {...register("vehicle_category")}
+                />
+              </div>
+              <div className="w-full">
+                <SelectField
+                  name="vehicle_no"
+                  label="Vehicle No."
+                  required={!isEditMode}
+                  options={vehicleOptions}
+                  control={control}
+                />
+              </div>
+              <div className="w-full">
+                <InputField
+                  name="quantity"
+                  label="Quantity"
+                  type="number"
+                  required={!isEditMode}
+                />
+              </div>
             </div>
-            <div className="w-full">
-              <InputField
-                name="quantity"
-                label="Quantity"
-                type="number"
-                required={!isEditMode}
-              />
+
+            <div className="flex flex-col lg:flex-row justify-between gap-x-3">
+
+              <div className="w-full">
+                <InputField
+                  name="last_service_date"
+                  label="Service Date"
+                  type="date"
+                  required={!isEditMode}
+                  inputRef={(e) => {
+                    register("date").ref(e);
+                    purChaseDateRef.current = e;
+                  }}
+
+                />
+              </div>
+              <div className="w-full">
+                <InputField
+                  name="next_service_date"
+                  label="Next Service Date"
+                  type="date"
+                  required={!isEditMode}
+                  inputRef={(e) => {
+                    register("date").ref(e);
+                    purChaseDateRef.current = e;
+                  }}
+
+                />
+              </div>
+              <div className="w-full">
+                <InputField
+                  name="last_km_reading"
+                  label="Last KM"
+                  required={!isEditMode}
+                  type="number"
+                />
+              </div>
+              <div className="w-full">
+                <InputField
+                  name="next_km_due"
+                  label="Next KM"
+                  required={!isEditMode}
+                  type="number"
+                />
+              </div>
+
             </div>
-          </div>
-          
-          <div className="flex flex-col lg:flex-row justify-between gap-3">
-            <div className="w-full">
-              <InputField
-                name="unit_price"
-                label="Unit Price"
-                type="number"
-                required={!isEditMode}
-              />
+
+            <div className="flex flex-col lg:flex-row justify-between gap-3">
+              <div className="w-full">
+                <InputField
+                  name="unit_price"
+                  label="Unit Price"
+                  type="number"
+                  required={!isEditMode}
+                />
+              </div>
+              <div className="w-full">
+                <InputField
+                  name="purchase_amount"
+                  label="Total"
+                  readOnly
+                  value={totalPrice}
+                  required={!isEditMode}
+                />
+              </div>
+              <div className="w-full">
+                <InputField name="remarks" label="Remark" />
+              </div>
+              <div className="w-full">
+                <InputField name="priority" label="priority" />
+              </div>
             </div>
-            <div className="w-full">
-              <InputField
-                name="purchase_amount"
-                label="Total"
-                readOnly
-                value={totalPrice}
-                required={!isEditMode}
-              />
-            </div>
-            <div className="w-full">
-              <InputField name="remarks" label="Remark" />
-            </div>
-            <div className="w-full">
-              <InputField name="priority" label="priority" />
-            </div>
-          </div>
-          
-          {/* <div className="md:flex justify-between gap-3">
+
+            {/* <div className="md:flex justify-between gap-3">
             <div className="w-full">
               <label className="text-gray-700 text-sm font-semibold">
                 Bill Image {!isEditMode && "(Required)"}
@@ -452,9 +516,9 @@ const PurchaseForm = () => {
               />
             </div>
           </div> */}
-          
-          {/* Preview */}
-          {/* {previewImage && (
+
+            {/* Preview */}
+            {/* {previewImage && (
             <div className="mt-2 relative flex justify-end">
               <button
                 type="button"
@@ -481,9 +545,9 @@ const PurchaseForm = () => {
             </div>
           )}
            */}
-          <BtnSubmit>{isEditMode ? "Update Purchase" : "Submit"}</BtnSubmit>
-        </form>
-      </FormProvider>
+            <BtnSubmit>{isEditMode ? "Update Purchase" : "Submit"}</BtnSubmit>
+          </form>
+        </FormProvider>
       </div>
     </div>
   );

@@ -34,7 +34,7 @@ const SalaryExpense = () => {
     pay_amount: "",
     payment_category: "",
     branch_name: "",
-    remarks: "",
+    particulars: "",
   })
   const [errors, setErrors] = useState({})
   // Date filter state
@@ -99,7 +99,7 @@ const SalaryExpense = () => {
           pay_amount: data?.pay_amount || "",
           payment_category: data?.payment_category || "",
           branch_name: data?.branch_name || "",
-          remarks: data?.remarks || "",
+          particulars: data?.particulars || "",
         })
         setEditingId(record.id)
       } catch (err) {
@@ -113,7 +113,7 @@ const SalaryExpense = () => {
         pay_amount: "",
         payment_category: "",
         branch_name: "",
-        remarks: "",
+        particulars: "",
       })
       setEditingId(null)
     }
@@ -159,10 +159,11 @@ const SalaryExpense = () => {
   const validateForm = () => {
     const newErrors = {}
     if (!formData.date) newErrors.date = "Date is required"
-    if (!formData.paid_to) newErrors.paid_to = "Recipient is required"
+    // if (!formData.paid_to) newErrors.paid_to = "Recipient is required"
     if (!formData.pay_amount) newErrors.pay_amount = "Amount is required"
     if (!formData.branch_name) newErrors.branch_name = "Branch Name is required"
     if (!formData.payment_category) newErrors.payment_category = "Category is required"
+    if (!formData.particulars) newErrors.particulars = "Particulars is required"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -181,7 +182,7 @@ const SalaryExpense = () => {
       }
 
       if (editingId) {
-        await api.post(`/expense/${editingId}`, payload)
+        await api.put(`/expense/${editingId}`, payload)
         toast.success("Expense Data Update successful")
       } else {
         await api.post(`/expense`, payload)
@@ -619,7 +620,7 @@ const SalaryExpense = () => {
                     />
                     {errors.date && <p className="text-red-500 text-xs mt-1">{errors.date}</p>}
                   </div>
-                  {/* <div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Paid To <span className="text-red-500">*</span></label>
                     <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       value={formData.paid_to}
@@ -630,7 +631,7 @@ const SalaryExpense = () => {
                       {!employeesLoading && employees.map((employee) => (<option key={employee.id} value={employee.full_name}>
                         {employee.full_name} </option>))} </select>
                     {errors.paid_to && <p className="text-red-500 text-xs mt-1">{errors.paid_to}</p>}
-                  </div> */}
+                  </div>
 
                 </div>
 
@@ -683,13 +684,13 @@ const SalaryExpense = () => {
                     {errors.pay_amount && <p className="text-red-500 text-xs mt-1">{errors.pay_amount}</p>}
                   </div>
                   <div className="m">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Remarks<span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Remarks"
-                      value={formData.remarks}
-                      onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
+                      value={formData.particulars}
+                      onChange={(e) => setFormData({ ...formData, particulars: e.target.value })}
                     />
                   </div>
                 </div>

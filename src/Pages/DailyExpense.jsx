@@ -1,9 +1,6 @@
 
 import { useEffect, useState } from "react"
-import axios from "axios"
 import { FaTruck, FaFilter, FaPen, FaFileExcel, FaFilePdf, FaPrint } from "react-icons/fa"
-import { GrFormNext, GrFormPrevious } from "react-icons/gr"
-import { Link } from "react-router-dom"
 // export
 import { CSVLink } from "react-csv"
 import * as XLSX from "xlsx"
@@ -11,6 +8,7 @@ import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { saveAs } from "file-saver"
 import Pagination from "../components/Shared/Pagination"
+import api from "../../utils/axiosConfig"
 
 const DailyTripExpense = () => {
   const [showFilter, setShowFilter] = useState(false)
@@ -26,14 +24,12 @@ const DailyTripExpense = () => {
 
   // Fetch data
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BASE_URL}/trip/list`)
+    api
+      .get(`/trip`)
       .then((response) => {
-        if (response.data.status === "Success") {
           // Sort by date, assuming 'date' is the correct property
           const sorted = response.data.data.sort((a, b) => new Date(b.date) - new Date(a.date))
           setTrip(sorted)
-        }
         setLoading(false)
       })
       .catch((error) => {
@@ -157,16 +153,6 @@ const DailyTripExpense = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentTrip = filteredExpense.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(filteredExpense.length / itemsPerPage)
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((currentPage) => currentPage - 1)
-  }
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((currentPage) => currentPage + 1)
-  }
-  const handlePageClick = (number) => {
-    setCurrentPage(number)
-  }
 
   return (
     <main className="md:p-2">

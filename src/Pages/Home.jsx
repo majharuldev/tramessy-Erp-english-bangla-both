@@ -8,17 +8,18 @@ const Home = () => {
   return (
     <div className="p-2">
       <OverViewCard />
-      <div className="grid grid-cols-2  pt-5">
-        <div className="pr-5">
+      <div className=" py-5">
+        <div className="">
           <StatisticsCard />
         </div>
-        <div className="">
+       
+      </div>
+       <div className=" grid grid-cols-1 md:grid-cols-2 gap-5">
          
           <ProfitLossChartCard/>
         </div>
-      </div>
       <SalesChart />
-       <PieChart />
+       {/* <PieChart /> */}
     </div>
   );
 };
