@@ -1967,7 +1967,7 @@ const TripList = () => {
                   <p className="w-48">Additional Cost</p> <p>{selectedTrip.additional_cost}</p>
                 </li>
                 <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Advance</p> <p>{selectedTrip.advance}</p>
+                  <p className="w-48">Vendor Name</p> <p>{selectedTrip.vendor_name}</p>
                 </li>
               </ul>
               <div className="flex justify-end mt-10">

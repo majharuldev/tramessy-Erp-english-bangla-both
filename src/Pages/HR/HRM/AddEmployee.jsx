@@ -403,7 +403,7 @@ const EmployeeForm = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="mx-auto space-y-4">
             {/* Row 1: Full Name, Email, Mobile */}
             <div className="md:flex justify-between gap-3">
-              <div className="w-full">
+              {/* <div className="w-full">
                 <SelectField
                   name="branch_name"
                   label="Branch Name"
@@ -411,9 +411,9 @@ const EmployeeForm = () => {
                   options={branchOptions}
                   control={control}
                 />
-              </div>
+              </div> */}
               <div className="w-full">
-                <InputField name="full_name" label="Full Name" required={isEditMode? false:true} />
+                <InputField name="employee_name" label="Full Name" required={isEditMode? false:true} />
               </div>
               <div className="w-full">
                 <InputField name="email" label="Email" />

@@ -176,7 +176,7 @@ const EmployeeList = () => {
                             className="w-20 h-20 rounded-full"
                           />
                         </td> */}
-                        <td className="px-2 py-1">{dt.full_name}</td>
+                        <td className="px-2 py-1">{dt.employee_name}</td>
                         <td className="px-2 py-1">{dt.email}</td>
                         <td className="px-2 py-1">{tableFormatDate(dt.join_date)}</td>
                         <td className="px-2 py-1">{dt.designation}</td>
@@ -295,7 +295,7 @@ const EmployeeList = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-               <p><span className="font-semibold">Branch:</span> {selectedEmployee.branch_name}</p>
+               {/* <p><span className="font-semibold">Branch:</span> {selectedEmployee.branch_name}</p> */}
               <p><span className="font-semibold">Gender:</span> {selectedEmployee.gender}</p>
               <p><span className="font-semibold">Blood Group:</span> {selectedEmployee.blood_group}</p>
               <p><span className="font-semibold">NID:</span> {selectedEmployee.nid}</p>

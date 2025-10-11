@@ -71,8 +71,8 @@ const CashDispatchForm = () => {
   }, [])
 
   const employeeOptions = employee.map((dt) => ({
-    value: dt.full_name,
-    label: dt.full_name,
+    value: dt.employee_name,
+    label: dt.employee_name,
   }))
 
   const { handleSubmit, reset, register, control } = methods

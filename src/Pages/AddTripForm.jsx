@@ -10,6 +10,7 @@ import { FiCalendar } from "react-icons/fi";
 import { add, format } from "date-fns";
 import useAdmin from "../hooks/useAdmin";
 import api from "../../utils/axiosConfig";
+import FormSkeleton from "../components/Form/FormSkeleton";
 
 export default function AddTripForm() {
   const [loading, setLoading] = useState(false);
@@ -195,6 +196,7 @@ export default function AddTripForm() {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
+        setLoading(true);
         // Fetch rates data first
         const ratesRes = await api.get(`/rate`);
         const ratesData = ratesRes.data;
@@ -297,7 +299,9 @@ export default function AddTripForm() {
       } catch (error) {
         console.error("Error fetching data:", error);
         // toast.error("Failed to load form data");
-      }
+      } finally {
+      setLoading(false); // ✅ সবশেষে loading বন্ধ
+    }
     };
 
     fetchAllData();
@@ -464,7 +468,11 @@ export default function AddTripForm() {
   return (
     <FormProvider {...methods}>
       <Toaster />
-      <form onSubmit={handleSubmit(onSubmit)} className="min-h-screen mt-5 p-2">
+      {loading ? (
+      <div className="p-4 bg-white rounded-md shadow border-t-2 border-primary">
+        <FormSkeleton />
+      </div>
+    ) :(<form onSubmit={handleSubmit(onSubmit)} className="min-h-screen mt-5 p-2">
 
         <div className="rounded-md shadow border-t-2 border-primary">
           {/* Form Header */}
@@ -671,7 +679,7 @@ export default function AddTripForm() {
                     label="Total Rent/Bill Amount"
                     type="number"
                     required={false}
-                    readOnly={isRateFound}
+                    // readOnly={isRateFound}
                     className={`${isRateFound ? "bg-gray-100" : ""}`}
                   />
                 </div>
@@ -755,7 +763,7 @@ export default function AddTripForm() {
             </div>
           </div>
         </div>
-      </form>
+      </form>)}
     </FormProvider>
   );
 }

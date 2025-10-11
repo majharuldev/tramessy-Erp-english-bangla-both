@@ -208,13 +208,13 @@ const OfficeForm = () => {
                 <div className="w-full">
                   <InputField name="branch_name" label="Branch Name" required />
                 </div>
-                <div className="w-full">
+                {/* <div className="w-full">
                   <InputField
                     name="factory_name"
                     label="Factory / Company Name"
                     required
                   />
-                </div>
+                </div> */}
               </div>
               <div className="mt-5 md:mt-1 md:flex justify-between gap-3">
                 <div className="w-full">
