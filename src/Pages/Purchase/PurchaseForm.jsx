@@ -1,6 +1,6 @@
 
 
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import BtnSubmit from "../../components/Button/BtnSubmit";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { InputField, SelectField } from "../../components/Form/FormFields";
@@ -8,14 +8,20 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../../utils/axiosConfig";
 import useAdmin from "../../hooks/useAdmin";
+import { AuthContext } from "../../providers/AuthProvider";
 
 const PurchaseForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id);
   const isAdmin = useAdmin();
+const {user} = useContext(AuthContext)
+    const methods = useForm({
+  defaultValues: {
+    sms_sent: "yes",
+  },
+});
 
-  const methods = useForm();
   const { handleSubmit, register, watch, reset, setValue, control } = methods;
   const purChaseDateRef = useRef(null);
   const [drivers, setDrivers] = useState([]);
@@ -138,7 +144,11 @@ const PurchaseForm = () => {
           setValue("branch_name", purchaseData.branch_name);
           setValue("supplier_name", purchaseData.supplier_name);
           setValue("quantity", purchaseData.quantity);
+          setValue("service_date", purchaseData.service_date);
+          setValue("next_service_date", purchaseData.next_service_date);
           setValue("unit_price", purchaseData.unit_price);
+          setValue("last_km", purchaseData.last_km);
+          setValue("next_km", purchaseData.next_km);
           setValue("purchase_amount", purchaseData.purchase_amount);
           setValue("remarks", purchaseData.remarks);
           setValue("priority", purchaseData.priority);
@@ -182,69 +192,17 @@ const PurchaseForm = () => {
     label: supply.supplier_name,
   }));
 
+//   const formData = new FormData();
+// Object.entries(data).forEach(([key, value]) => {
+//   formData.append(key, value);
+// });
+
+// await api.post("/purchase", formData, {
+//   headers: { "Content-Type": "multipart/form-data" },
+// });
+
+
   // Handle form submission for both add and update
-  // const onSubmit = async (data) => {
-  //   try {
-  //     const purchaseFormData = new FormData();
-
-  //     for (const key in data) {
-  //       // Handle file uploads separately
-  //       if (key === "bill_image") {
-  //         // যদি নতুন ফাইল সিলেক্ট করা হয়
-  //         if (typeof data[key] === "object") {
-  //           purchaseFormData.append(key, data[key]);
-  //         } 
-  //         // যদি এডিট মোডে থাকে এবং নতুন ফাইল সিলেক্ট না করা হয়
-  //         else if (isEditMode && existingImage && !data[key]) {
-  //           purchaseFormData.append(key, existingImage);
-  //         }
-  //       } else if (data[key] !== null && data[key] !== undefined) {
-  //         purchaseFormData.append(key, data[key]);
-  //       }
-  //     }
-
-  //     let response;
-
-  //     if (isEditMode) {
-  //       // Update existing purchase
-  //       response = await api.put(
-  //         `/purchase/${id}`,
-  //         purchaseFormData,
-  //         {
-  //           headers: {
-  //             "Content-Type": "multipart/form-data",
-  //           },
-  //         }
-  //       );
-  //       toast.success("Purchase updated successfully!", {
-  //         position: "top-right",
-  //       });
-  //     } else {
-  //       // Create new purchase
-  //       response = await api.post(
-  //         `/purchase`,
-  //         purchaseFormData,
-  //         {
-  //           headers: {
-  //             "Content-Type": "multipart/form-data",
-  //           },
-  //         }
-  //       );
-  //       toast.success("Purchase submitted successfully!", {
-  //         position: "top-right",
-  //       });
-  //     }
-
-  //     reset();
-  //     navigate("/tramessy/Purchase/maintenance");
-  //   } catch (error) {
-  //     console.error(error);
-  //     const errorMessage =
-  //       error.response?.data?.message || error.message || "Unknown error";
-  //     toast.error("Server issue: " + errorMessage);
-  //   }
-  // };
-
   const onSubmit = async (data) => {
     try {
       // const payload = {
@@ -263,6 +221,22 @@ const PurchaseForm = () => {
       //   priority: data.priority ?? "",
       //   // bill_image: যদি backend JSON support করে, Base64 encode পাঠাও
       // };
+// date format local 
+      ["date", "service_date", "next_service_date"].forEach((field) => {
+  if (data[field]) {
+    const d = new Date(data[field]);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    data[field] = d.toISOString().split("T")[0];
+  }
+});
+//  Create করলে বর্তমান ইউজার
+    if (!isEditMode) {
+      data.created_by = user?.name || user?.email || "Unknown";
+    } 
+    //  Update করলে আগের created_by অপরিবর্তিত থাকবে (form theke paoa)
+    else {
+      data.created_by = data.created_by || existingData?.created_by || "Unknown";
+    }
 
       const response = isEditMode
         ? await api.put(`/purchase/${id}`, data)   // JSON
@@ -271,16 +245,16 @@ const PurchaseForm = () => {
       if (response.data.success) {
         toast.success(isEditMode ? "Purchase updated!" : "Purchase submitted!");
         //  Only send SMS if it's a new trip and sms_sent = "yes"
-        if (!id && data.sms_sent === "yes") {
+        if (!id && !isAdmin && data.sms_sent === "yes") {
           const purchase = response.data.data; // Assuming your backend returns created trip data
-          const purchaseId = purchase.id || "";
-          const supplierName = trip?.supplier_name || "";
+          const purchaseDate= purchase.date || "";
+          const supplierName = purchase.supplier_name || "";
           const userName= user.name || "";
-          const driverName = trip?.driver_name || "";
-          const vehicleNo = trip?.vehicle_no || "";
+          const purchaseCategory = purchase?.category || "";
+          const vehicleNo = purchase?.vehicle_no || "";
 
           // Build message content
-          const messageContent = `Dear Sir, A new Maintenance created by ${userName}.\nPurchase ID: ${purchaseId}\nSupplier: ${supplierName}\nVehicle: ${vehicleNo}`;
+          const messageContent = `Dear Sir, A new Maintenance created by ${userName}.\nPurchase Date: ${purchaseDate}\nSupplier: ${supplierName}\nVehicle: ${vehicleNo}\nPurchase Name: ${purchaseCategory}`;
 
           // SMS Config
         const adminNumber = "01773288109"; // or multiple separated by commas
@@ -430,7 +404,7 @@ const PurchaseForm = () => {
 
               <div className="w-full">
                 <InputField
-                  name="last_service_date"
+                  name="service_date"
                   label="Service Date"
                   type="date"
                   required={!isEditMode}
@@ -456,7 +430,7 @@ const PurchaseForm = () => {
               </div>
               <div className="w-full">
                 <InputField
-                  name="last_km_reading"
+                  name="last_km"
                   label="Last KM"
                   required={!isEditMode}
                   type="number"
@@ -464,7 +438,7 @@ const PurchaseForm = () => {
               </div>
               <div className="w-full">
                 <InputField
-                  name="next_km_due"
+                  name="next_km"
                   label="Next KM"
                   required={!isEditMode}
                   type="number"
@@ -476,7 +450,7 @@ const PurchaseForm = () => {
 
               <div className="w-full">
                 <InputField
-                  name="last_service_date"
+                  name="service_date"
                   label="Document Renew Date"
                   type="date"
                   required={!isEditMode}

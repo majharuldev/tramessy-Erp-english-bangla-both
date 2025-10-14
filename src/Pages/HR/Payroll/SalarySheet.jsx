@@ -25,21 +25,27 @@ const SalarySheet = () => {
   const printTableRef = useRef();
   const [selectedSlip, setSelectedSlip] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loanData, setLoanData] = useState([]);
+  const [bonusData, setBonusData] = useState([]);
 
   // Fetch all API data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [empRes, salaryRes, attRes] = await Promise.all([
+        const [empRes, salaryRes, attRes, loanRes, bonusRes] = await Promise.all([
           api.get('/employee'),
           api.get('/salaryAdvanced'),
-          api.get('/attendence')
+          api.get('/attendence'),
+           api.get('/loan'),
+        api.get('/bonous'),
         ]);
 
         setEmployees(empRes.data.data || []);
         setSalaryAdvances(salaryRes.data.data || []);
         setAttendences(attRes.data.data || []);
+        setLoanData(loanRes.data.data || []); 
+      setBonusData(bonusRes.data.data || []);
       } catch (err) {
         toast.error("Failed to fetch data");
         console.error(err);
@@ -60,6 +66,9 @@ const SalarySheet = () => {
     const merged = employees.map((emp, index) => {
       const empSalary = salaryAdvances.find(s => s.employee_id == emp.id) || {};
       const empAttend = attendences.find(a => a.employee_id == emp.id) || {};
+      const empLoan = loanData.find(l => l.employee_id == emp.id) || {};
+  const empBonus = bonusData.filter(b => b.employee_id == emp.id && b.status === "Completed")
+                            .reduce((sum, b) => sum + Number(b.amount), 0);
       // Dynamic month-year & net pay in words
       const monthYear =
         empAttend?.month ||
@@ -71,9 +80,12 @@ const SalarySheet = () => {
       const conv = emp.conv ? Number(emp.conv) : "";
       const medical = emp.medical ? Number(emp.medical) : "";
       const allowance = emp.allowan ? Number(emp.allowan) : "";
-      const total = [basic, rent, conv, medical, allowance].reduce((acc, v) => acc + (v || 0), 0);
+      const totalEarnings = basic + rent + conv + medical + allowance + empBonus;
+      // const total = [basic, rent, conv, medical, allowance].reduce((acc, v) => acc + (v || 0), 0);
       const advance = empSalary.amount ? Number(empSalary.amount) : 0;
-      const netPay = total - advance;
+      const loanDeduction = Number(empLoan.monthly_deduction || 0);
+      const deductionTotal = advance + loanDeduction;
+      const netPay = totalEarnings - deductionTotal;
 
       return {
         empId: emp.id,
@@ -86,10 +98,11 @@ const SalarySheet = () => {
         conv,
         medical,
         allowance,
-        total,
-        bonus: 0,
+        total: basic + rent + conv + medical + allowance,
+    bonus: empBonus,
         advance,
-        deduction: 0,
+        monthly_deduction: loanDeduction,
+        deductionTotal,
         netPay
       };
     });
@@ -331,7 +344,7 @@ const handlePrintTable = () => {
                 </th>
                 <th className="border border-gray-400 px-2 py-1" rowSpan={3}>Working<br />DAY</th>
                 <th className="border border-gray-400 px-2 py-1" rowSpan={3}>Designation</th>
-                <th className="border border-gray-400 px-2 py-1 " colSpan={6} >
+                <th className="border border-gray-400 px-2 py-1 " colSpan={7} >
                   E A R N I N G S
                 </th>
                 <th className="border border-gray-400 px-2 py-1 " colSpan={3}>
@@ -348,9 +361,10 @@ const handlePrintTable = () => {
                 <th className="border border-gray-400 px-2 py-1">Conv</th>
                 <th className="border border-gray-400 px-2 py-1">Medical</th>
                 <th className="border border-gray-400 px-2 py-1">Allowan Ce/Ot</th>
-                <th className="border border-gray-400 px-2 py-1 ">Total</th>
                 <th className="border border-gray-400 px-2 py-1">Bonus</th>
+                <th className="border border-gray-400 px-2 py-1 ">Total</th>
                 <th className="border border-gray-400 px-2 py-1">Advance</th>
+                <th className="border border-gray-400 px-2 py-1">Loan</th>
                 <th className="border border-gray-400 px-2 py-1">Total</th>
                 <th className="border border-gray-400 px-2 py-1"></th>
                 <th className="border border-gray-400 px-2 py-1 "></th>
@@ -371,20 +385,21 @@ const handlePrintTable = () => {
                     <td className="border border-gray-400 px-2 py-1 text-left">{row.name}</td>
                     <td className="border border-gray-400 px-2 py-1">{row.days}</td>
                     <td className="border border-gray-400 px-2 py-1">{row.designation}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row.basic.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row.rent.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row.conv.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row.medical.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row.allowance.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.basic?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.rent?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.conv?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.medical?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.allowance?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.bonus?.toLocaleString()}</td>
                     <td className="border border-gray-400 px-2 py-1 font-semibold">
-                      {row.total.toLocaleString()}
+                      {row?.total?.toLocaleString()}
                     </td>
-                    <td className="border border-gray-400 px-2 py-1">{row.bonus.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row.advance.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row.deduction.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.advance?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.monthly_deduction?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.deductionTotal?.toLocaleString()}</td>
                     <td className="border border-gray-400 px-2 py-1">C</td>
                     <td className="border border-gray-400 px-2 py-1  font-bold">
-                      {row.netPay.toLocaleString()}
+                      {row?.netPay?.toLocaleString()}
                     </td>
                     <td className="border border-gray-400 px-2 py-1 action_column flex items-center gap-2">
                       <button
@@ -403,7 +418,7 @@ const handlePrintTable = () => {
             </tbody>
             <tfoot>
               <tr className=" font-bold text-center">
-                <td className="border border-gray-400 px-2 py-1" colSpan={9}>
+                <td className="border border-gray-400 px-2 py-1" colSpan={10}>
                   Grand Total
                 </td>
                 <td className="border border-gray-400 px-2 py-1">

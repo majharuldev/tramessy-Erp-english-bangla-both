@@ -69,7 +69,7 @@ const PurchaseList = () => {
   // Search (Product ID, Supplier, Vehicle, Driver)
   const filteredPurchase = vehicleFiltered.filter((dt) => {
     // শুধু এই দুইটা ক্যাটেগরি দেখানোর জন্য
-    if (!(dt.category === "engine_oil" || dt.category === "parts")) {
+    if (!(dt.category === "engine_oil" || dt.category === "parts" || dt.category === "documents")) {
       return false;
     }
     const term = searchTerm.toLowerCase();
@@ -492,7 +492,7 @@ const PurchaseList = () => {
         )}
       </div>
       {viewModalOpen && selectedPurchase && (
-        <div className="fixed inset-0 flex items-center justify-center bg-[#000000ad] z-50 p-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-[#000000ad] z-50 p-4 overflow-auto">
           <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-5 relative">
             <h2 className="text-xl font-bold text-primary border-b pb-4 mb-6">
               Purchase Information
@@ -532,12 +532,32 @@ const PurchaseList = () => {
                 <span>{selectedPurchase.quantity}</span>
               </div>
               <div className="flex justify-between p-2">
+                <span className="font-medium w-1/2">Service Date:</span>
+                <span>{tableFormatDate(selectedPurchase.service_date)}</span>
+              </div>
+              <div className="flex justify-between p-2">
+                <span className="font-medium w-1/2">Next Service Date:</span>
+                <span>{tableFormatDate(selectedPurchase.next_service_date)}</span>
+              </div>
+              <div className="flex justify-between p-2">
+                <span className="font-medium w-1/2">Last KM:</span>
+                <span>{selectedPurchase.last_km}</span>
+              </div>
+              <div className="flex justify-between p-2">
+                <span className="font-medium w-1/2">Next KM:</span>
+                <span>{selectedPurchase.next_km}</span>
+              </div>
+              <div className="flex justify-between p-2">
                 <span className="font-medium w-1/2">Unit Price:</span>
                 <span>{selectedPurchase.unit_price}</span>
               </div>
               <div className="flex justify-between p-2">
                 <span className="font-medium w-1/2">Total:</span>
                 <span>{selectedPurchase.purchase_amount}</span>
+              </div>
+              <div className="flex justify-between p-2">
+                <span className="font-medium w-1/2">Created By:</span>
+                <span>{selectedPurchase.created_by}</span>
               </div>
               {/* <div className="flex flex-col items-start p-2">
                 <span className="font-medium mb-2">Bill Image:</span>

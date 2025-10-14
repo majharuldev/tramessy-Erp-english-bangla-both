@@ -223,7 +223,7 @@ const CashDispatchForm = () => {
                 <InputField name="bank_name" label="Bank Name" required={!isEditing} />
               </div>
               <div className="w-full">
-                <InputField name="remarks" label="Note" required={!isEditing} />
+                <InputField name="purphase" label="Purphase" required={!isEditing} />
               </div>
             </div>
             {/* Submit Button */}
