@@ -4,6 +4,7 @@ import { FaEnvelope, FaLock } from "react-icons/fa";
 import ReusableForm from "./ReusableForm";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
+import toast, { Toaster } from "react-hot-toast";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
@@ -27,18 +28,34 @@ const Login = () => {
     setError("")
     setIsLoading(true)
 
-    const result = await login(email, password)
+     try {
+    const res = await login(email, password); 
+    console.log(res)
+if (res.success) {
+      // লগইন সফল, Active ইউজার
+      toast.success("Login successful!");
+      navigate("/tramessy");
+    } else {
+      // লগইন ব্যর্থ বা Inactive
+      toast.error(res.message || "Login failed");
+      setError(res.message || "Login failed");
+    }
+  } catch (err) {
+    toast.error(err.message || "Login failed");
+    setError(err.message || "Login failed");
+  }
 
-    // if (result.success) {
-      navigate("/tramessy")
-    // } else {
-      setError(result.message || "Invalid credentials")
-    // }
+    // const result = await login(email, password)
+
+    //   navigate("/tramessy")
+    //   setError(result.message || "Invalid credentials")
+
     setIsLoading(false)
   }
 
   return (
     <div className="md:px-40 h-screen flex items-center justify-center">
+      <Toaster/>
       <div className="md:border-2 border-primary rounded-xl md:flex justify-between">
         {/* img */}
         <div className="hidden md:block md:w-1/2 mt-10 md:mt-0">

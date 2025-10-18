@@ -1059,7 +1059,7 @@ import { formatDate, tableFormatDate } from "../hooks/formatDate"
 import DatePicker from "react-datepicker"
 import { FiFilter } from "react-icons/fi"
 import { FcApproval } from "react-icons/fc";
-
+import logo from "../assets/AJ_Logo.png"
 const TripList = () => {
   const [trip, setTrip] = useState([])
   const [loading, setLoading] = useState(true)
@@ -1067,6 +1067,7 @@ const TripList = () => {
   const isAdmin = useAdmin()
   const [selectedInvoice, setSelectedInvoice] = useState(null)
   const printRef = useRef()
+  const printViewRef = useRef();
   // delete modal
   const [isOpen, setIsOpen] = useState(false)
   const [selectedTripId, setselectedTripId] = useState(null)
@@ -1188,41 +1189,41 @@ const TripList = () => {
   // }
 
   // Cancel approve
-  
-  
-  
+
+
+
   const confirmApprove = async () => {
-  if (!tripToApprove) return toast.error("No trip selected for approval");
+    if (!tripToApprove) return toast.error("No trip selected for approval");
 
-  setIsApproving(true);
+    setIsApproving(true);
 
-  try {
-    // Spread all existing trip data and override status
-    const payload = {
-      ...tripToApprove,
-      status: "Approved",
-      user_id: tripToApprove.user_id || null,
-    };
+    try {
+      // Spread all existing trip data and override status
+      const payload = {
+        ...tripToApprove,
+        status: "Approved",
+        user_id: tripToApprove.user_id || null,
+      };
 
-    const response = await api.put(`/trip/${tripToApprove.id}`, payload);
+      const response = await api.put(`/trip/${tripToApprove.id}`, payload);
 
-    if (response.data.success) {
-      setTrip((prevTrips) =>
-        prevTrips.map((t) => (t.id === tripToApprove.id ? { ...t, status: "Approved" } : t))
-      );
-      toast.success(`Trip #${tripToApprove.id} approved successfully!`);
-    } else {
-      toast.error(response.data.message || "Failed to approve trip");
+      if (response.data.success) {
+        setTrip((prevTrips) =>
+          prevTrips.map((t) => (t.id === tripToApprove.id ? { ...t, status: "Approved" } : t))
+        );
+        toast.success(`Trip #${tripToApprove.id} approved successfully!`);
+      } else {
+        toast.error(response.data.message || "Failed to approve trip");
+      }
+    } catch (error) {
+      console.error("Approve error:", error);
+      toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setIsApproving(false);
+      setShowApproveConfirm(false);
+      setTripToApprove(null);
     }
-  } catch (error) {
-    console.error("Approve error:", error);
-    toast.error(error.response?.data?.message || "Something went wrong");
-  } finally {
-    setIsApproving(false);
-    setShowApproveConfirm(false);
-    setTripToApprove(null);
-  }
-};
+  };
 
   const cancelApprove = () => {
     console.log("[v0] Approve cancelled")
@@ -1260,13 +1261,13 @@ const TripList = () => {
 
   const handlePrintClick = async (tripData) => {
     let licenseNo = "N/A";
-    
+
     // If license is not in trip data, fetch from driver API
     if (!tripData.lincense && tripData.driver_name) {
       const driverResponse = await api.get('/driver');
       const drivers = driverResponse.data;
-      const driver = drivers.find(d => 
-        d.driver_name === tripData.driver_name || 
+      const driver = drivers.find(d =>
+        d.driver_name === tripData.driver_name ||
         d.driver_mobile === tripData.driver_mobile
       );
       licenseNo = driver?.lincense || "N/A";
@@ -1315,7 +1316,7 @@ const TripList = () => {
         setLoading(false)
       })
   }, [])
-  if (loading) return <p className="text-center mt-16">Loading trip...</p>
+
 
   // excel
   // const exportTripsToExcel = () => {
@@ -1345,36 +1346,36 @@ const TripList = () => {
   //   saveAs(data, "trip_report.xlsx")
   // }
   const exportTripsToExcel = async () => {
-  try {
-    // full trip data from database (no filter)
-    const response = await api.get("/trip");
-    let allTrips = response.data;
+    try {
+      // full trip data from database (no filter)
+      const response = await api.get("/trip");
+      let allTrips = response.data;
 
-    // Non-admin হলে total_rent field বাদ দেবে
-    if (!isAdmin) {
-      allTrips = allTrips.map(({ total_rent, ...rest }) => rest);
+      // Non-admin হলে total_rent field বাদ দেবে
+      if (!isAdmin) {
+        allTrips = allTrips.map(({ total_rent, ...rest }) => rest);
+      }
+
+      // Excel sheet বানানো (auto header = object keys)
+      const worksheet = XLSX.utils.json_to_sheet(allTrips);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Trips");
+
+      // Excel buffer তৈরি
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      // File save
+      const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+      saveAs(data, "trip_full_database.xlsx");
+      toast.success("Full trip data downloaded successfully!");
+    } catch (error) {
+      console.error("Excel export error:", error);
+      toast.error("Failed to download Excel file!");
     }
-
-    // Excel sheet বানানো (auto header = object keys)
-    const worksheet = XLSX.utils.json_to_sheet(allTrips);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Trips");
-
-    // Excel buffer তৈরি
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    // File save
-    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(data, "trip_full_database.xlsx");
-    toast.success("Full trip data downloaded successfully!");
-  } catch (error) {
-    console.error("Excel export error:", error);
-    toast.error("Failed to download Excel file!");
-  }
-};
+  };
 
   // pdf
   const exportTripsToPDF = () => {
@@ -1425,6 +1426,7 @@ const TripList = () => {
 
     doc.save("trip_report.pdf")
   }
+
   // print
   const printTripsTable = () => {
     // Hide action column for printing
@@ -1450,8 +1452,8 @@ const TripList = () => {
       </thead>
       <tbody>
         ${trip
-          .map(
-            (dt, index) => `
+        .map(
+          (dt, index) => `
           <tr>
             <td>${index + 1}</td>
             <td>${dt.start_date}</td>
@@ -1461,13 +1463,13 @@ const TripList = () => {
             <td>${dt.vehicle_no || "N/A"}</td>
             <td>${dt.load_point}</td>
             <td>${dt.unload_point}</td>
-             <td>${isAdmin?(dt.total_rent || 0): "hide"}</td>
+             <td>${isAdmin ? (dt.total_rent || 0) : "hide"}</td>
             <td>${dt.total_exp || 0}</td>
-            <td>${isAdmin?(Number.parseFloat(dt.total_rent || 0) - Number.parseFloat(dt.total_exp || 0)):"hide"}</td>
+            <td>${isAdmin ? (Number.parseFloat(dt.total_rent || 0) - Number.parseFloat(dt.total_exp || 0)) : "hide"}</td>
           </tr>
         `,
-          )
-          .join("")}
+        )
+        .join("")}
       </tbody>
     </table>
   `
@@ -1508,30 +1510,30 @@ const TripList = () => {
   // delete by id
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/trip/delete/${id}`, {
-        method: "DELETE",
-      })
+      const response = await api.delete(`/trip/${id}`);
 
-      if (!response.ok) {
-        throw new Error("Failed to delete driver")
+      // Axios er jonno check
+      if (response.status === 200) {
+        // UI update
+        setTrip((prev) => prev.filter((item) => item.id !== id));
+        toast.success("Trip deleted successfully", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+
+        setIsOpen(false);
+        setselectedTripId(null);
+      } else {
+        throw new Error("Delete request failed");
       }
-      // Remove trip from local list
-      setTrip((prev) => prev.filter((trip) => trip.id !== id))
-      toast.success("Trip deleted successfully", {
-        position: "top-right",
-        autoClose: 3000,
-      })
-
-      setIsOpen(false)
-      setselectedTripId(null)
     } catch (error) {
-      console.error("Delete error:", error)
+      console.error("Delete error:", error);
       toast.error("There was a problem deleting!", {
         position: "top-right",
         autoClose: 3000,
-      })
+      });
     }
-  }
+  };
   // view trip by id
   const handleView = async (id) => {
     try {
@@ -1543,6 +1545,54 @@ const TripList = () => {
       toast.error("Can't get trip details")
     }
   }
+  // view print
+  // const handleViewPrint = useReactToPrint({
+  //   contentRef: printViewRef,
+  //   documentTitle: `Trip-${trip?.id}-Details`,
+  // });
+
+  const handleViewPrint = () => {
+    const printContent = document.getElementById("printArea");
+    const buttons = document.querySelectorAll('.no-print');
+    buttons.forEach(btn => (btn.style.display = 'none'));
+    const WindowPrint = window.open("", "", "width=900,height=650");
+    WindowPrint.document.write(`
+    <html>
+      <head>
+        <title>Trip Details</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+          }
+          .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+          }
+          .grid div {
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 8px;
+            background: #f9f9f9;
+          }
+          strong {
+            color: #333;
+          }
+        </style>
+      </head>
+      <body>
+        ${printContent.innerHTML}
+      </body>
+    </html>
+  `);
+    WindowPrint.document.close();
+    WindowPrint.print();
+    //  Re-show buttons after printing
+    setTimeout(() => {
+      buttons.forEach(btn => (btn.style.display = ''));
+    }, 500);
+  };
 
   // Sort trips by date descending (latest first)
   const sortedTrips = [...trip].sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -1589,6 +1639,7 @@ const TripList = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentTrip = filteredTripList.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(filteredTripList.length / itemsPerPage)
+  if (loading) return <p className="text-center mt-16">Loading trip...</p>
 
   return (
     <main className="p-2">
@@ -1647,7 +1698,7 @@ const TripList = () => {
               }}
               type="text"
               placeholder="Search trip..."
-              className="border border-gray-300 rounded-md outline-none text-xs py-2 ps-2 pr-5"
+              className="lg:w-60 border border-gray-300 rounded-md outline-none text-xs py-2 ps-2 pr-5"
             />
             {/*  Clear button */}
             {searchTerm && (
@@ -1806,10 +1857,10 @@ const TripList = () => {
                         <p>Unload: {dt.unload_point}</p>
                       </td>
 
-                      <td className="p-2">{isAdmin?(dt.total_rent):"hide"}</td>
+                      <td className="p-2">{isAdmin ? (dt.total_rent) : "hide"}</td>
                       <td className="p-2">{dt.total_exp}</td>
                       <td className="p-2">
-                        {isAdmin?(Number.parseFloat(dt.total_rent || 0) - Number.parseFloat(dt.total_exp || 0)):"hide"}
+                        {isAdmin ? (Number.parseFloat(dt.total_rent || 0) - Number.parseFloat(dt.total_exp || 0)) : "hide"}
                       </td>
                       <td className="p-2">{dt?.status}</td>
                       <td className="p-2 action_column relative">
@@ -1872,9 +1923,16 @@ const TripList = () => {
                                     className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                     disabled={isApproving}
                                   >
-                                    <FcApproval className="mr-2 h-4 w-4"  />{isApproving ? "Approving..." : "Approved"}
+                                    <FcApproval className="mr-2 h-4 w-4" />{isApproving ? "Approving..." : "Approved"}
                                   </button>
                                 )}
+                                <button
+                                  onClick={() => {
+                                    setselectedTripId(dt.id);
+                                    setIsOpen(true);
+                                  }}
+                                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"                                >
+                                  <FaTrashAlt className="mr-2 h-4 w-3 text-red-500" /> Delete  </button>
                               </div>
                             </div>
                           )}
@@ -1938,122 +1996,113 @@ const TripList = () => {
       {/* get trip information by id */}
       {viewModalOpen && selectedTrip && (
         <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-[#000000ad] z-50 overflow-auto scroll-hidden">
-          <div className="w-4xl p-5 bg-gray-100 rounded-xl mt-10">
-            <div className="flex justify-between items-center">
-              <h3 className="text-gray-700 font-semibold">Trip Info</h3>
-              <div>Created By: <p>{selectedTrip?.created_by}</p> </div>
-            </div>
-            <div className="mt-5">
-              <ul className="flex border border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Customer</p> <p>{selectedTrip.customer}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2">
-                  <p className="w-48">Trip Date</p> <p>{tableFormatDate(selectedTrip.start_date)}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Load Point</p> <p>{selectedTrip.load_point}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2">
-                  <p className="w-48">Unload Point</p> <p>{selectedTrip.unload_point}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Trip type</p> <p>{selectedTrip.trip_type}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2">
-                  <p className="w-48">Additional Load</p> <p>{selectedTrip.additional_load? selectedTrip.additional_load: "N/A"}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Driver Name</p> <p>{selectedTrip.driver_name? selectedTrip.driver_name: "N/A"}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Driver Mobile</p> <p>{selectedTrip.driver_mobile? selectedTrip.driver_mobile: 0}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Labor Cost</p> <p>{selectedTrip.labor?selectedTrip.labor:0}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Toll Cost</p> <p>{selectedTrip.toll_cost?selectedTrip.toll_cost: 0}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Driver Commission</p> <p>{selectedTrip.driver_commission?selectedTrip.driver_commission:0}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Fuel Cost</p> <p>{selectedTrip.fuel_cost?selectedTrip.fuel_cost: 0}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Parking cost</p> <p>{selectedTrip.parking_cost?selectedTrip.parking_cost:0}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Night Guard Cost</p> <p>{selectedTrip.night_guard?selectedTrip.night_guard:0}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Callan cost</p> <p>{selectedTrip.callan_cost?selectedTrip.callan_cost:0}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Others Cost</p> <p>{selectedTrip.others_cost?selectedTrip.others_cost:0}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Feri Cost</p> <p>{selectedTrip.feri_cost?selectedTrip.feri_cost:0}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Police Cost</p> <p>{selectedTrip.police_cost?selectedTrip.police_cost:0}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Chada Cost</p> <p>{selectedTrip.chada?selectedTrip.chada:0}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Food Cost</p> <p>{selectedTrip.food_cost?selectedTrip.food_cost:0}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">TransportType</p> <p>{selectedTrip.transport_type?selectedTrip.transport_type:"N/A"}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Vehicle Number</p> <p>{selectedTrip.vehicle_no?selectedTrip.vehicle_no:"N/A"}</p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Total Rent/Bill Amount</p> <p>{isAdmin?(selectedTrip.total_rent?selectedTrip.total_rent: 0): "N/A"}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Unload Charge</p> <p>{selectedTrip.unload_charge?selectedTrip.unload_charge:0} </p>
-                </li>
-              </ul>
-              <ul className="flex border-b border-r border-l border-gray-300">
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Additional Cost</p> <p>{selectedTrip.additional_cost?selectedTrip.additional_cost:0}</p>
-                </li>
-                <li className="w-[428px] flex text-gray-700 text-sm font-semibold px-3 py-2 border-r border-gray-300">
-                  <p className="w-48">Vendor Name</p> <p>{selectedTrip.vendor_name?selectedTrip.vendor_name:"N/A"}</p>
-                </li>
-              </ul>
-              <div className="flex justify-end mt-10">
+
+          <div className="bg-white w-[90%] md:w-[800px] rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-fadeIn">
+            <div id="printArea" ref={printViewRef} className="print:p-0">
+              <div className="flex items-center justify-between p-4 ">
+                <div className="">
+                  {/* Logo */}
+                  <img src={logo} alt="" />
+                  <div className="text-xs text-secondary">
+                    <div className="font-bold">M/S A J ENTERPRISE</div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold text-secondary mb-2">M/S AJ Enterprise</h1>
+                  <div className="text-xs text-gray-700">
+                    <div>Razzak Plaza, 11th Floor, Room No: J-12,</div>
+                    <div>2 Sahid Tajuddin Sarani, Moghbazar, Dhaka-1217, Bangladesh</div>
+                  </div>
+                </div>
+                <div className="w-16">
+                  <button
+                    onClick={() => setViewModalOpen(false)}
+                    className="text-primary hover:text-gray-300 transition no-print"
+                  >
+                    <IoMdClose size={24} />
+                  </button></div>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 text-gray-800">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold border-b pb-2">Trip Information</h3>
+                  <p className="text-sm text-gray-500">
+                    Created By: <span className="font-semibold">{selectedTrip.created_by || "N/A"}</span>
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div><strong>Trip ID:</strong> {selectedTrip.id}</div>
+                  <div><strong>Trip Type:</strong> {selectedTrip.trip_type || "N/A"}</div>
+                  <div><strong>Customer:</strong> {selectedTrip.customer || "N/A"}</div>
+                  <div><strong>Trip Date:</strong> {selectedTrip.start_date || "N/A"}</div>
+                  <div><strong>Load Point:</strong> {selectedTrip.load_point || "N/A"}</div>
+                  <div><strong>Unload Point:</strong> {selectedTrip.unload_point || "N/A"}</div>
+                  <div><strong>Additional Load:</strong> {selectedTrip.additional_load || "N/A"}</div>
+                  <div><strong>Branch:</strong> {selectedTrip.branch_name || "N/A"}</div>
+                  <div><strong>Transport Type:</strong> {selectedTrip.transport_type || "N/A"}</div>
+                  <div><strong>Vehicle No:</strong> {selectedTrip.vehicle_no || "N/A"}</div>
+                  <div><strong>Vendor Name:</strong> {selectedTrip.vendor_name || "N/A"}</div>
+                  <div><strong>Unload Charge:</strong> {selectedTrip.unload_charge || 0}</div>
+                </div>
+
+                <h3 className="text-lg font-bold mt-4 mb-3 border-b pb-1">
+                  Expense Details
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div><strong>Labor Cost:</strong> {selectedTrip.labor || 0}</div>
+                  <div><strong>Toll Cost:</strong> {selectedTrip.toll_cost || 0}</div>
+                  <div><strong>Driver Advance:</strong> {selectedTrip.driver_adv || 0}</div>
+                  <div><strong>Fuel Cost:</strong> {selectedTrip.fuel_cost || 0}</div>
+                  <div><strong>Parking Cost:</strong> {selectedTrip.parking_cost || 0}</div>
+                  <div><strong>Night Guard Cost:</strong> {selectedTrip.night_guard || 0}</div>
+                  <div><strong>Callan Cost:</strong> {selectedTrip.callan_cost || 0}</div>
+                  <div><strong>Others Cost:</strong> {selectedTrip.others_cost || 0}</div>
+                  <div><strong>Feri Cost:</strong> {selectedTrip.feri_cost || 0}</div>
+                  <div><strong>Police Cost:</strong> {selectedTrip.police_cost || 0}</div>
+                  <div><strong>Chada Cost:</strong> {selectedTrip.chada || 0}</div>
+                  <div><strong>Food Cost:</strong> {selectedTrip.food_cost || 0}</div>
+                  <div><strong>Additional Cost:</strong> {selectedTrip.additional_cost || 0}</div>
+                  <div><strong>Total Expense:</strong> {selectedTrip.total_exp || 0}</div>
+                </div>
+
+                <h3 className="text-lg font-bold mt-4 border-b pb-1">
+                  Financial Summary
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div><strong>Total Rent:</strong> {isAdmin ? selectedTrip.total_rent || 0 : "N/A"}</div>
+                  <div><strong>Profit:</strong> {selectedTrip.total_rent && selectedTrip.total_exp ? (selectedTrip.total_rent - selectedTrip.total_exp) : 0}</div>
+                  <div><strong>Status:</strong>
+                    <span
+                      className={`ml-2 px-2 py-0.5 rounded text-white text-xs 
+                ${selectedTrip.status === "Approved" ? "bg-green-600" : "bg-yellow-500"}`}
+                    >
+                      {selectedTrip.status}
+                    </span>
+                  </div>
+                  <div className="">
+                    <strong>Remarks:</strong>
+                    <p className="bg-gray-100 rounded-md p-2 mt-1 text-sm">{selectedTrip.remarks || "N/A"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-between items-center px-6 pb-2 no-print">
                 <button
                   onClick={() => setViewModalOpen(false)}
-                  className="text-white bg-primary py-1 px-2 rounded-md cursor-pointer hover:bg-primary/80"
+                  className="px-4 py-1 rounded-md border border-gray-400 text-gray-600 hover:bg-gray-100 transition"
                 >
                   Close
+                </button>
+                <button
+                  onClick={handleViewPrint}
+                  className="flex items-center gap-2 bg-gradient-to-r from-primary to-green-600 text-white px-4 py-1 rounded-md shadow hover:opacity-90 transition"
+                >
+                  <BiPrinter size={18} /> Print
                 </button>
               </div>
             </div>

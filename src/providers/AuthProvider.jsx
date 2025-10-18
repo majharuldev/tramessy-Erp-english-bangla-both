@@ -11,33 +11,71 @@ const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const token = Cookies.get("auth_token");
-  //   if (token) {
-  //     api.get("/user")   //  এর /api/user endpoint
-  //       .then((res) => {
-  //         setUser(res.data); // user এর মধ্যে role থাকবে
-  //         setIsAuthenticated(true);
-  //       })
-  //       .catch(() => {
-  //         setUser(null);
-  //         setIsAuthenticated(false);
-  //       })
-  //       .finally(() => setLoading(false));
-  //   } else {
-  //     setLoading(false);
+//   useEffect(() => {
+//   const token = Cookies.get("auth_token");
+//   const savedUser = Cookies.get("auth_user");
+
+//   if (token && savedUser) {
+//     setUser(JSON.parse(savedUser));
+//     setIsAuthenticated(true);
+//      setLoading(false);
+
+//   //  প্রতি 1 মিনিট পর স্ট্যাটাস চেক
+//     const interval = setInterval(async () => {
+//       try {
+//         const res = await api.get("/user");
+//         const updatedUser = res.data;
+
+//         // যদি user inactive হয়ে যায়
+//         if (updatedUser.status !== "Active") {
+//           logout();
+//         } else {
+//           Cookies.set("auth_user", JSON.stringify(updatedUser));
+//           setUser(updatedUser);
+//         }
+//       } catch (error) {
+//         console.error("User status check failed:", error);
+//       }
+//     }, 60000); // প্রতি 60 সেকেন্ডে চেক করবে
+
+//     return () => clearInterval(interval);
+//   }
+// }, []);
+
+useEffect(() => {
+  const checkAuth = async () => {
+    const token = Cookies.get("auth_token");
+    const savedUser = Cookies.get("auth_user");
+
+    if (token && savedUser) {
+      setUser(JSON.parse(savedUser));
+      setIsAuthenticated(true);
+    }
+
+    // initial loading শেষ
+    setLoading(false);
+  };
+
+  checkAuth();
+
+  //  Background user status check every 24 h
+  // const interval = setInterval(async () => {
+  //   try {
+  //     const res = await api.get("/user");
+  //     const updatedUser = res.data;
+
+  //     if (updatedUser.status !== "Active") {
+  //       logout();
+  //     } else {
+  //       Cookies.set("auth_user", JSON.stringify(updatedUser));
+  //       setUser(updatedUser);
+  //     }
+  //   } catch (error) {
+  //     console.error("User status check failed:", error);
   //   }
-  // }, []);
+  // }, 24 * 60 * 60 * 1000);
 
-  useEffect(() => {
-  const token = Cookies.get("auth_token");
-  const savedUser = Cookies.get("auth_user");
-
-  if (token && savedUser) {
-    setUser(JSON.parse(savedUser));
-    setIsAuthenticated(true);
-  }
-  setLoading(false);
+  return () => clearInterval(interval);
 }, []);
 
 
@@ -45,6 +83,14 @@ const AuthProvider = ({ children }) => {
     try {
       const res = await api.post("/login", { email, password });
       const { token, user } = res.data;
+          //  যদি ইউজারের স্ট্যাটাস inactive হয় তাহলে লগইন ব্লক করে দাও
+    if (user.status !== "Active") {
+      return {
+        success: false,
+        message: "Your account is inactive. Please contact admin.",
+      };
+    }
+
       Cookies.set("auth_token", token, { expires: 1 });
        Cookies.set("auth_user", JSON.stringify(user), { expires: 1 });
 

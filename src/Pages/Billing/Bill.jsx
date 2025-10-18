@@ -345,7 +345,7 @@ const Bill = () => {
               <div><strong>Sub: ${billNumber}</strong></div>
             </div>
             <div>
-              <div><strong>তারিখ: ${new Date().toLocaleDateString("bn-BD")}</strong></div>
+              <div><strong>Date: ${new Date().toLocaleDateString("bn-BD")}</strong></div>
             </div>
           </div>
 
@@ -354,6 +354,8 @@ const Bill = () => {
               <tr>
                 <th>Trip No</th>
                 <th>Date</th>
+                <th>Driver</th>
+                <th>Customer</th>
                 <th>Truck No</th>
                 <th>Load/Unload</th>
                 <th>Rent</th>
@@ -367,7 +369,9 @@ const Bill = () => {
           (dt, i) => `
                 <tr>
                   <td class="text-center">${dt.id}</td>
-                  <td class="text-center">${dt.date}</td>
+                  <td class="text-center">${tableFormatDate(dt.start_date)}</td>
+                  <td class="text-center">${dt.driver_name || "N/A"}</td>
+                  <td class="text-center">${dt.customer || "N/A"}</td>
                   <td class="text-center">${dt.vehicle_no || "N/A"}</td>
                   <td>${dt.load_point || "N/A"} to ${dt.unload_point || "N/A"}</td>
                   <td class="text-right">${dt.total_rent || 0}</td>
@@ -379,7 +383,7 @@ const Bill = () => {
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="4" class="text-right"><strong>Totals</strong></td>
+                <td colspan="6" class="text-right"><strong>Totals</strong></td>
                 <td class="text-right"><strong>${printTotalRent}</strong></td>
                 <td class="text-right"><strong>${printTotalDemurrage}</strong></td>
                 <td class="text-right"><strong>${printGrandTotal}</strong></td>
@@ -513,13 +517,13 @@ const Bill = () => {
               <FaFileExcel className="" />
               Excel
             </button>
-            <button
+            {/* <button
               onClick={exportToPDF}
               className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded  transition-all duration-300 cursor-pointer"
             >
               <FaFilePdf className="" />
               PDF
-            </button>
+            </button> */}
             <button
               onClick={handlePrint}
               className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded transition-all duration-300 cursor-pointer"

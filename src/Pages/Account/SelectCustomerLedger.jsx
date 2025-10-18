@@ -324,7 +324,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
             <table className="min-w-full text-sm text-left text-gray-900">
               <thead className="bg-gray-100 text-gray-800 font-bold">
                 <tr className="font-bold bg-gray-50">
-                  <td colSpan={9} className="border border-black px-2 py-1 text-right">
+                  <td colSpan={8} className="border border-black px-2 py-1 text-right">
                     Total
                   </td>
                   <td className="border border-black px-2 py-1 text-right">
@@ -344,7 +344,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
                   <th className="border px-2 py-1">Load</th>
                   <th className="border px-2 py-1">Unload</th>
                   <th className="border px-2 py-1">Vehicle</th>
-                  <th className="border px-2 py-1">Driver</th>
+                  {/* <th className="border px-2 py-1">Driver</th> */}
                   <th className="border px-2 py-1">Trip Rent</th>
                   <th className="border px-2 py-1">Demurage</th>
                   <th className="border px-2 py-1">Bill Amount</th>
@@ -385,9 +385,9 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
                         <td className="border px-2 py-1">
                           {item.vehicle_no || <span className="flex justify-center items-center">--</span>}
                         </td>
-                        <td className="border px-2 py-1">
+                        {/* <td className="border px-2 py-1">
                           {item.driver_name || <span className="flex justify-center items-center">--</span>}
-                        </td>
+                        </td> */}
                         <td className="border px-2 py-1">
                           {tripRent ? tripRent : "--"}
                         </td>

@@ -5,7 +5,7 @@ import autoTable from "jspdf-autotable"
 import * as XLSX from "xlsx"
 import { saveAs } from "file-saver"
 import dayjs from "dayjs"
-import { FaFileExcel, FaFilePdf, FaFilter, FaPrint, FaTruck } from "react-icons/fa"
+import { FaFileExcel, FaFilePdf, FaFilter, FaPrint, FaTrashAlt, FaTruck } from "react-icons/fa"
 import { GrFormNext, GrFormPrevious } from "react-icons/gr"
 import toast, { Toaster } from "react-hot-toast"
 import { FaPlus } from "react-icons/fa6"
@@ -485,31 +485,31 @@ const SalaryExpense = () => {
         {/* Conditional Filter Section */}
         {showFilter && (
           <div className="md:flex gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                dateFormat="dd/MM/yyyy"
-                placeholderText="DD/MM/YYYY"
-                locale="en-GB"
-                className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
-                isClearable
-              />
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate}
-                dateFormat="dd/MM/yyyy"
-                placeholderText="DD/MM/YYYY"
-                locale="en-GB"
-                className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
-                isClearable
-              />
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
             <div className="mt-3 md:mt-0 flex gap-2">
               <button
                 onClick={() => {
@@ -591,20 +591,19 @@ const SalaryExpense = () => {
                     <td className="px-3 py-3 text-sm action_column flex items-center gap-2">
                       <button
                         onClick={() => showModal(item)}
-                        className="flex items-center gap-1 px-2 py-2 text-xs border border-gray-300 rounded bg-white hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-1 px-2 py-2 text-xs bg-white hover:bg-gray-50 transition-colors"
                       >
                         <BiEdit size={16} />
                       </button>
-                      {/* <button
+                      <button
                         onClick={() => {
-                          setSelectedSlip(item);
-                          handlePrintClick(item);
+                          setSelectedOfficeId(dt.id);
+                          setIsOpen(true);
                         }}
-                        className="flex items-center w-full px-3 py-2 text-sm text-gray-700 bg-white shadow rounded"
+                        className="text-red-500 hover:text-white hover:bg-red-600 px-2 py-1 rounded shadow-md transition-all cursor-pointer"
                       >
-                        <BiPrinter className="mr-1 h-4 w-4" />
-                        PaySlip
-                      </button> */}
+                        <FaTrashAlt className="text-[12px]" />
+                      </button>
                     </td>
                   </tr>
                 ))

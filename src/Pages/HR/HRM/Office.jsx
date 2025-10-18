@@ -326,7 +326,7 @@ const printOfficeTable = () => {
                           setSelectedOfficeId(dt.id);
                           setIsOpen(true);
                         }}
-                        className="text-red-900 hover:text-white hover:bg-red-900 px-2 py-1 rounded shadow-md transition-all cursor-pointer"
+                        className="text-red-500 hover:text-white hover:bg-red-600 px-2 py-1 rounded shadow-md transition-all cursor-pointer"
                       >
                         <FaTrashAlt className="text-[12px]" />
                       </button>

@@ -193,6 +193,12 @@ const OfficeLedger = () => {
           thead tr { background: #11375B; color: white; }
           th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
           tr:nth-child(even) { background-color: #f9f9f9; }
+           thead th {
+          color: #000000 !important;
+          background-color: #ffffff !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
         </style>
       </head>
       <body>

@@ -152,6 +152,12 @@ const SupplierLedger = () => {
             tr:nth-child(even) { background: #f9f9f9; }
             tr:hover { background: #f1f5f9; }
             .footer { margin-top: 20px; text-align: right; font-size: 12px; }
+            thead th {
+          color: #000000 !important;
+          background-color: #ffffff !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
           </style>
         </head>
         <body>

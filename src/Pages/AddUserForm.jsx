@@ -56,7 +56,7 @@ const AddUserForm = () => {
       const response = await api[method](url, submitData);
       const resData = response.data;
 
-      if (resData.data.success) {
+      if (resData.success) {
         toast.success(
           `User ${isEditMode ? 'updated' : 'created'} successfully!`, 
           { position: "top-right" }

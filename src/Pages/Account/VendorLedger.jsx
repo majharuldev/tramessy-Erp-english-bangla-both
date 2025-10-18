@@ -100,7 +100,7 @@ const VendorLedger = () => {
   // Calculate running balance for filtered data
   let currentRunningBalance = openingBalance;
   const rowsWithRunningBalance = filteredVendors.map((item) => {
-    const tripRent = toNumber(item.trip_rent || 0);
+    const tripRent = toNumber(item.total_rent || 0);
     const advance = toNumber(item.advance || 0);
     const payAmount = toNumber(item.pay_amount || 0);
 
@@ -119,7 +119,7 @@ const VendorLedger = () => {
   // Calculate totals for filtered data
   const totals = rowsWithRunningBalance.reduce(
     (acc, item) => {
-      acc.rent += toNumber(item.trip_rent || 0);
+      acc.rent += toNumber(item.total_rent || 0);
       acc.advance += toNumber(item.advance || 0);
       acc.pay_amount += toNumber(item.pay_amount || 0);
       return acc;
@@ -512,7 +512,7 @@ const VendorLedger = () => {
                         )}
                       </td>
                       <td className="border px-2 py-1">
-                        {item.trip_rent ? toNumber(item.trip_rent) : "--"}
+                        {item.total_rent ? toNumber(item.total_rent) : "--"}
                       </td>
                       <td className="border px-2 py-1">
                         {item.advance ? toNumber(item.advance) : "--"}

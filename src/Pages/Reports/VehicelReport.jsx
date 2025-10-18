@@ -67,30 +67,52 @@ export default function VehicleProfitReport() {
     const vehicleDateMap = new Map()
 
     // Process trip data
+    // tripData
+    //   .filter((trip) => {
+    //     let dateMatch = true
+    //     // if (selectedDate) {
+    //     //   dateMatch = trip.date === selectedDate
+    //     // } else if (fromDate && toDate) {
+    //     //   dateMatch = trip.date >= fromDate && trip.date <= toDate
+    //     // } else if (fromDate) {
+    //     //   dateMatch = trip.date >= fromDate
+    //     // } else if (toDate) {
+    //     //   dateMatch = trip.date <= toDate
+    //     // }
+    //     if (fromDate && toDate) {
+    //       dateMatch = trip.start_date >= fromDate && trip.start_date <= toDate
+    //     } else if (fromDate) {
+    //       dateMatch = trip.start_date === fromDate  // শুধু একদিন
+    //     } else {
+    //       dateMatch = true
+    //     }
+
+    //     const vehicleMatch = selectedVehicle === "" || trip.vehicle_no === selectedVehicle
+
+    //     return dateMatch && vehicleMatch && trip.vehicle_no
+    //   })
     tripData
-      .filter((trip) => {
-        let dateMatch = true
-        // if (selectedDate) {
-        //   dateMatch = trip.date === selectedDate
-        // } else if (fromDate && toDate) {
-        //   dateMatch = trip.date >= fromDate && trip.date <= toDate
-        // } else if (fromDate) {
-        //   dateMatch = trip.date >= fromDate
-        // } else if (toDate) {
-        //   dateMatch = trip.date <= toDate
-        // }
-        if (fromDate && toDate) {
-          dateMatch = trip.start_date >= fromDate && trip.start_date <= toDate
-        } else if (fromDate) {
-          dateMatch = trip.start_date === fromDate  // শুধু একদিন
-        } else {
-          dateMatch = true
-        }
+  .filter((trip) => {
+    let dateMatch = true;
 
-        const vehicleMatch = selectedVehicle === "" || trip.vehicle_no === selectedVehicle
+    // সবকিছুকে YYYY-MM-DD format এ কনভার্ট করো
+    const tripDate = trip.start_date ? trip.start_date.split("T")[0] : "";
+    const from = fromDate ? fromDate.toISOString().split("T")[0] : "";
+    const to = toDate ? toDate.toISOString().split("T")[0] : "";
 
-        return dateMatch && vehicleMatch && trip.vehicle_no
-      })
+    if (from && to) {
+      dateMatch = tripDate >= from && tripDate <= to;
+    } else if (from) {
+      dateMatch = tripDate === from; // শুধু একদিনের জন্য
+    } else {
+      dateMatch = true;
+    }
+
+    const vehicleMatch =
+      selectedVehicle === "" || trip.vehicle_no === selectedVehicle;
+
+    return dateMatch && vehicleMatch && trip.vehicle_no;
+  })
       .forEach((trip) => {
         // const key = `${trip.vehicle_no}-${trip.date}`
         const key = `${normalizeVehicleNo(trip.vehicle_no)}-${trip.date}`
@@ -116,29 +138,42 @@ export default function VehicleProfitReport() {
       })
 
     // Process purchase data
-    purchaseData
-      .filter((purchase) => {
-        let dateMatch = true
-        // if (selectedDate) {
-        //   dateMatch = purchase.date === selectedDate
-        // } else if (fromDate && toDate) {
-        //   dateMatch = purchase.date >= fromDate && purchase.date <= toDate
-        // } else if (fromDate) {
-        //   dateMatch = purchase.date >= fromDate
-        // } else if (toDate) {
-        //   dateMatch = purchase.date <= toDate
-        // }
-        if (fromDate && toDate) {
-          dateMatch = purchase.date >= fromDate && purchase.date <= toDate
-        } else if (fromDate) {
-          dateMatch = purchase.date === fromDate  // শুধু একদিন
-        } else {
-          dateMatch = true
-        }
-        const vehicleMatch = selectedVehicle === "" || purchase.vehicle_no === selectedVehicle
+    // purchaseData
+    //   .filter((purchase) => {
+    //     let dateMatch = true
+    //     if (fromDate && toDate) {
+    //       dateMatch = purchase.date >= fromDate && purchase.date <= toDate
+    //     } else if (fromDate) {
+    //       dateMatch = purchase.date === fromDate  // শুধু একদিন
+    //     } else {
+    //       dateMatch = true
+    //     }
+    //     const vehicleMatch = selectedVehicle === "" || purchase.vehicle_no === selectedVehicle
 
-        return dateMatch && vehicleMatch && purchase.vehicle_no
-      })
+    //     return dateMatch && vehicleMatch && purchase.vehicle_no
+    //   })
+    purchaseData
+  .filter((purchase) => {
+    let dateMatch = true;
+
+    const purchaseDate = purchase.date ? purchase.date.split("T")[0] : "";
+    const from = fromDate ? fromDate.toISOString().split("T")[0] : "";
+    const to = toDate ? toDate.toISOString().split("T")[0] : "";
+
+    if (from && to) {
+      dateMatch = purchaseDate >= from && purchaseDate <= to;
+    } else if (from) {
+      dateMatch = purchaseDate === from;
+    } else {
+      dateMatch = true;
+    }
+
+    const vehicleMatch =
+      selectedVehicle === "" || purchase.vehicle_no === selectedVehicle;
+
+    return dateMatch && vehicleMatch && purchase.vehicle_no;
+  })
+
       .forEach((purchase) => {
         // const key = `${purchase.vehicle_no}-${purchase.date}`
         const key = `${normalizeVehicleNo(purchase.vehicle_no)}-${purchase.date}`
