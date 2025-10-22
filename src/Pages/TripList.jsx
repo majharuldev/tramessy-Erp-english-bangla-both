@@ -1561,6 +1561,7 @@ const TripList = () => {
       <head>
         <title>Trip Details</title>
         <style>
+          @page { margin: 0; }
           body {
             font-family: Arial, sans-serif;
             padding: 20px;
@@ -1571,8 +1572,8 @@ const TripList = () => {
             gap: 16px;
           }
           .grid div {
-            border: 1px solid #ddd;
-            padding: 8px;
+          border-top: 1px solid #ddd;
+            padding: 5px;
             border-radius: 8px;
             background: #f9f9f9;
           }
@@ -1862,7 +1863,21 @@ const TripList = () => {
                       <td className="p-2">
                         {isAdmin ? (Number.parseFloat(dt.total_rent || 0) - Number.parseFloat(dt.total_exp || 0)) : "hide"}
                       </td>
-                      <td className="p-2">{dt?.status}</td>
+                      <td className="p-2">
+                        <span
+                          className={`px-3 py-1 rounded text-xs font-semibold
+            ${dt.status === "Approved"
+                              ? "bg-green-50 text-green-700  border-green-300"
+                              : dt.status === "Pending"
+                                ? "bg-yellow-50 text-yellow-700  border-yellow-300"
+                                : dt.status === "Rejected"
+                                  ? "bg-red-50 text-red-700  border-red-300"
+                                  : "bg-gray-50 text-gray-700  border-gray-300"
+                            }`}
+                        >
+                          {dt.status || "Pending"}
+                        </span>
+                      </td>
                       <td className="p-2 action_column relative">
                         <div className="flex gap-1">
                           {/* Dropdown toggle button */}
@@ -1885,12 +1900,12 @@ const TripList = () => {
                               onClick={(e) => e.stopPropagation()}
                             >
                               <div className="py-1">
-                                <Link to={`/tramessy/UpdateTripForm/${dt.id}`} onClick={() => setOpenDropdown(null)}>
+                                {(dt.status === "Pending" || dt.status === "Rejected") && (<Link to={`/tramessy/UpdateTripForm/${dt.id}`} onClick={() => setOpenDropdown(null)}>
                                   <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <FaPen className="mr-2 text-[12px]" />
                                     Edit
                                   </button>
-                                </Link>
+                                </Link>)}
                                 <button
                                   onClick={() => {
                                     handleView(dt.id)
@@ -2036,7 +2051,8 @@ const TripList = () => {
                   <div><strong>Trip ID:</strong> {selectedTrip.id}</div>
                   <div><strong>Trip Type:</strong> {selectedTrip.trip_type || "N/A"}</div>
                   <div><strong>Customer:</strong> {selectedTrip.customer || "N/A"}</div>
-                  <div><strong>Trip Date:</strong> {selectedTrip.start_date || "N/A"}</div>
+                  <div><strong>Trip Start Date:</strong> {selectedTrip.start_date || "N/A"}</div>
+                  <div><strong>Trip End Date:</strong> {selectedTrip.end_date || "N/A"}</div>
                   <div><strong>Load Point:</strong> {selectedTrip.load_point || "N/A"}</div>
                   <div><strong>Unload Point:</strong> {selectedTrip.unload_point || "N/A"}</div>
                   <div><strong>Additional Load:</strong> {selectedTrip.additional_load || "N/A"}</div>
@@ -2044,7 +2060,11 @@ const TripList = () => {
                   <div><strong>Transport Type:</strong> {selectedTrip.transport_type || "N/A"}</div>
                   <div><strong>Vehicle No:</strong> {selectedTrip.vehicle_no || "N/A"}</div>
                   <div><strong>Vendor Name:</strong> {selectedTrip.vendor_name || "N/A"}</div>
-                  <div><strong>Unload Charge:</strong> {selectedTrip.unload_charge || 0}</div>
+                  <div><strong>Driver Name:</strong> {selectedTrip.driver_name || "N/A"}</div>
+                  <div><strong>Product Details:</strong> {selectedTrip.product_details || "N/A"}</div>
+                  <div><strong>Invoice No:</strong> {selectedTrip.invoice_no || 0}</div>
+                  <div><strong>Buyar Name:</strong> {selectedTrip.buyar_name || "N/A"}</div>
+                  <div><strong>Challan No:</strong> {selectedTrip.challan || "N/A"}</div>
                 </div>
 
                 <h3 className="text-lg font-bold mt-4 mb-3 border-b pb-1">
@@ -2066,6 +2086,8 @@ const TripList = () => {
                   <div><strong>Food Cost:</strong> {selectedTrip.food_cost || 0}</div>
                   <div><strong>Additional Cost:</strong> {selectedTrip.additional_cost || 0}</div>
                   <div><strong>Total Expense:</strong> {selectedTrip.total_exp || 0}</div>
+                  <div>{selectedTrip.transport_type === "vendor_transport" &&(<><strong>Vendor Rent:</strong>{selectedTrip.total_exp || 0}</>)}</div>
+                  
                 </div>
 
                 <h3 className="text-lg font-bold mt-4 border-b pb-1">
@@ -2074,11 +2096,19 @@ const TripList = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   <div><strong>Total Rent:</strong> {isAdmin ? selectedTrip.total_rent || 0 : "N/A"}</div>
-                  <div><strong>Profit:</strong> {selectedTrip.total_rent && selectedTrip.total_exp ? (selectedTrip.total_rent - selectedTrip.total_exp) : 0}</div>
+                  <div><strong>Demurrage Days:</strong> {selectedTrip.d_day || 0}</div>
+                  <div><strong>Demurrage Amount:</strong> {selectedTrip.d_amount || 0}</div>
+                  <div><strong>Demurrage Total:</strong> {selectedTrip.d_total || 0}</div>
+                  <div><strong>Profit:</strong>
+                    {isAdmin ? (selectedTrip.total_rent && selectedTrip.total_exp ? ((selectedTrip.total_rent + selectedTrip.d_total) - selectedTrip.total_exp) : 0) : "N/A"}</div>
                   <div><strong>Status:</strong>
                     <span
                       className={`ml-2 px-2 py-0.5 rounded text-white text-xs 
-                ${selectedTrip.status === "Approved" ? "bg-green-600" : "bg-yellow-500"}`}
+                ${selectedTrip.status === "Approved"
+                          ? "bg-green-600"
+                          : selectedTrip.status === "Rejected"
+                            ? "bg-red-600"
+                            : "bg-yellow-500"}`}
                     >
                       {selectedTrip.status}
                     </span>

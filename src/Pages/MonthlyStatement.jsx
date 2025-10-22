@@ -57,19 +57,20 @@ const trips = (tripsRes.data?.data || []).filter(
 
         if (trip.transport_type === "own_transport") {
           monthlyData[month].ownTripIncome += parseFloat(trip.total_rent) || 0;
-          monthlyData[month].ownTripCost += 
-            (parseFloat(trip.fuel_cost) || 0) +
-            // (parseFloat(trip.driver_commission) || 0) +
-            (parseFloat(trip.food_cost) || 0) +
-            (parseFloat(trip.parking_cost) || 0) +
-            (parseFloat(trip.toll_cost) || 0) +
-            (parseFloat(trip.others_cost) || 0) +
-            (parseFloat(trip.chada_cost) || 0) +
-            (parseFloat(trip.challan_cost) || 0) +
-            (parseFloat(trip.feri_cost) || 0) +
-            (parseFloat(trip.night_guard) || 0) +
-            (parseFloat(trip.police_cost) || 0) +
-            (parseFloat(trip.labor) || 0);
+          // monthlyData[month].ownTripCost += 
+          //   (parseFloat(trip.fuel_cost) || 0) +
+          //   // (parseFloat(trip.driver_commission) || 0) +
+          //   (parseFloat(trip.food_cost) || 0) +
+          //   (parseFloat(trip.parking_cost) || 0) +
+          //   (parseFloat(trip.toll_cost) || 0) +
+          //   (parseFloat(trip.others_cost) || 0) +
+          //   (parseFloat(trip.chada_cost) || 0) +
+          //   (parseFloat(trip.challan_cost) || 0) +
+          //   (parseFloat(trip.feri_cost) || 0) +
+          //   (parseFloat(trip.night_guard) || 0) +
+          //   (parseFloat(trip.police_cost) || 0) +
+          //   (parseFloat(trip.labor) || 0);
+          monthlyData[month].ownTripCost += parseFloat(trip.total_exp) || 0;
         } else if (trip.transport_type === "vendor_transport") {
           monthlyData[month].vendorTripIncome += parseFloat(trip.total_rent) || 0;
           monthlyData[month].vendorTripCost += parseFloat(trip.total_exp) || 0;
@@ -191,15 +192,15 @@ const trips = (tripsRes.data?.data || []).filter(
       ],
       body: filteredData.map(item => [
         item.month,
-        item.ownTripIncome.toFixed(2),
-        item.vendorTripIncome.toFixed(2),
-        item.ownTripCost.toFixed(2),
-        item.vendorTripCost.toFixed(2),
-        item.purchaseCost.toFixed(2),
-        item.salaryExpense.toFixed(2),
-        item.officeExpense.toFixed(2),
-        item.totalExpense.toFixed(2),
-        item.netProfit.toFixed(2)
+        item.ownTripIncome,
+        item.vendorTripIncome,
+        item.ownTripCost,
+        item.vendorTripCost,
+        item.purchaseCost,
+        item.salaryExpense,
+        item.officeExpense,
+        item.totalExpense,
+        item.netProfit
       ]),
       startY: 20
     });
@@ -357,38 +358,38 @@ const trips = (tripsRes.data?.data || []).filter(
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="p-2 border border-gray-400 text-center">{item.id}</td>
                     <td className="p-2 border border-gray-400">{item.month}</td>
-                    <td className="p-2 border border-gray-400 text-right">{item.ownTripIncome.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-400 text-right">{item.vendorTripIncome.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-400 text-right ">{item.ownTripCost.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-400 text-right ">{item.vendorTripCost.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-400 text-right ">{item.purchaseCost.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-400 text-right ">{item.salaryExpense.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-400 text-right ">{item.officeExpense.toFixed(2)}</td>
+                    <td className="p-2 border border-gray-400 text-right">{item.ownTripIncome}</td>
+                    <td className="p-2 border border-gray-400 text-right">{item.vendorTripIncome}</td>
+                    <td className="p-2 border border-gray-400 text-right ">{item.ownTripCost}</td>
+                    <td className="p-2 border border-gray-400 text-right ">{item.vendorTripCost}</td>
+                    <td className="p-2 border border-gray-400 text-right ">{item.purchaseCost}</td>
+                    <td className="p-2 border border-gray-400 text-right ">{item.salaryExpense}</td>
+                    <td className="p-2 border border-gray-400 text-right ">{item.officeExpense}</td>
                     <td className="p-2 border border-gray-400 text-right  font-semibold">
-                      {item.totalExpense.toFixed(2)}
+                      {item.totalExpense}
                     </td>
                     <td className={`p-2 border border-gray-400 text-right font-semibold ${
                       item.netProfit >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      {item.netProfit.toFixed(2)}
+                      {item.netProfit}
                     </td>
                   </tr>
                 ))}
                 {/* Totals row */}
                 <tr className="font-semibold">
                   <td className="p-2 border border-gray-400 text-center" colSpan={2}>Total</td>
-                  <td className="p-2 border border-gray-400 text-right">{calculateTotal('ownTripIncome').toFixed(2)}</td>
-                  <td className="p-2 border border-gray-400 text-right">{calculateTotal('vendorTripIncome').toFixed(2)}</td>
-                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('ownTripCost').toFixed(2)}</td>
-                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('vendorTripCost').toFixed(2)}</td>
-                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('purchaseCost').toFixed(2)}</td>
-                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('salaryExpense').toFixed(2)}</td>
-                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('officeExpense').toFixed(2)}</td>
-                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('totalExpense').toFixed(2)}</td>
+                  <td className="p-2 border border-gray-400 text-right">{calculateTotal('ownTripIncome')}</td>
+                  <td className="p-2 border border-gray-400 text-right">{calculateTotal('vendorTripIncome')}</td>
+                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('ownTripCost')}</td>
+                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('vendorTripCost')}</td>
+                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('purchaseCost')}</td>
+                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('salaryExpense')}</td>
+                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('officeExpense')}</td>
+                  <td className="p-2 border border-gray-400 text-right ">{calculateTotal('totalExpense')}</td>
                   <td className={`p-2 border border-gray-400 text-right ${
                     calculateTotal('netProfit') >= 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {calculateTotal('netProfit').toFixed(2)}
+                    {calculateTotal('netProfit')}
                   </td>
                 </tr>
               </tbody>

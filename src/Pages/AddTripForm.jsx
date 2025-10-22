@@ -863,7 +863,6 @@
 //   );
 // }
 
-"use client"
 
 import { useForm, FormProvider, useWatch } from "react-hook-form"
 import { useNavigate, useParams } from "react-router-dom"
@@ -945,6 +944,8 @@ export default function AddTripForm() {
       branch_name: "",
       sms_sent: "yes",
       challan_cost: "",
+      remarks: "",
+      status: "pending",
     },
   })
 
@@ -1029,6 +1030,7 @@ export default function AddTripForm() {
         (Number(foodCost) || 0) +
         (Number(chadaCost) || 0) +
         (Number(fuelCost) || 0) +
+        (Number(challan_cost) || 0) +
         (Number(additional_cost) || 0) +
         (Number(othersCost) || 0)
 
@@ -1049,6 +1051,7 @@ export default function AddTripForm() {
     foodCost,
     chadaCost,
     fuelCost,
+    challan_cost,
     othersCost,
     d_day,
     d_amount,
@@ -1139,9 +1142,9 @@ export default function AddTripForm() {
               d_day: Number(tripData.d_day) || 0,
               d_amount: Number(tripData.d_amount) || 0,
               d_total: Number(tripData.d_total) || 0,
-              // total_exp: Number(tripData.total_exp) || 0,
-              total_exp:
-                tripData.transport_type === "vendor_transport" ? tripData.total_exp : Number(tripData.total_exp) || 0,
+              total_exp: Number(tripData.total_exp) || 0,
+              // total_exp:
+              //   tripData.transport_type === "vendor_transport" ? tripData.total_exp : Number(tripData.total_exp) || 0,
               total_rent: Number(tripData.total_rent) || 0,
               trip_rent: Number(tripData.trip_rent) || 0,
               advance: Number(tripData.advance) || 0,
@@ -1150,9 +1153,11 @@ export default function AddTripForm() {
             }
 
             reset(parsedTripData)
-            // if (!parsedTripData.sms_sent) {
-            //   setValue("sms_sent", "yes");
-            // }
+            if (tripData.status) {
+              setValue("status", tripData.status);
+            } else {
+              setValue("status", "pending");
+            }
             if (!parsedTripData.sms_sent) {
               if (isAdmin) {
                 setValue("sms_sent", "no") // Admin হলে SMS বন্ধ
@@ -1368,7 +1373,7 @@ export default function AddTripForm() {
   return (
     <FormProvider {...methods}>
       <Toaster />
-      {loading ? (
+      {loading && id ? (
         <div className="p-4 bg-white rounded-md shadow border-t-2 border-primary">
           <FormSkeleton />
         </div>
@@ -1457,16 +1462,25 @@ export default function AddTripForm() {
                         { value: "round trip", label: "Round Trip" },
                       ]}
                       control={control}
-                      // required={!id}
+                    // required={!id}
                     />
                   </div>
                   <div className="w-full">
                     <InputField name="additional_load" label="Additional Load point" />
                   </div>
+
+                  <div className="w-full">
+                    <InputField name="buyar_name" label="Buyar Name" required={false} />
+                  </div>
+                </div>
+                <div className="flex gap-x-6">
+                  <div className="w-full">
+                    <InputField name="invoice_no" label="Invoice No" required={false} />
+                  </div>
                   <TextAreaField
                     name="product_details"
                     label="Product Details"
-                    required
+                    required={false}
                     placeholder="Enter product details here..."
                   />
                 </div>
@@ -1642,6 +1656,9 @@ export default function AddTripForm() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
                     <InputField name="additional_cost" label="Additional Load Cost" type="number" />
                     <InputField name="total_exp" label="Total Expense" readOnly />
+
+                    <InputField name="remarks" label="Remarks" required={false} />
+
                   </div>
                 </div>
               )}
@@ -1655,6 +1672,23 @@ export default function AddTripForm() {
                     <InputField name="advance" label="Advance" type="number" required={!id} />
                     <InputField name="due_amount" readOnly label="Due Amount" type="number" required={!id} />
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                    <InputField name="remarks" label="Remarks" required={false} />
+                  </div>
+                </div>
+              )}
+              {isAdmin && id && (
+                <div className="w-[20%]">
+                  <SelectField
+                    name="status"
+                    label="Status"
+                    required
+                    options={[
+                      { value: "Pending", label: "Pending" },
+                      { value: "Approved", label: "Approved" },
+                      { value: "Rejected", label: "Rejected" },
+                    ]}
+                  />
                 </div>
               )}
               {!isAdmin && (

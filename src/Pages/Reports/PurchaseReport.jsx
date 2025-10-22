@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { FaFilter, FaUserSecret, FaFilePdf, FaPrint, FaFileExcel } from "react-icons/fa";
 import * as XLSX from "xlsx";
-import axios from "axios";
-import jsPDF  from "jspdf";
+import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Pagination from "../../components/Shared/Pagination";
 import api from "../../../utils/axiosConfig";
+import { tableFormatDate } from "../../hooks/formatDate";
+import DatePicker from "react-datepicker";
 
 const PurchaseReport = () => {
   const [purchases, setPurchases] = useState([]);
@@ -21,7 +22,7 @@ const PurchaseReport = () => {
 
   // Load purchase data
   useEffect(() => {
-    api.get(`/purchase`) 
+    api.get(`/purchase`)
       .then(res => {
         if (res.data.status === "Success") {
           setPurchases(res.data.data);
@@ -34,14 +35,14 @@ const PurchaseReport = () => {
     const dateMatch =
       (!startDate || new Date(p.date) >= new Date(startDate)) &&
       (!endDate || new Date(p.date) <= new Date(endDate));
-     const supplierMatch = !supplierFilter || p.supplier_name === supplierFilter;
-  const categoryMatch = !categoryFilter || p.category === categoryFilter;
-  const searchMatch =
-    !searchTerm ||
-    p.supplier_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.category?.toLowerCase().includes(searchTerm.toLowerCase());
-  return dateMatch && supplierMatch && categoryMatch && searchMatch;
+    const supplierMatch = !supplierFilter || p.supplier_name === supplierFilter;
+    const categoryMatch = !categoryFilter || p.category === categoryFilter;
+    const searchMatch =
+      !searchTerm ||
+      p.supplier_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.category?.toLowerCase().includes(searchTerm.toLowerCase());
+    return dateMatch && supplierMatch && categoryMatch && searchMatch;
   });
 
   // Summary calculations
@@ -84,18 +85,18 @@ const PurchaseReport = () => {
   // const exportPdf = () => {
   //   const doc = new jsPDF();
   //   const title = "Purchase Report";
-    
+
   //   // Add title
   //   doc.setFontSize(16);
   //   doc.text(title, 14, 16);
-    
+
   //   // Add summary information
   //   doc.setFontSize(10);
   //   doc.text(`Total Purchases: ${filteredPurchases.length}`, 14, 26);
   //   doc.text(`Total Amount: ${totalAmount.toLocaleString()} ৳`, 14, 32);
   //   doc.text(`Top Supplier: ${topSupplier}`, 14, 38);
   //   doc.text(`Top Category: ${topCategory}`, 14, 44);
-    
+
   //   // Add table
   //   const headers = [
   //     "#", 
@@ -107,7 +108,7 @@ const PurchaseReport = () => {
   //     "Unit Price", 
   //     "Total"
   //   ];
-    
+
   //   const data = filteredPurchases.map((p, i) => [
   //     i + 1,
   //     p.date,
@@ -118,7 +119,7 @@ const PurchaseReport = () => {
   //     p.unit_price,
   //     p.purchase_amount ?? (p.quantity * p.unit_price)
   //   ]);
-    
+
   //   doc.autoTable({
   //     head: [headers],
   //     body: data,
@@ -133,64 +134,64 @@ const PurchaseReport = () => {
   //       textColor: 255
   //     }
   //   });
-    
+
   //   doc.save('purchase_report.pdf');
   // };
 
   const exportPdf = () => {
-  const doc = new jsPDF();
-  const title = "Purchase Report";
+    const doc = new jsPDF();
+    const title = "Purchase Report";
 
-  // Add title
-  doc.setFontSize(16);
-  doc.text(title, 14, 16);
+    // Add title
+    doc.setFontSize(16);
+    doc.text(title, 14, 16);
 
-  // Add summary information
-  doc.setFontSize(10);
-  doc.text(`Total Purchases: ${filteredPurchases.length}`, 14, 26);
-  doc.text(`Total Amount: ${totalAmount.toLocaleString()} ৳`, 14, 32);
-  doc.text(`Top Supplier: ${topSupplier}`, 14, 38);
-  doc.text(`Top Category: ${topCategory}`, 14, 44);
+    // Add summary information
+    doc.setFontSize(10);
+    doc.text(`Total Purchases: ${filteredPurchases.length}`, 14, 26);
+    doc.text(`Total Amount: ${totalAmount.toLocaleString()} ৳`, 14, 32);
+    doc.text(`Top Supplier: ${topSupplier}`, 14, 38);
+    doc.text(`Top Category: ${topCategory}`, 14, 44);
 
-  // Add table
-  const headers = [
-    ["#", "Date", "Supplier", "Category", "Item", "Qty", "Unit Price", "Total"]
-  ];
+    // Add table
+    const headers = [
+      ["#", "Date", "Supplier", "Category", "Item", "Qty", "Unit Price", "Total"]
+    ];
 
-  const data = filteredPurchases.map((p, i) => [
-    i + 1,
-    p.date,
-    p.supplier_name,
-    p.category,
-    p.item_name,
-    p.quantity,
-    p.unit_price,
-    p.purchase_amount ?? (p.quantity * p.unit_price)
-  ]);
+    const data = filteredPurchases.map((p, i) => [
+      i + 1,
+      p.date,
+      p.supplier_name,
+      p.category,
+      p.item_name,
+      p.quantity,
+      p.unit_price,
+      p.purchase_amount ?? (p.quantity * p.unit_price)
+    ]);
 
-  autoTable(doc, {
-    head: headers,
-    body: data,
-    startY: 50,
-    styles: {
-      fontSize: 8,
-      cellPadding: 2,
-      halign: "center"
-    },
-    headStyles: {
-      fillColor: [17, 55, 91],
-      textColor: 255
-    }
-  });
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 50,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        halign: "center"
+      },
+      headStyles: {
+        fillColor: [17, 55, 91],
+        textColor: 255
+      }
+    });
 
-  doc.save("purchase_report.pdf");
-};
+    doc.save("purchase_report.pdf");
+  };
 
 
-    // Simple print function
- const handlePrint = () => {
-  // Generate table rows for all filtered purchases
-  const rowsHtml = filteredPurchases.map((p, i) => `
+  // Simple print function
+  const handlePrint = () => {
+    // Generate table rows for all filtered purchases
+    const rowsHtml = filteredPurchases.map((p, i) => `
     <tr>
       <td style="border:1px solid #ddd;padding:6px;text-align:center">${i + 1}</td>
       <td style="border:1px solid #ddd;padding:6px;text-align:center">${p.date}</td>
@@ -203,8 +204,8 @@ const PurchaseReport = () => {
     </tr>
   `).join("");
 
-  // Totals row
-  const totalsRow = `
+    // Totals row
+    const totalsRow = `
     <tr style="font-weight:bold;background:#f0f0f0">
       <td colspan="5" style="border:1px solid #ddd;padding:6px;text-align:right">Total:</td>
       <td style="border:1px solid #ddd;padding:6px;text-align:right">${totalQty}</td>
@@ -213,7 +214,7 @@ const PurchaseReport = () => {
     </tr>
   `;
 
-  const html = `
+    const html = `
     <table style="width:100%;border-collapse:collapse">
       <thead style="background:#11375B;color:white">
         <tr>
@@ -236,8 +237,8 @@ const PurchaseReport = () => {
     </table>
   `;
 
-  const WinPrint = window.open("", "", "width=900,height=650");
-  WinPrint.document.write(`
+    const WinPrint = window.open("", "", "width=900,height=650");
+    WinPrint.document.write(`
     <html>
       <head>
         <title>Purchase Report</title>
@@ -249,31 +250,31 @@ const PurchaseReport = () => {
       </body>
     </html>
   `);
-  WinPrint.document.close();
-  WinPrint.focus();
-  WinPrint.print();
-  WinPrint.close();
-};
+    WinPrint.document.close();
+    WinPrint.focus();
+    WinPrint.print();
+    WinPrint.close();
+  };
 
   // Grand totals for all filtered purchases
-// Grand totals for all filtered purchases
-const totalQty = filteredPurchases.reduce(
-  (sum, p) => sum + (Number(p.quantity) || 0),
-  0
-);
-const totalUnitPrice  = filteredPurchases.reduce(
-  (sum, p) => sum + (Number(p.unit_price) || 0),
-  0
-);
+  // Grand totals for all filtered purchases
+  const totalQty = filteredPurchases.reduce(
+    (sum, p) => sum + (Number(p.quantity) || 0),
+    0
+  );
+  const totalUnitPrice = filteredPurchases.reduce(
+    (sum, p) => sum + (Number(p.unit_price) || 0),
+    0
+  );
 
-const totalAmountOverall = filteredPurchases.reduce(
-  (sum, p) =>
-    sum +
-    ((Number(p.quantity) || 0) * (Number(p.unit_price) || 0)),
-  0
-);
+  const totalAmountOverall = filteredPurchases.reduce(
+    (sum, p) =>
+      sum +
+      ((Number(p.quantity) || 0) * (Number(p.unit_price) || 0)),
+    0
+  );
 
-// Weighted average unit price (if totalQty > 0)
+  // Weighted average unit price (if totalQty > 0)
 
 
   // Pagination
@@ -289,7 +290,7 @@ const totalAmountOverall = filteredPurchases.reduce(
 
   return (
     <div className="p-2">
-      <div 
+      <div
         ref={reportRef}
         className="w-[22rem] md:w-full overflow-hidden overflow-x-automax-w-7xl mx-auto bg-white shadow-xl rounded-xl p-4 border border-gray-200"
       >
@@ -330,17 +331,30 @@ const totalAmountOverall = filteredPurchases.reduce(
         {/* Filters */}
         {showFilter && (
           <div className="grid md:grid-cols-4 gap-4 border border-gray-300 rounded-md p-4 mb-6">
-            <input
-              type="date"
-              value={startDate}
-              onChange={e => setStartDate(e.target.value)}
-              className="border p-2 rounded"
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
             />
-            <input
-              type="date"
-              value={endDate}
-              onChange={e => setEndDate(e.target.value)}
-              className="border p-2 rounded"
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
             />
             <select
               value={supplierFilter}
@@ -368,20 +382,20 @@ const totalAmountOverall = filteredPurchases.reduce(
         {/* Search + Export */}
         <div className="flex justify-between mb-4 flex-wrap gap-2">
           <div className="flex gap-2">
-            <button 
-              onClick={exportExcel} 
+            <button
+              onClick={exportExcel}
               className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white flex items-center gap-2"
             >
               <FaFileExcel /> Excel
             </button>
-            <button 
-              onClick={exportPdf} 
+            <button
+              onClick={exportPdf}
               className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white flex items-center gap-2"
             >
               <FaFilePdf /> PDF
             </button>
-            <button 
-              onClick={handlePrint} 
+            <button
+              onClick={handlePrint}
               className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white flex items-center gap-2"
             >
               <FaPrint /> Print
@@ -396,18 +410,18 @@ const totalAmountOverall = filteredPurchases.reduce(
               className="border rounded px-3 py-1"
             />
           </div>
-           {/*  Clear button */}
-    {searchTerm && (
-      <button
-        onClick={() => {
-          setSearchTerm("");
-          setCurrentPage(1);
-        }}
-        className="absolute right-9 top-[17rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
-      >
-        ✕
-      </button>
-    )}
+          {/*  Clear button */}
+          {searchTerm && (
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setCurrentPage(1);
+              }}
+              className="absolute right-10 top-[17.3rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
+            >
+              ✕
+            </button>
+          )}
         </div>
 
         {/* Table */}
@@ -429,7 +443,7 @@ const totalAmountOverall = filteredPurchases.reduce(
               {currentPurchase.map((p, i) => (
                 <tr key={p.id} className="">
                   <td className="p-2">{i + 1}</td>
-                  <td className="p-2">{p.date}</td>
+                  <td className="p-2">{tableFormatDate(p.date)}</td>
                   <td className="p-2">{p.supplier_name}</td>
                   <td className="p-2">{p.category}</td>
                   <td className="p-2">{p.item_name}</td>
@@ -444,26 +458,26 @@ const totalAmountOverall = filteredPurchases.reduce(
                 </tr>
               )}
             </tbody>
-            {currentPurchase.length>0 &&<tfoot className="bg-gray-100 font-bold">
-  <tr>
-    <td colSpan="5" className="text-right p-2">Total:</td>
-    <td className="p-2">{totalQty}</td>
-    <td className="p-2">{totalUnitPrice}</td>
-    <td className="p-2">{totalAmountOverall}</td>
-  </tr>
-</tfoot>}
+            {currentPurchase.length > 0 && <tfoot className="bg-gray-100 font-bold">
+              <tr>
+                <td colSpan="5" className="text-right p-2">Total:</td>
+                <td className="p-2">{totalQty}</td>
+                <td className="p-2">{totalUnitPrice}</td>
+                <td className="p-2">{totalAmountOverall}</td>
+              </tr>
+            </tfoot>}
           </table>
         </div>
-        
+
         {/* Pagination */}
         {currentPurchase.length > 0 && totalPages >= 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-          maxVisible={8} 
-        />
-      )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+            maxVisible={8}
+          />
+        )}
       </div>
     </div>
   );
