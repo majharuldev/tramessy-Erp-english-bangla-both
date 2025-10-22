@@ -393,7 +393,7 @@ const AddRentVehicleForm = () => {
                       { value: "open_truck", label: "Open Truck" },
                       { value: "trailer", label: "Trailer" },
                       { value: "freezer_van", label: "Freezer Van" },
-                      { value: "Well Tanker", label: "Well Tanker" },
+                      { value: "Oil Tanker", label: "Oil Tanker" },
                     ]}
                   />
                 </div>

@@ -279,6 +279,7 @@ const AddVendorForm = () => {
                   { value: "open_truck", label: "Open Truck" },
                   { value: "trailer", label: "Trailer" },
                   { value: "freezer_van", label: "Freezer Van" },
+                  { value: "Oil Tanker", label: "Oil Tranker" },
                 ]}
                 />
               </div>
