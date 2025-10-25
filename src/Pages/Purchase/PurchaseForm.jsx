@@ -19,7 +19,7 @@ const PurchaseForm = () => {
   const methods = useForm({
     defaultValues: {
       sms_sent: "yes",
-       items: [{ item_name: "", quantity: 0, unit_price: 0, total: 0 }],
+      items: [{ item_name: "", quantity: 0, unit_price: 0, total: 0 }],
     },
   });
 
@@ -39,11 +39,11 @@ const PurchaseForm = () => {
   const unitPrice = parseFloat(watch("unit_price") || 0);
   const totalPrice = quantity * unitPrice;
 
-   // Dynamic item fields
+  // Dynamic item fields
   const { fields, append, remove } = useFieldArray({
     control,
     name: "items",
-  }); 
+  });
   // Update purchase_amount when quantity or unit_price changes
   useEffect(() => {
     const totalPrice = quantity * unitPrice;
@@ -211,25 +211,82 @@ const PurchaseForm = () => {
 
 
   // Handle form submission for both add and update
+  // const onSubmit = async (data) => {
+  //   try {
+
+  //     // date format local 
+  //     ["date", "service_date", "next_service_date"].forEach((field) => {
+  //       if (data[field]) {
+  //         const d = new Date(data[field]);
+  //         d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  //         data[field] = d.toISOString().split("T")[0];
+  //       }
+  //     });
+  //     // created_by ঠিকভাবে সেট করা
+  //     let createdByValue = "Unknown";
+  //     if (user?.name) createdByValue = user.name;
+  //     else if (user?.email) createdByValue = user.email;
+
+  //     // যদি Edit mode হয়, তাহলে আগেরটা রেখে দাও
+  //     if (isEditMode && data.created_by) {
+  //       createdByValue = data.created_by;
+  //     }
+
+  //     const payload = {
+  //       ...data,
+  //       created_by: createdByValue,
+  //     };
+
+  //     const response = isEditMode
+  //       ? await api.put(`/purchase/${id}`, payload)   // JSON
+  //       : await api.post(`/purchase`, payload);
+
+  //     if (response.data.success) {
+  //       toast.success(isEditMode ? "Purchase updated!" : "Purchase submitted!");
+  //       //  Only send SMS if it's a new trip and sms_sent = "yes"
+  //       if (!id && !isAdmin && data.sms_sent === "yes") {
+  //         const purchase = response.data.data; // Assuming your backend returns created trip data
+  //         const purchaseId = purchase.id;
+  //         const purchaseDate = purchase.date || "";
+  //         const supplierName = purchase.supplier_name || "";
+  //         const userName = user.name || "";
+  //         const purchaseCategory = purchase?.category || "";
+  //         const vehicleNo = purchase?.vehicle_no || "";
+
+  //         // Build message content
+  //         const messageContent = `Dear Sir, A new Maintenance created by ${userName}.\nPurchase Id: ${purchaseId}\nPurchase Date: ${purchaseDate}\nSupplier: ${supplierName}\nVehicle: ${vehicleNo}\nPurchase Name: ${purchaseCategory}`;
+
+  //         // SMS Config
+  //         const adminNumber = "01872121862"; // or multiple separated by commas
+  //         const API_KEY = "3b82495582b99be5";
+  //         const SECRET_KEY = "ae771458";
+  //         const CALLER_ID = "1234";
+
+  //         // Correct URL (same structure as your given example)
+  //         const smsUrl = `http://smpp.revesms.com:7788/sendtext?apikey=${API_KEY}&secretkey=${SECRET_KEY}&callerID=${CALLER_ID}&toUser=${adminNumber}&messageContent=${encodeURIComponent(messageContent)}`;
+  //         try {
+  //           await fetch(smsUrl);
+  //           toast.success("SMS sent to admin!");
+  //         } catch (smsError) {
+  //           // console.error("SMS sending failed:", smsError);
+  //           // toast.error("Trip saved, but SMS failed to send.");
+  //         }
+  //       }
+  //       navigate("/tramessy/Purchase/maintenance");
+  //       reset();
+  //     } else {
+  //       throw new Error(isEditMode ? "Failed to update Purchase" : "Failed to create Purchase");
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error(error.response?.data?.message || "Server error");
+  //   }
+  // };
+
+
   const onSubmit = async (data) => {
     try {
-      // const payload = {
-      //   date: new Date(data.date).toISOString().split("T")[0],
-      //   category: data.category ?? "",
-      //   item_name: data.item_name ?? "",
-      //   driver_name: data.driver_name ?? "",
-      //   vehicle_no: data.vehicle_no ?? "",
-      //   vehicle_category: data.vehicle_category ?? "",
-      //   branch_name: data.branch_name ?? "",
-      //   supplier_name: data.supplier_name ?? "",
-      //   quantity: Number(data.quantity) || 0,
-      //   unit_price: Number(data.unit_price) || 0,
-      //   purchase_amount: Number(data.purchase_amount) || 0,
-      //   remarks: data.remarks ?? "",
-      //   priority: data.priority ?? "",
-      //   // bill_image: যদি backend JSON support করে, Base64 encode পাঠাও
-      // };
-      // date format local 
+      // 🔹 Date fields localize করা
       ["date", "service_date", "next_service_date"].forEach((field) => {
         if (data[field]) {
           const d = new Date(data[field]);
@@ -237,66 +294,66 @@ const PurchaseForm = () => {
           data[field] = d.toISOString().split("T")[0];
         }
       });
-      // created_by ঠিকভাবে সেট করা
-      let createdByValue = "Unknown";
-      if (user?.name) createdByValue = user.name;
-      else if (user?.email) createdByValue = user.email;
 
-      // যদি Edit mode হয়, তাহলে আগেরটা রেখে দাও
+      // 🔹 created_by
+      let createdByValue = user?.name || user?.email || "Unknown";
       if (isEditMode && data.created_by) {
         createdByValue = data.created_by;
       }
 
+      // 🔹 items array থেকে আলাদা আলাদা array বানানো
+      const item_name = data.items.map((item) => item.item_name);
+      const quantity = data.items.map((item) => Number(item.quantity));
+      const unit_price = data.items.map((item) => Number(item.unit_price));
+      const total = data.items.map((item) => Number(item.total));
+
+      // 🔹 purchase_amount হিসাব করা (সব total এর যোগফল)
+      const purchase_amount =
+        total.reduce((sum, value) => sum + value, 0) + Number(data.service_charge || 0);
+
+      // 🔹 payload তৈরি
       const payload = {
-        ...data,
+        date: data.date,
+        supplier_name: data.supplier_name,
+        category: data.category,
+        purchase_amount: purchase_amount,
+        service_charge: Number(data.service_charge) || 0,
+        remarks: data.remarks || "",
+        driver_name: data.driver_name || "",
+        branch_name: data.branch_name,
+        vehicle_no: data.vehicle_no || "",
+        vehicle_category: data.vehicle_category || "",
+        priority: data.priority || "",
+        validity: data.validity || "",
+        next_service_date: data.next_service_date,
+        service_date: data.service_date,
+        last_km: Number(data.last_km) || 0,
+        next_km: Number(data.next_km) || 0,
         created_by: createdByValue,
+        item_name,
+        quantity,
+        unit_price,
+        total,
       };
 
+      // 🔹 Submit request
       const response = isEditMode
-        ? await api.put(`/purchase/${id}`, payload)   // JSON
+        ? await api.put(`/purchase/${id}`, payload)
         : await api.post(`/purchase`, payload);
 
       if (response.data.success) {
         toast.success(isEditMode ? "Purchase updated!" : "Purchase submitted!");
-        //  Only send SMS if it's a new trip and sms_sent = "yes"
-        if (!id && !isAdmin && data.sms_sent === "yes") {
-          const purchase = response.data.data; // Assuming your backend returns created trip data
-          const purchaseId = purchase.id;
-          const purchaseDate = purchase.date || "";
-          const supplierName = purchase.supplier_name || "";
-          const userName = user.name || "";
-          const purchaseCategory = purchase?.category || "";
-          const vehicleNo = purchase?.vehicle_no || "";
-
-          // Build message content
-          const messageContent = `Dear Sir, A new Maintenance created by ${userName}.\nPurchase Id: ${purchaseId}\nPurchase Date: ${purchaseDate}\nSupplier: ${supplierName}\nVehicle: ${vehicleNo}\nPurchase Name: ${purchaseCategory}`;
-
-          // SMS Config
-          const adminNumber = "01872121862"; // or multiple separated by commas
-          const API_KEY = "3b82495582b99be5";
-          const SECRET_KEY = "ae771458";
-          const CALLER_ID = "1234";
-
-          // Correct URL (same structure as your given example)
-          const smsUrl = `http://smpp.revesms.com:7788/sendtext?apikey=${API_KEY}&secretkey=${SECRET_KEY}&callerID=${CALLER_ID}&toUser=${adminNumber}&messageContent=${encodeURIComponent(messageContent)}`;
-          try {
-            await fetch(smsUrl);
-            toast.success("SMS sent to admin!");
-          } catch (smsError) {
-            // console.error("SMS sending failed:", smsError);
-            // toast.error("Trip saved, but SMS failed to send.");
-          }
-        }
         navigate("/tramessy/Purchase/maintenance");
         reset();
       } else {
-        throw new Error(isEditMode ? "Failed to update Purchase" : "Failed to create Purchase");
+        throw new Error("Failed to save purchase");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error:", error);
       toast.error(error.response?.data?.message || "Server error");
     }
   };
+
 
 
 
@@ -386,7 +443,15 @@ const PurchaseForm = () => {
                   <InputField name="item_name" label="Item Name" required={!isEditMode} />
                 </div>
               )} */}
-              
+              <div className="w-full">
+                <InputField
+                  name="service_charge"
+                  label="Service Charge"
+                  type="number"
+                  required={!isEditMode}
+                />
+              </div>
+
               <div className="w-full hidden">
                 <InputField
                   name="driver_name"
@@ -407,31 +472,31 @@ const PurchaseForm = () => {
                 />
               </div>
 
-            {selectedCategory==="engine_oil"&&(<div className="w-full">
+              {/* {selectedCategory==="engine_oil"&&(<div className="w-full">
               <InputField
                 name="quantity"
                 label="Quantity"
                 type="number"
                 required={!isEditMode}
               />
-            </div>)}
+            </div>)} */}
             </div>
             <div>
               {/* 🔹 Dynamic Item Fields */}
-              {selectedCategory !=="engine_oil" &&(<div className="space-y-4">
+              {(<div className="space-y-4">
                 <h4 className="text-lg font-semibold text-primary">Items</h4>
 
                 {fields.map((field, index) => {
                   const quantity = watch(`items.${index}.quantity`) || 0;
-                  const unitPrice = watch(`items.${index}.unit_price`) || 0;
+                  const unitPrice = parseFloat(watch(`items.${index}.unit_price`)) || 0;
                   const total = quantity * unitPrice;
                   setValue(`items.${index}.total`, total);
 
                   return (
                     <div key={field.id} className="flex flex-col md:flex-row gap-3 border border-gray-300 p-3 rounded-md relative">
                       <InputField name={`items.${index}.item_name`} label="Item Name" required={!isEditMode} className="!w-full" />
-                      <InputField name={`items.${index}.quantity`} label="Quantity" type="number" required={!isEditMode}  className="!w-full" />
-                      <InputField name={`items.${index}.unit_price`} label="Unit Price" type="number" required={!isEditMode}  className="!w-full"/>
+                      <InputField name={`items.${index}.quantity`} label="Quantity" type="number" required={!isEditMode} className="!w-full" />
+                      <InputField name={`items.${index}.unit_price`} label="Unit Price" type="number" required={!isEditMode} className="!w-full" />
                       <InputField name={`items.${index}.total`} label="Total" readOnly value={total} className="!salw-full" />
 
                       <button
@@ -456,7 +521,7 @@ const PurchaseForm = () => {
             </div>
 
             <div className="flex flex-col lg:flex-row  gap-x-3">
-              {selectedCategory=== "engine_oil" &&(<div className="flex flex-col lg:flex-row  gap-x-3 w-full">
+              {/* {selectedCategory=== "engine_oil" &&(<div className="flex flex-col lg:flex-row  gap-x-3 w-full">
                 <div className="w-full">
                   <InputField
                     name="unit_price"
@@ -474,8 +539,16 @@ const PurchaseForm = () => {
                     required={!isEditMode}
                   />
                 </div>
-              </div>)}
-
+              </div>)} */}
+              <div className="w-full">
+                  <InputField
+                    name="purchase_amount"
+                    label="Total"
+                    readOnly
+                    value={totalPrice}
+                    required={!isEditMode}
+                  />
+                </div>
               {selectedCategory !== "documents" && (<div className="flex gap-x-3 flex-col lg:flex-row w-full">
                 <div className="w-full">
                   <InputField
@@ -537,7 +610,7 @@ const PurchaseForm = () => {
             </div>
 
             <div className="flex flex-col lg:flex-row justify-between gap-3">
-              {selectedCategory!=="documents"&&(<div className="w-full">
+              {selectedCategory !== "documents" && (<div className="w-full">
                 <InputField
                   name="last_km"
                   label="Last KM"
@@ -545,7 +618,7 @@ const PurchaseForm = () => {
                   type="number"
                 />
               </div>)}
-              {selectedCategory!=="documents"&&(<div className="w-full">
+              {selectedCategory !== "documents" && (<div className="w-full">
                 <InputField
                   name="next_km"
                   label="Next KM"

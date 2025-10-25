@@ -46,6 +46,7 @@ const PurchaseList = () => {
         setLoading(false);
       });
   }, []);
+  console.log(purchase, "all purchase");
   // state
   const [vehicleFilter, setVehicleFilter] = useState("");
 
@@ -72,12 +73,16 @@ const PurchaseList = () => {
     return true;
   });
 
+  console.log(vehicleFiltered, "vehicleFiltered");
+
   // Search (Product ID, Supplier, Vehicle, Driver)
   const filteredPurchase = vehicleFiltered.filter((dt) => {
     // শুধু এই দুইটা ক্যাটেগরি দেখানোর জন্য
-    if (!(dt.category === "engine_oil" || dt.category === "parts" || dt.category === "documents")) {
-      return false;
-    }
+const category = dt.category?.toLowerCase();
+  console.log("CATEGORY:", dt.category);
+  if (!(category === "engine_oil" || category === "parts" || category === "documents")) {
+    return false;
+  }
     const term = searchTerm.toLowerCase();
     // যদি সার্চ term সংখ্যা হয় (যেমন "3")
     const isNumeric = !isNaN(term);

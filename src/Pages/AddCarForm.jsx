@@ -46,9 +46,7 @@ const vehicleSizes = {
   open_truck: ["3 Ton", "5 Ton", "10 Ton", "15 Ton", "30 Ton"],
   trailer: ["20 Feet", "23 Feet", "40 Feet", "30 Ton"],
   freezer_van: ["1 Ton", "3 Ton", "5 Ton", "10 Ton"],
-  car: ["4 Seater", "7 Seater"],
-  micro_bus: ["12 Seater", "14 Seater"],
-  bus: ["30 Seater", "40 Seater", "50 Seater"],
+  "Oil Tanker": ["5,000 Litre", "10,000 Litre", "15,000 Litre", "20,000 Litre"],
 };
 // সিলেক্ট করা ক্যাটাগরির জন্য সাইজ লিস্ট বানানো
   const sizeOptions =
