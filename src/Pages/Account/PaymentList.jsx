@@ -39,7 +39,7 @@ const PaymentList = () => {
       .get(`/payments`)
       .then((response) => {
         if (response.data.status === "Success") {
-          setPayment(response.data.data);
+          setPayment(response?.data.data);
         }
         setLoading(false);
       })
@@ -48,8 +48,9 @@ const PaymentList = () => {
         setLoading(false);
       });
   }, []);
+ 
   // Filter by date
-  const filteredPayment = payment.filter((trip) => {
+  const filteredPayment = payment?.filter((trip) => {
     const tripDate = new Date(trip.date);
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
@@ -63,7 +64,7 @@ const PaymentList = () => {
     }
   });
   // search
-  const filteredPaymentList = filteredPayment.filter((dt) => {
+  const filteredPaymentList = filteredPayment?.filter((dt) => {
     const term = searchTerm.toLowerCase();
     return (
       dt.date?.toLowerCase().includes(term) ||
@@ -82,157 +83,139 @@ const PaymentList = () => {
 
 
 // excel export
-const exportToExcel = () => {
-  if (!filteredPaymentList.length) {
-    toast.error("No data to export!");
-    return;
-  }
+  // excel
+  const exportToExcel = () => {
+    const exportData = filteredPaymentList.map((dt, index) => {
+      const item = dt.purchase?.items?.[0];
+      const total = parseFloat(dt.total_amount) || 0;
+      const paid = parseFloat(dt.pay_amount) || 0;
+      const due = total - paid;
+      
+      let status = "Unpaid";
+      if (due === 0) {
+        status = "Paid";
+      } else if (paid > 0 && due > 0) {
+        status = "Partial";
+      }
 
-  const exportData = filteredPaymentList.map((dt, index) => {
-    // Convert item list to readable strings
-    const itemNames = dt.items?.map((item) => item.item_name).join(", ") || "";
-    const quantities = dt.items?.map((item) => item.quantity).join(", ") || "";
-
-    // Safely convert numbers
-    const total = Number(dt.total || 0);
-    const pay = Number(dt.pay_amount || 0);
-    const due = total - pay;
-
-    // Payment status
-    const status =
-      pay === 0 ? "Unpaid" : pay >= total ? "Paid" : "Partial";
-
-    return {
-      SL: index + 1,
-      Date: dt.date ? new Date(dt.date).toLocaleDateString("en-GB") : "",
-      SupplierName: dt.supplier_name || "",
-      Category: dt.category || "",
-      ItemNames: itemNames,
-      Quantity: quantities,
-      UnitPrice: Number(dt.unit_price || 0),
-      TotalAmount: total,
-      PayAmount: pay,
-      DueAmount: due,
-      Status: status,
-    };
-  });
-
-  // Create worksheet and workbook
-  const worksheet = XLSX.utils.json_to_sheet(exportData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Payments");
-
-  // Optional: auto-fit columns
-  const colWidths = Object.keys(exportData[0]).map((key) => ({
-    wch: Math.max(
-      key.length,
-      ...exportData.map((item) => String(item[key] || "").length),
-      10
-    ),
-  }));
-  worksheet["!cols"] = colWidths;
-
-  // Save file
-  XLSX.writeFile(workbook, "PaymentReport.xlsx");
-  toast.success("Excel file exported successfully!");
-};
-
-  // pdf
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-    const tableColumn = [
-      "SL",
-      "Date",
-      "Supplier Name",
-      "Category",
-      "Item Name",
-      "Qty",
-      "Unit Price",
-      "Total",
-      "Paid",
-      "Due",
-      "Status",
-    ];
-
-    const tableRows = filteredPaymentList.map((dt, index) => [
-      index + 1,
-      dt.date,
-      dt.supplier_name,
-      dt.category,
-      dt.item_name,
-      dt.quantity,
-      dt.unit_price,
-      dt.total_amount,
-      dt.pay_amount,
-      parseFloat(dt.total_amount) - parseFloat(dt.pay_amount),
-      parseFloat(dt.pay_amount) === 0
-        ? "Unpaid"
-        : parseFloat(dt.pay_amount) >= parseFloat(dt.total_amount)
-          ? "Paid"
-          : "Partial",
-    ]);
-
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      styles: { fontSize: 8 },
+      return {
+        "SL": index + 1,
+        "Date": dt.date,
+        "Supplier Name": dt.supplier_name,
+        "Category": dt.category,
+        "Item name": item?.item_name || "-",
+        "Quantity": toNumber(item?.quantity) || "-",
+        "Rate": toNumber(item?.unit_price) || "-",
+        "Service charge": toNumber(dt.purchase?.service_charge) || 0,
+        "Total Amount": toNumber(dt?.total_amount) || "-",
+        "Pay Amount": toNumber(dt.pay_amount),
+        "Due": due,
+        "Status": status
+      };
     });
 
-    doc.save("PaymentReport.pdf");
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "পেমেন্ট রিপোর্ট");
+    
+    // কলামের width অটো-সেট করার জন্য
+    const maxWidth = exportData.reduce((widths, row) => {
+      Object.keys(row).forEach((key, idx) => {
+        const length = row[key]?.toString().length || 0;
+        if (!widths[idx] || length > widths[idx]) {
+          widths[idx] = length;
+        }
+      });
+      return widths;
+    }, []);
+    
+    worksheet['!cols'] = maxWidth.map(w => ({ width: w + 2 }));
+    
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(dataBlob, "পেমেন্ট_রিপোর্ট.xlsx");
   };
+
+
   // handle print
+  // প্রিন্ট ফাংশন - টেবিলের মতোই ফরম্যাট
   const handlePrint = () => {
     const printWindow = window.open("", "_blank");
-    const tableRows = filteredPaymentList.map(
-      (dt, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${dt.date ? format(parseISO(dt.date), "dd-MMMM-yyyy") : ""}</td>
-        <td>${dt.supplier_name}</td>
-        <td>${dt.category}</td>
-        <td>${dt.items.map((item, i) => (
-                      <div key={i}>{item.item_name}</div>
-                    ))}</td>
-        <td>${dt.items.map((item, i) => (
-                      <div key={i}>{item.quantity}</div>
-                    ))}</td>
-        <td>${dt.items.map((item, i) => (
-                      <div key={i}>{item.unit_price}</div>
-                    ))}</td>
-        <td>${dt.service_charge}</td>
-        <td>${dt.total_amount}</td>
-        <td>${dt.pay_amount}</td>
-        <td>${parseFloat(dt.total_amount) - parseFloat(dt.pay_amount)}</td>
-        <td>${parseFloat(dt.pay_amount) === 0
-          ? "Unpaid"
-          : parseFloat(dt.pay_amount) >= parseFloat(dt.total_amount)
-            ? "Paid"
-            : "Partial"
-        }</td>
-      </tr>
-    `
-    );
+    
+    const tableRows = filteredPaymentList.map((dt, index) => {
+      const item = dt.purchase?.items?.[0];
+      const total = parseFloat(dt.total_amount) || 0;
+      const paid = parseFloat(dt.pay_amount) || 0;
+      const due = total - paid;
+      
+      let status = "Unpaid";
+      if (due === 0) {
+        status = "Paid";
+      } else if (paid > 0 && due > 0) {
+        status = "Partial";
+      }
+
+      return `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${tableFormatDate(dt.date)}</td>
+          <td>${dt.supplier_name}</td>
+          <td>${dt.category}</td>
+          <td>${item?.item_name || "-"}</td>
+          <td>${item?.quantity || "-"}</td>
+          <td>${item?.unit_price || "-"}</td>
+          <td>${dt.purchase?.service_charge || 0}</td>
+          <td>${dt?.total_amount || "-"}</td>
+          <td>${dt.pay_amount}</td>
+          <td>${due}</td>
+          <td>${status}</td>
+        </tr>
+      `;
+    }).join("");
 
     const htmlContent = `
     <html>
       <head>
-        <title>Print Report</title>
+        <title>পেমেন্ট রিপোর্ট</title>
         <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px;
+            direction: ltr;
+          }
+          h3 { 
+            text-align: center; 
+            margin-bottom: 20px;
+            color: #11375B;
+          }
           table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 10px;
           }
           th, td {
             border: 1px solid #ddd;
-            padding: 6px;
+            padding: 4px;
             text-align: left;
           }
           th {
             background-color: #11375B;
             color: white;
+            font-weight: bold;
           }
-             thead th {
+          tr:nth-child(even) {
+            background-color: #f9f9f9;
+          }
+          @media print {
+            body { margin: 0; }
+            table { font-size: 9px; }
+          }
+            thead th {
           color: #000000 !important;
           background-color: #ffffff !important;
           -webkit-print-color-adjust: exact !important;
@@ -241,34 +224,40 @@ const exportToExcel = () => {
         </style>
       </head>
       <body>
-        <h3>Payment Report</h3>
+        <h3>পেমেন্ট রিপোর্ট</h3>
         <table>
           <thead>
             <tr>
               <th>SL</th>
               <th>Date</th>
-              <th>Supplier Name</th>
+              <th>Supplier</th>
               <th>Category</th>
-              <th>Item Name</th>
-              <th>Qty</th>
-              <th>Unit Price</th>
+              <th>Item name</th>
+              <th>Quantity</th>
+              <th>Rate</th>
               <th>Service Charge</th>
-              <th>Total</th>
-              <th>Paid</th>
+              <th>Total Amount</th>
+              <th>Payment</th>
               <th>Due</th>
-              <th>Status</th>
+              <th>স্ট্যাটাস</th>
             </tr>
           </thead>
           <tbody>
-            ${tableRows.join("")}
+            ${tableRows}
           </tbody>
         </table>
+        <div style="margin-top: 20px; text-align: center; font-size: 12px;">
+          মোট রেকর্ড: ${filteredPaymentList.length}
+        </div>
       </body>
     </html>
   `;
+    
     printWindow.document.write(htmlContent);
     printWindow.document.close();
+    printWindow.focus();
     printWindow.print();
+    printWindow.onafterprint = () => printWindow.close();
   };
   // onsubmit
   const onSubmit = async (data) => {
@@ -546,13 +535,13 @@ const exportToExcel = () => {
 
                       <td className="px-1 py-2">{dt.supplier_name}</td>
                       <td className="px-1 py-2">{dt.category}</td>
-                      <td className="px-1 py-2">{dt.items.map((item, i) => (
+                      <td className="px-1 py-2">{dt?.purchase?.items?.map((item, i) => (
                       <div key={i}>{item.item_name}</div>
                     ))}</td>
-                      <td className="px-1 py-2">{dt.items.map((item, i) => (
+                      <td className="px-1 py-2">{dt.purchase?.items.map((item, i) => (
                       <div key={i}>{item.quantity}</div>
                     ))}</td>
-                      <td className="px-1 py-2">{dt.items.map((item, i) => (
+                      <td className="px-1 py-2">{dt.purchase?.items.map((item, i) => (
                       <div key={i}>{item.unit_price}</div>
                     ))}</td>
                     <td className="px-1 py-2">{dt.service_charge}</td>

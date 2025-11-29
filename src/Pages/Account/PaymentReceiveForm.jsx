@@ -9,6 +9,7 @@ import { FiCalendar } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../utils/axiosConfig";
+import { format } from "date-fns";
 
 const PaymentReceiveForm = () => {
   const { id } = useParams();
@@ -86,11 +87,16 @@ const PaymentReceiveForm = () => {
 
   const onSubmit = async (data) => {
     const refId = isEditing ? data.ref_id : generateRefId();
-    
+    const formatDate = (date) => {
+        if (!date) return null
+        const parsed = new Date(date)
+        return isNaN(parsed) ? null : format(parsed, "yyyy-MM-dd")
+      }
     try {
       const payload = {
       ...data,
     }
+    payload.date = formatDate(data.date)
 
     // যদি create হয়, নতুন ref_id generate করো
     if (!isEditing) {

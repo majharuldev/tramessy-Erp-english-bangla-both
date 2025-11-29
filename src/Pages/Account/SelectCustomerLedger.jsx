@@ -48,7 +48,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
     cust => cust.customer_name === selectedCustomerName
   );
   const dueAmount = selectedCustomer && selectedCustomer.due
-    ? parseFloat(selectedCustomer.due) || 0
+    ? toNumber(selectedCustomer.due) || 0
     : 0;
 
   // filter date 
@@ -81,7 +81,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
   const grandDue = totals.due + dueAmount;
 
   const totalRent = filteredLedger.reduce(
-    (sum, entry) => sum + parseFloat(entry.rec_amount || 0),
+    (sum, entry) => sum + toNumber(entry.rec_amount || 0),
     0
   );
 
@@ -400,9 +400,9 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
                         <td className="border px-2 py-1">
                           {receivedAmount ? receivedAmount : "--"}
                         </td>
-                        <td className="border px-2 py-1">
-                          {cumulativeDue}
-                        </td>
+                       <td className={`border border-gray-700 px-2 py-1 ${cumulativeDue < 0 ? 'text-red-600' : ''}`}>
+                      {cumulativeDue < 0 ? `(${Math.abs(cumulativeDue)})` : cumulativeDue}
+                    </td>
                       </tr>
                     );
                   });

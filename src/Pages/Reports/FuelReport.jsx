@@ -36,7 +36,10 @@ export default function FuelReport() {
     setLoading(true);
     try {
       const tripRes = await api.get(`/trip`);
-      setTripData(tripRes.data || []);
+      const approvedTrips = (tripRes?.data ?? []).filter(
+          (t) => t.status === "Approved"
+        );
+      setTripData(approvedTrips);
       generateFuelReport(tripRes.data);
     } catch (error) {
       console.error("Error fetching trip data", error);

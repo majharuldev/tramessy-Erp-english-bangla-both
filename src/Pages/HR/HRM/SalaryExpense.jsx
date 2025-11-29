@@ -20,6 +20,7 @@ import api from "../../../../utils/axiosConfig"
 import DatePicker from "react-datepicker"
 import { IoMdClose } from "react-icons/io"
 import toNumber from "../../../hooks/toNumber"
+import { tableFormatDate } from "../../../hooks/formatDate"
 
 
 const SalaryExpense = () => {
@@ -575,7 +576,7 @@ const SalaryExpense = () => {
                 filteredExpense.map((item, index) => (
                   <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="px-3 py-3 text-sm">{index + 1}</td>
-                    <td className="px-3 py-3 text-sm">{item.date}</td>
+                    <td className="px-3 py-3 text-sm">{tableFormatDate(item.date)}</td>
                     <td className="px-3 py-3 text-sm">{item.branch_name}</td>
                     <td className="px-3 py-3 text-sm">{item.paid_to}</td>
                     <td className="px-3 py-3 text-sm">{item.amount}</td>

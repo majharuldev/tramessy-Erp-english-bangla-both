@@ -596,7 +596,7 @@ const normalizeDate = (dateStr) => {
                 <th className="px-4 py-3">Parts Cost</th>
                 <th className="px-4 py-3">Fuel Cost</th>
                 <th className="px-4 py-3">Engine Oil</th>
-                <th className="px-4 py-3">Net Profit</th>
+                <th className="px-4 py-3">Gross Profit</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">

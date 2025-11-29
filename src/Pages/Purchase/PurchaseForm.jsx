@@ -10,6 +10,7 @@ import useAdmin from "../../hooks/useAdmin";
 import { AuthContext } from "../../providers/AuthProvider";
 import { IoMdClose } from "react-icons/io";
 import FormSkeleton from "../../components/Form/FormSkeleton";
+import axios from "axios";
 
 const PurchaseForm = () => {
   const navigate = useNavigate();
@@ -293,12 +294,14 @@ const PurchaseForm = () => {
           const SECRET_KEY = "ae771458";
           const CALLER_ID = "1234";
            // Correct URL (same structure as your given example)
-          const smsUrl = `http://smpp.revesms.com:7788/sendtext?apikey=${API_KEY}&secretkey=${SECRET_KEY}&callerID=${CALLER_ID}&toUser=${adminNumber}&messageContent=${encodeURIComponent(messageContent)}`;
+          const smsUrl = `https://smpp.revesms.com:7790/sendtext?apikey=${API_KEY}&secretkey=${SECRET_KEY}&callerID=${CALLER_ID}&toUser=${adminNumber}&messageContent=${encodeURIComponent(
+        messageContent
+      )}`;
           try {
-            await fetch(smsUrl);
+             await axios.post(smsUrl);
             toast.success("SMS sent to admin!");
           } catch (smsError) {
-            // console.error("SMS sending failed:", smsError);
+            console.error("SMS sending failed:", smsError);
             // toast.error("Trip saved, but SMS failed to send.");
           }
         }

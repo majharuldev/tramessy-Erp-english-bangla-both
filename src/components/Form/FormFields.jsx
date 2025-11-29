@@ -135,7 +135,7 @@ export const InputField = ({
   //  If type="date" → Use react-datepicker
   if (type === "date") {
     return (
-      <div className="mb-4">
+      <div className="mb-4 ">
         {label && (
           <label
             htmlFor={name}

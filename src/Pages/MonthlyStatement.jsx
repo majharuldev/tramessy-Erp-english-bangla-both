@@ -31,11 +31,11 @@ const MonthlyStatement = () => {
       ]);
 
       // Only approved trips
-const trips = (tripsRes.data?.data || []).filter(
+const trips = (tripsRes.data || []).filter(
   (trip) => trip.status === "Approved"
 );
       const purchases = purchasesRes.data?.data || [];
-      const expenses = expensesRes.data?.data || [];
+      const expenses = expensesRes.data || [];
 
       const monthlyData = {};
 
@@ -43,7 +43,7 @@ const trips = (tripsRes.data?.data || []).filter(
 
       // Process all data
       trips.forEach(trip => {
-        const month = getMonthKey(trip.date);
+        const month = getMonthKey(trip.start_date);
         if (!monthlyData[month]) {
           monthlyData[month] = {
             ownTripIncome: 0,
@@ -109,9 +109,9 @@ const trips = (tripsRes.data?.data || []).filter(
         }
 
         if (expense.payment_category === "Salary") {
-          monthlyData[month].salaryExpense += parseFloat(expense.pay_amount) || 0;
+          monthlyData[month].salaryExpense += parseFloat(expense.amount) || 0;
         } else {
-          monthlyData[month].officeExpense += parseFloat(expense.pay_amount) || 0;
+          monthlyData[month].officeExpense += parseFloat(expense.amount) || 0;
         }
       });
 

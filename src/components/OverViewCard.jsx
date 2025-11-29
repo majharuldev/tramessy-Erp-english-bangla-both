@@ -2,18 +2,29 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 import api from "../../utils/axiosConfig";
+import toNumber from "../hooks/toNumber";
 const OverViewCard = () => {
   const [tripCost, setTripCost] = useState(0);
   const [tripCommission, setTripCommission] = useState(0);
   const [tripLabor, setTripLabor] = useState(0);
   const [tripOtherCost, setTripOtherCost] = useState(0);
-  const [dailySales, setDailySales] = useState(0  );
+  const [dailySales, setDailySales] = useState(0);
   const [otherExpense, setOtherExpense] = useState(0);
   const [totalTodayExpense, setTotalTodayExpense] = useState(0);
   const [totalDispatch, setTotalDispatch] = useState(0);
   const [totalReceiveAmount, setTotalReceiveAmount] = useState(0);
   const today = dayjs().format("YYYY-MM-DD");
   const [todayTripCount, setTodayTripCount] = useState(0);
+  const [tripExpense, setTripExpense] = useState(0);
+  const [purchaseExpense, setPurchaseExpense] = useState(0);
+  const [officeExpense, setOfficeExpense] = useState(0);
+  const [salaryExpense, setSalaryExpense] = useState(0);
+  useEffect(() => {
+    fetchTripData();
+    fetchPurchaseData();
+    fetchOfficeAndSalaryExpense();
+  }, []);
+
   // daily trip
   useEffect(() => {
     api
@@ -23,13 +34,14 @@ const OverViewCard = () => {
         // Get today's date in YYYY-MM-DD format
         const today = new Date().toISOString().split("T")[0];
         // Only today's approved trips
-    const todayApprovedTrips = allTrips.filter(
-      (trip) => trip.start_date === today && trip.status === "Approved"
-    );
+        const todayApprovedTrips = allTrips.filter(
+          (trip) => trip.start_date === today && trip.status === "Approved"
+        );
         // Set today's trip count
         setTodayTripCount(todayApprovedTrips.length);
       });
   }, []);
+
   // daily sales
   useEffect(() => {
     api
@@ -39,7 +51,7 @@ const OverViewCard = () => {
         const today = new Date().toISOString().split("T")[0];
         const sale = data
           .filter((item) => item.start_date === today && item.status === "Approved")
-          .reduce((sum, trip) => sum + parseFloat(trip.total_rent || 0), 0);
+          .reduce((sum, trip) => sum + toNumber(trip.total_rent || 0), 0);
 
         setDailySales(sale);
       })
@@ -47,92 +59,77 @@ const OverViewCard = () => {
         console.error("Error fetching trip data:", error);
       });
   }, []);
-  // daily expense
-  useEffect(() => {
-    const fetchTodayExpenses = async () => {
-      try {
-        // Fetch Purchase
-        const purchaseRes = await api.get(
-          `/purchase`
-        );
-        const purchases = purchaseRes.data?.data || [];
-        const todayPurchases = purchases.filter((item) => item.date === today);
-        const purchaseTotal = todayPurchases.reduce((sum, item) => {
-          const qty = parseFloat(item.quantity);
-          const price = parseFloat(item.unit_price);
-          return sum + (isNaN(qty) || isNaN(price) ? 0 : qty * price);
-        }, 0);
 
-        // Fetch Trips
-        const tripRes = await api.get(
-          `/trip`
-        );
-        const trips = tripRes.data || [];
-        const todayTrips = trips.filter((item) => item.start_date === today && item.status === "Approved");
+  //  1. Trip Expense Calculate
+  const fetchTripData = async () => {
+    try {
+      const res = await api.get("/trip");
 
-        let commission = 0;
-        let labor = 0;
-        let other = 0;
+      const total = res.data.reduce((sum, item) => {
+        return sum + toNumber(item.total_exp);
+      }, 0);
 
-        todayTrips.forEach((trip) => {
-          commission += parseFloat(trip.driver_commission) || 0;
-          labor += parseFloat(trip.labor) || 0;
+      setTripExpense(total);
+    } catch (error) {
+      console.error("Trip fetch error:", error);
+    }
+  };
 
-          const otherFields = [
-            "fuel_cost",
-            "road_cost",
-            "food_cost",
-            "body_fare",
-            "toll_cost",
-            "feri_cost",
-            "police_cost",
-            "driver_adv",
-            "chada",
-            "parking_cost",
-            "night_guard",
-            "unload_charge",
-            "extra_fare",
-            "vehicle_rent",
-          ];
+  // 2. Purchase Expense Calculate
+  const fetchPurchaseData = async () => {
+    try {
+      const res = await api.get("/purchase");
 
-          otherFields.forEach((field) => {
-            const val = parseFloat(trip[field]);
-            if (!isNaN(val)) {
-              other += val;
-            }
-          });
-        });
+      const total = res.data.data.reduce((sum, p) => {
+        const purchaseAmount = toNumber(p.purchase_amount);
+        const serviceCharge = toNumber(p.service_charge);
+        return sum + purchaseAmount + serviceCharge;
+      }, 0);
 
-        const tripTotal = commission + labor + other;
-        const totalExpense = purchaseTotal + tripTotal;
+      setPurchaseExpense(total);
+    } catch (error) {
+      console.error("Purchase fetch error:", error);
+    }
+  };
 
-        setTripCost(tripTotal);
-        setOtherExpense(purchaseTotal);
-        setTotalTodayExpense(totalExpense);
+  //  3. Office Expense + Salary Expense Calculate (from same API)
+  const fetchOfficeAndSalaryExpense = async () => {
+    try {
+      const res = await api.get("/expense");
 
-        // Optional: Set breakdowns if you want to show them individually
-        setTripCommission(commission);
-        setTripLabor(labor);
-        setTripOtherCost(other);
-      } catch (err) {
-        console.error("Error fetching expenses:", err);
-      }
-    };
+      let office = 0;
+      let salary = 0;
 
-    fetchTodayExpenses();
-  }, [today]);
+      res.data.forEach((item) => {
+        if (item.payment_category === "Utility") {
+          office += toNumber(item.amount);
+        }
+        if (item.payment_category === "Salary") {
+          salary += toNumber(item.amount);
+        }
+      });
+
+      setOfficeExpense(office);
+      setSalaryExpense(salary);
+    } catch (error) {
+      console.error("Expense fetch error:", error);
+    }
+  };
+
+  const totalExpense = tripExpense + purchaseExpense + officeExpense + salaryExpense;
 
   // daily cash dispatch
   useEffect(() => {
     const fetchDispatch = async () => {
       try {
         const response = await api.get(
-          `/account`
+          `/fundTransfer`
         );
         const data = response.data?.data || [];
         const total = data
-          .filter((item) => item.date === today)
-          .reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+          .filter((item) => dayjs(item.date).format("YYYY-MM-DD") === today)
+          .reduce((sum, item) => sum + toNumber(item.amount || 0), 0);
+
         setTotalDispatch(total);
       } catch (error) {
         console.error("Failed to fetch dispatch data:", error);
@@ -145,12 +142,12 @@ const OverViewCard = () => {
     const fetchAmount = async () => {
       try {
         const response = await api.get(
-          `/paymentRecived`
+          `/payment-recieve`
         );
         const data = response.data?.data || [];
         const total = data
-          .filter((item) => item.date === today)
-          .reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+          .filter((item) => dayjs(item.date).format("YYYY-MM-DD") === today)
+          .reduce((sum, item) => sum + toNumber(item.amount || 0), 0);
         setTotalReceiveAmount(total);
       } catch (error) {
         console.error("Failed to fetch receive amount data:", error);
@@ -158,6 +155,7 @@ const OverViewCard = () => {
     };
     fetchAmount();
   }, [today]);
+
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -210,42 +208,46 @@ const OverViewCard = () => {
             </div>
           </div>
         </div>
-        {/* daily expense */}
-        <div className="col-span-2 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg p-6 border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-700 border-b border-gray-300 pb-3 mb-4">
+        {/* Daily Expense Summary */}
+        <div className="col-span-2 bg-white rounded-xl shadow-md p-5 border border-gray-200">
+          <h3 className="text-lg font-bold text-gray-700 border-b border-gray-200 pb-1 mb-3">
             📋 Daily Expense Summary
           </h3>
 
-          <div className="text-sm text-gray-700">
-            <div className="grid grid-cols-5 gap-3 font-semibold py-2 px-3 bg-gray-100 rounded-md">
-              <div>Expense Type</div>
-              <div className="text-center">Commission</div>
-              <div className="text-center">Labor</div>
-              <div className="text-right">Others</div>
-              <div className="text-right">Total</div>
-            </div>
+          {/* Header */}
+          <div className="grid grid-cols-2 text-sm font-semibold text-gray-700 bg-gray-100 py-1.5 px-3 rounded-md">
+            <div>Expense Type</div>
+            <div className="text-right">Amount</div>
+          </div>
 
-            <div className="grid grid-cols-5 gap-3 py-2 px-3 items-center hover:bg-gray-50 transition">
-              <div className="font-medium text-gray-700">Trip Cost</div>
-              <div className="text-center">{tripCommission.toFixed(2)} TK</div>
-              <div className="text-center">{tripLabor.toFixed(2)} TK</div>
-              <div className="text-right">{tripOtherCost.toFixed(2)} TK</div>
-              <div className="text-right">{tripCost.toFixed(2)} TK</div>
-            </div>
+          {/* Row */}
+          <div className="grid grid-cols-2 text-sm py-1.5 px-3 border-b border-gray-200">
+            <div>Trip Expense</div>
+            <div className="text-right">{tripExpense}</div>
+          </div>
 
-            <div className="border-t border-gray-200 pt-2 space-y-2">
-              <div className="flex justify-between font-medium">
-                <span>🧾 Other Expenses (Purchase)</span>
-                <span>{otherExpense.toFixed(2)} TK</span>
-              </div>
+          <div className="grid grid-cols-2 text-sm py-1.5 px-3 border-b border-gray-200">
+            <div>Purchase Expense</div>
+            <div className="text-right">{purchaseExpense}</div>
+          </div>
 
-              <div className="flex justify-between font-bold text-base text-gray-700 border-t border-dashed border-gray-300 pt-3 mt-2">
-                <span>💰 Total Expense</span>
-                <span>{totalTodayExpense.toFixed(2)} TK</span>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 text-sm py-1.5 px-3 border-b border-gray-200">
+            <div>Office Expense</div>
+            <div className="text-right">{officeExpense}</div>
+          </div>
+
+          <div className="grid grid-cols-2 text-sm py-1.5 px-3 border-b border-gray-200">
+            <div>Salary Expense</div>
+            <div className="text-right">{salaryExpense}</div>
+          </div>
+
+          {/* Total */}
+          <div className="grid grid-cols-2 text-sm font-bold py-2 px-3 mt-1">
+            <div>Total Expense</div>
+            <div className="text-right">{totalExpense}</div>
           </div>
         </div>
+
       </div>
     </div>
   );

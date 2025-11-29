@@ -3,10 +3,14 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { MdOutlineArrowDropDown } from "react-icons/md";
-import * as XLSX from "xlsx"; 
+import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import api from "../../../utils/axiosConfig";
+import { tableFormatDate } from "../../hooks/formatDate";
+import DatePicker from "react-datepicker";
+import { FaFilter } from "react-icons/fa6";
+import toNumber from "../../hooks/toNumber";
 
 const SupplierLedger = () => {
   const [supplies, setSupplies] = useState([]); // Supplier dropdown options
@@ -15,6 +19,10 @@ const SupplierLedger = () => {
   const [selectedSupplier, setSelectedSupplier] = useState("");
   const [openingBalance, setOpeningBalance] = useState(0);
   const [currentBalance, setCurrentBalance] = useState(0);
+  const [showFilter, setShowFilter] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [filteredLedger, setFilteredLedger] = useState([]);
 
   // Fetch supplies list
   useEffect(() => {
@@ -52,7 +60,7 @@ const SupplierLedger = () => {
       const selectedSupply = supplies.find(
         (supply) => supply.supplier_name === selectedSupplier
       );
-      
+
       if (selectedSupply) {
         // Set opening balance from supplier's due_amount
         const newOpeningBalance = parseFloat(selectedSupply.due_amount) || 0;
@@ -89,16 +97,55 @@ const SupplierLedger = () => {
     }
   }, [selectedSupplier, supplies]);
 
-    //  Excel Export
+  //  filter ledger data based on selected supplier and date range
+  useEffect(() => {
+  const filtered = supplierLedger.filter((item) => {
+    const supplierMatch = selectedSupplier
+      ? item.supplier_name === selectedSupplier
+      : true;
+
+    const itemDate = new Date(item.date);
+    itemDate.setHours(0, 0, 0, 0);
+
+    // No date filter
+    if (!startDate && !endDate) return supplierMatch;
+
+    // Only start date
+    if (startDate && !endDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      return supplierMatch && itemDate.getTime() === start.getTime();
+    }
+
+    // Range filter
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+
+      return supplierMatch && itemDate >= start && itemDate <= end;
+    }
+
+    return supplierMatch;
+  });
+
+  setFilteredLedger(filtered);
+}, [supplierLedger, selectedSupplier, startDate, endDate]);
+
+
+  //  Excel Export
   const exportExcel = () => {
     const tableData = ledgerWithBalance.map((item, index) => ({
       SL: index + 1,
       Date: item?.date,
+      Supplier: item?.supplier_name,
       Particulars: item?.remarks || "",
       Mode: item?.mode || "",
-      PurchaseAmount: item?.purchase_amount || "",
-      PaymentAmount: item?.pay_amount || "",
-      Balance: item?.runningBalance || "",
+      PurchaseAmount: toNumber(item?.purchase_amount) || "",
+      PaymentAmount: toNumber(item?.pay_amount) || "",
+      Balance: toNumber(item?.runningBalance) || "",
     }));
 
     const ws = XLSX.utils.json_to_sheet(tableData);
@@ -119,9 +166,9 @@ const SupplierLedger = () => {
       head: [["SL", "Date", "Particulars", "Mode", "Purchase", "Payment", "Balance"]],
       body: ledgerWithBalance.map((item, index) => [
         index + 1,
-       item.date,
+        item.date,
         item.remarks || "",
-        item.mode|| "",
+        item.mode || "",
         item?.purchase_amount || 0,
         item?.pay_amount || 0,
         item?.runningBalance || 0,
@@ -176,19 +223,19 @@ const SupplierLedger = () => {
             </thead>
             <tbody>
               ${ledgerWithBalance
-                .map(
-                  (item, i) => `
+        .map(
+          (item, i) => `
                 <tr>
                   <td>${i + 1}</td>
                   <td>${item?.date}</td>
-                  <td>${item?.remarks  || "--"}</td>
+                  <td>${item?.remarks || "--"}</td>
                   <td>${item?.mode || "--"}</td>
                   <td>${item?.purchase_amount || 0}</td>
                   <td>${item?.pay_amount || 0}</td>
                   <td>${item?.runningBalance || 0}</td>
                 </tr>`
-                )
-                .join("")}
+        )
+        .join("")}
             </tbody>
           </table>
           <div class="footer">
@@ -205,9 +252,9 @@ const SupplierLedger = () => {
   // Calculate running balance
   const calculateRunningBalance = () => {
     let balance = openingBalance;
-    return supplierLedger.map((item) => {
-      const purchase = parseFloat(item.purchase_amount) || 0;
-      const payment = parseFloat(item.pay_amount) || 0;
+    return filteredLedger.map((item) => {
+      const purchase = toNumber(item.purchase_amount) || 0;
+      const payment = toNumber(item.pay_amount) || 0;
       balance += purchase - payment;
       return {
         ...item,
@@ -219,10 +266,10 @@ const SupplierLedger = () => {
   const ledgerWithBalance = calculateRunningBalance();
 
   // Closing balance 
-const closingBalance =
-  ledgerWithBalance.length > 0
-    ? ledgerWithBalance[ledgerWithBalance.length - 1].runningBalance
-    : openingBalance;
+  const closingBalance =
+    ledgerWithBalance.length > 0
+      ? ledgerWithBalance[ledgerWithBalance.length - 1].runningBalance
+      : openingBalance;
 
   if (loading) return <p className="text-center mt-16">Loading data...</p>;
 
@@ -251,39 +298,87 @@ const closingBalance =
               Print
             </button>
           </div>
-          <div className="mt-3 md:mt-0 w-full md:w-64 relative">
-            <label className="text-gray-700 text-sm font-semibold">
-              Select Supplier Ledger
-            </label>
-            <select
-              value={selectedSupplier}
-              onChange={(e) => setSelectedSupplier(e.target.value)}
-              className="mt-1 w-full text-gray-700 text-sm border border-gray-300 bg-white p-2 rounded appearance-none outline-none"
-            >
-              <option value="">Select supplier</option>
-              {supplies.map((supply, idx) => (
-                <option key={idx} value={supply.supplier_name}>
-                  {supply.supplier_name} 
-                  {/* (Due: {supply.due_amount}) */}
-                </option>
-              ))}
-            </select>
-            <MdOutlineArrowDropDown className="absolute top-[35px] right-2 pointer-events-none text-xl text-gray-500" />
+          <div className="flex gap-2">
+            <button onClick={() => setShowFilter((prev) => !prev)} className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300">
+              <FaFilter /> Filter
+            </button>
           </div>
         </div>
+        {showFilter && (
+          <div className="md:flex items-center gap-4 border border-gray-300 rounded-md p-5 mb-4">
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Start Date"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
+
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="End Date"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
+
+            <div className="mt-3 md:mt-0 w-full relative">
+              {/* <label className="text-gray-700 text-sm font-semibold">
+              Select Supplier Ledger
+            </label> */}
+              <select
+                value={selectedSupplier}
+                onChange={(e) => setSelectedSupplier(e.target.value)}
+                className=" w-full text-gray-700 text-sm border border-gray-300 bg-white p-2 rounded appearance-none outline-none"
+              >
+                <option value="">All Supplier</option>
+                {supplies.map((supply, idx) => (
+                  <option key={idx} value={supply.supplier_name}>
+                    {supply.supplier_name}
+                    {/* (Due: {supply.due_amount}) */}
+                  </option>
+                ))}
+              </select>
+              <MdOutlineArrowDropDown className="absolute top-[14px] right-2 pointer-events-none text-xl text-gray-500" />
+            </div>
+            <button
+              onClick={() => {
+                setStartDate("");
+                setEndDate("");
+                setSelectedSupplier("");
+                setShowFilter(false);
+              }}
+              className="bg-primary text-white px-2 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+            >
+              <FaFilter /> Clear
+            </button>
+          </div>
+
+        )}
 
         {/* Table */}
         <div className="w-full mt-5 overflow-x-auto border border-gray-200">
           <table className="w-full text-sm text-left">
             <thead className="text-black capitalize font-bold">
               <tr>
-    <td colSpan="6" className="text-right border border-gray-700 px-2 py-2">
-      Closing Balance:
-    </td>
-    <td className="border border-gray-700 px-2 py-2">
-      {closingBalance < 0 ? `${Math.abs(closingBalance)}` : closingBalance}
-    </td>
-  </tr>
+                <td colSpan="6" className="text-right border border-gray-700 px-2 py-2">
+                  Closing Balance:
+                </td>
+                <td className="border border-gray-700 px-2 py-2">
+                  {closingBalance < 0 ? `(${Math.abs(closingBalance)})` : closingBalance}
+                </td>
+              </tr>
               <tr>
                 <th className="border border-gray-700 px-2 py-1">SL.</th>
                 <th className="border border-gray-700 px-2 py-1">Date</th>
@@ -312,7 +407,7 @@ const closingBalance =
                     {index + 1}.
                   </td>
                   <td className="border border-gray-700 px-2 py-1">
-                    {dt.date}
+                    {tableFormatDate(dt.date)}
                   </td>
                   <td className="border border-gray-700 px-2 py-1">
                     {dt.remarks}
@@ -327,8 +422,8 @@ const closingBalance =
                     {dt.pay_amount}
                   </td>
                   <td className="border border-gray-700 px-2 py-1">
-                    {dt.runningBalance < 0 
-                      ? `${Math.abs(dt.runningBalance)}` 
+                    {dt.runningBalance < 0
+                      ? `(${Math.abs(dt.runningBalance)})`
                       : dt.runningBalance}
                   </td>
                 </tr>

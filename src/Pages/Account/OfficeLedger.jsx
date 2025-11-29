@@ -368,7 +368,7 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
                  <span className="text-gray-800">{totalCashOut}</span>
                 </td>
                 <td className="border border-gray-700 px-2 py-2">
-                <span className="text-gray-800">{totalBalance.toFixed(2)}</span>
+                <span className={`text-gray-800 ${totalBalance < 0 ? 'text-red-600' : 'text-gray-800'}`}>{totalBalance <0 ? `(${totalBalance})`: totalBalance}</span>
                 </td>
                 <td className="border border-gray-700 px-2 py-2"></td>
               </tr>
@@ -415,9 +415,9 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
                   <td className="border border-gray-700 px-2 py-1">
                     {dt.cash_out || "--"}
                   </td>
-                  <td className="border border-gray-700 px-2 py-1">
+                  <td className={`border border-gray-700 px-2 py-1 `}>
                     {dt.runningBalance < 0
-                      ? `${Math.abs(dt.runningBalance)}`
+                      ? `(${Math.abs(dt.runningBalance)})`
                       : dt.runningBalance}
                   </td>
                   <td className="border border-gray-700 px-2 py-1">

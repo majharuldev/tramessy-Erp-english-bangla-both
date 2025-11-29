@@ -11,6 +11,7 @@ import CreatableSelect from "react-select/creatable"
 import { IoIosRemoveCircle } from "react-icons/io"
 import api from "../../../utils/axiosConfig"
 import { tableFormatDate } from "../../hooks/formatDate"
+import DatePicker from "react-datepicker"
 
 pdfMake.vfs = pdfFonts.vfs
 
@@ -537,57 +538,33 @@ const Bill = () => {
         </div>
 
         {showFilter && (
-          <div className="flex gap-4 border border-gray-300 rounded-md p-5 my-5">
-            <div className="relative w-full">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value)
-                  setCurrentPage(1)
-                }}
-                className="w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-              />
-              {startDate && (
-                <button
-                  onClick={() => {
-                    setStartDate("")
-                    setCurrentPage(1)
-                  }}
-                  className="absolute right-8 top-1.5 text-gray-600 hover:text-gray-900"
-                  aria-label="Clear start date"
-                  type="button"
-                >
-                  &times;
-                </button>
-              )}
-            </div>
-            <div className="relative w-full">
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => {
-                  setEndDate(e.target.value)
-                  setCurrentPage(1)
-                }}
-                className="w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
-              />
-              {endDate && (
-                <button
-                  onClick={() => {
-                    setEndDate("")
-                    setCurrentPage(1)
-                  }}
-                  className="absolute right-8 top-1.5 text-gray-600 hover:text-gray-900"
-                  aria-label="Clear end date"
-                  type="button"
-                >
-                  &times;
-                </button>
-              )}
-            </div>
-            {/* customer filter */}
-            <div className="w-full relative">
+          <div className="md:flex items-center gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              locale="en-GB"
+              className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
+              isClearable
+            />
+            <div className=" w-full">
               <CreatableSelect
                 isClearable
                 placeholder="Select or create customer..."
@@ -605,17 +582,17 @@ const Bill = () => {
                 className="text-sm"
               />
             </div>
-            <div className="w-xs ">
+            <div className="">
               <button
                 onClick={() => {
                   setStartDate("");
                   setEndDate("");
+                  setSelectedCustomer("");
                   setShowFilter(false);
-                  setSelectedCustomer("")
                 }}
-                className="w-full bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                className="bg-primary text-white px-2 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <IoIosRemoveCircle /> Clear
+                <FaFilter /> Clear
               </button>
             </div>
           </div>
@@ -632,7 +609,7 @@ const Bill = () => {
                 <th className="border border-gray-700 px-2 py-1">Truck No</th>
                 <th className="border border-gray-700 px-2 py-1">Load Point</th>
                 <th className="border border-gray-700 px-2 py-1">Unload Point</th>
-                <th className="border border-gray-700 px-2 py-1">Rent Rent</th>
+                <th className="border border-gray-700 px-2 py-1">Total Rent</th>
                 <th className="border border-gray-700 px-2 py-1">Demurrage</th>
                 <th className="border border-gray-700 px-2 py-1">Bill Amount</th>
                 <th className="border border-gray-700 px-2 py-1">BillStatus</th>

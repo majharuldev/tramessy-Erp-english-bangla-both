@@ -90,11 +90,16 @@ const CashDispatchForm = () => {
   // post data on server
   const onSubmit = async (data) => {
     const refId = isEditing ? data.ref_id : generateRefId()
-
+const formatDate = (date) => {
+        if (!date) return null
+        const parsed = new Date(date)
+        return isNaN(parsed) ? null : format(parsed, "yyyy-MM-dd")
+      }
     try {
      const payload = {
       ...data,
     }
+    payload.date = formatDate(data.date)
 
     // যদি create হয়, নতুন ref_id generate করো
     if (!isEditing) {

@@ -91,8 +91,8 @@ useEffect(() => {
       };
     }
 
-      Cookies.set("auth_token", token, { expires: 1 });
-       Cookies.set("auth_user", JSON.stringify(user), { expires: 1 });
+      Cookies.set("auth_token", token);
+       Cookies.set("auth_user", JSON.stringify(user));
 
       // login এর পরে user details আনো
       // const userRes = await api.get("/user");
