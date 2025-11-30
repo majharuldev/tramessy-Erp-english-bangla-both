@@ -17,9 +17,12 @@ const useProfitLoseData = (filterType = "year") => {
           api.get(`/expense`)
         ]);
 
-        const trips = tripsRes.data?.data || [];
+        // const trips = tripsRes.data || [];
+        const trips = (tripsRes.data || []).filter(
+  (trip) => trip.status === "Active"
+);
         const purchases = purchasesRes.data?.data || [];
-        const expenses = expensesRes.data?.data || [];
+        const expenses = expensesRes.data || [];
 
         const monthlyData = {};
         const getMonthKey = (date) => dayjs(date).format("YYYY-MM");
@@ -89,9 +92,9 @@ const useProfitLoseData = (filterType = "year") => {
             };
           }
           if (expense.payment_category === "Salary") {
-            monthlyData[month].salaryExpense += parseFloat(expense.pay_amount) || 0;
+            monthlyData[month].salaryExpense += parseFloat(expense.amount) || 0;
           } else {
-            monthlyData[month].officeExpense += parseFloat(expense.pay_amount) || 0;
+            monthlyData[month].officeExpense += parseFloat(expense.amount) || 0;
           }
         });
 

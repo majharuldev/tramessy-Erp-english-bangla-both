@@ -14,10 +14,12 @@ import {
   Legend
 } from "recharts";
 import useProfitLoseData from "../hooks/useProfitLoseHooks";
+import useAdmin from "../hooks/useAdmin";
 
 const Home = () => {
   const { data:monthlyData, loading: monthlyLoading } = useProfitLoseData("month");
   const { data:yearlyData, loading: yearlyLoading } = useProfitLoseData("year");
+  const isAdmin = useAdmin()
   return (
     <div className="p-2">
       <OverViewCard />
@@ -27,7 +29,7 @@ const Home = () => {
         </div>
        
       </div>
-       <div className=" grid grid-cols-1 md:grid-cols-2 gap-5">
+       {isAdmin && <div className=" grid grid-cols-1 md:grid-cols-2 gap-5">
          
           {/* <ProfitLossChartCard/> */}
           <div>
@@ -80,7 +82,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-        </div>
+        </div>}
       <SalesChart />
        {/* <PieChart /> */}
     </div>

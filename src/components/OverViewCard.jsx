@@ -3,6 +3,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import api from "../../utils/axiosConfig";
 import toNumber from "../hooks/toNumber";
+import useAdmin from "../hooks/useAdmin";
 const OverViewCard = () => {
   const [tripCost, setTripCost] = useState(0);
   const [tripCommission, setTripCommission] = useState(0);
@@ -19,11 +20,12 @@ const OverViewCard = () => {
   const [purchaseExpense, setPurchaseExpense] = useState(0);
   const [officeExpense, setOfficeExpense] = useState(0);
   const [salaryExpense, setSalaryExpense] = useState(0);
+  const isAdmin = useAdmin();
   useEffect(() => {
     fetchTripData();
     fetchPurchaseData();
     fetchOfficeAndSalaryExpense();
-  }, []);
+  }, [today]);
 
   // daily trip
   useEffect(() => {
@@ -60,61 +62,58 @@ const OverViewCard = () => {
       });
   }, []);
 
-  //  1. Trip Expense Calculate
+  // daily expense
+  // trip expense
   const fetchTripData = async () => {
     try {
-      const res = await api.get("/trip");
-
-      const total = res.data.reduce((sum, item) => {
-        return sum + toNumber(item.total_exp);
-      }, 0);
-
-      setTripExpense(total);
+      const res = await api.get("/trip")
+      const total = res.data
+        .filter((item) => item.start_date === today)
+        .reduce((sum, item) => {
+          return sum + toNumber(item.total_exp)
+        }, 0)
+      setTripExpense(total)
     } catch (error) {
-      console.error("Trip fetch error:", error);
+      console.error("Trip fetch error:", error)
     }
-  };
-
-  // 2. Purchase Expense Calculate
+  }
+// daily purchase expense
   const fetchPurchaseData = async () => {
     try {
-      const res = await api.get("/purchase");
-
-      const total = res.data.data.reduce((sum, p) => {
-        const purchaseAmount = toNumber(p.purchase_amount);
-        const serviceCharge = toNumber(p.service_charge);
-        return sum + purchaseAmount + serviceCharge;
-      }, 0);
-
-      setPurchaseExpense(total);
+      const res = await api.get("/purchase")
+      const total = res.data.data
+        .filter((p) => p.date === today)
+        .reduce((sum, p) => {
+          const purchaseAmount = toNumber(p.purchase_amount)
+          return sum + purchaseAmount
+        }, 0)
+      setPurchaseExpense(total)
     } catch (error) {
-      console.error("Purchase fetch error:", error);
+      console.error("Purchase fetch error:", error)
     }
-  };
-
-  //  3. Office Expense + Salary Expense Calculate (from same API)
+  }
+// office and salary expense
   const fetchOfficeAndSalaryExpense = async () => {
     try {
-      const res = await api.get("/expense");
-
-      let office = 0;
-      let salary = 0;
-
+      const res = await api.get("/expense")
+      let office = 0
+      let salary = 0
       res.data.forEach((item) => {
-        if (item.payment_category === "Utility") {
-          office += toNumber(item.amount);
+        if (item.date === today) {
+          if (item.payment_category === "Utility") {
+            office += toNumber(item.amount)
+          }
+          if (item.payment_category === "Salary") {
+            salary += toNumber(item.amount)
+          }
         }
-        if (item.payment_category === "Salary") {
-          salary += toNumber(item.amount);
-        }
-      });
-
-      setOfficeExpense(office);
-      setSalaryExpense(salary);
+      })
+      setOfficeExpense(office)
+      setSalaryExpense(salary)
     } catch (error) {
-      console.error("Expense fetch error:", error);
+      console.error("Expense fetch error:", error)
     }
-  };
+  }
 
   const totalExpense = tripExpense + purchaseExpense + officeExpense + salaryExpense;
 
@@ -178,7 +177,7 @@ const OverViewCard = () => {
           <div className="text-gray-700 text-sm space-y-2">
             <div className="flex justify-between font-semibold">
               <span>Total Sale</span>-
-              <span>{dailySales.toLocaleString()} TK</span>
+              <span>{isAdmin? (dailySales.toLocaleString()) :  "Hide"} TK</span>
             </div>
           </div>
         </div>

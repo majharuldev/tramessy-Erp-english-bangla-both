@@ -2103,6 +2103,7 @@ const exportTripsToExcel = async () => {
                   <div><strong>Vehicle No:</strong> {selectedTrip.vehicle_no || "N/A"}</div>
                   <div><strong>Vendor Name:</strong> {selectedTrip.vendor_name || "N/A"}</div>
                   <div><strong>Driver Name:</strong> {selectedTrip.driver_name || "N/A"}</div>
+                   <div><strong>Driver Mobile:</strong> {selectedTrip.driver_mobile || "N/A"}</div>
                   <div><strong>Product Details:</strong> {selectedTrip.product_details || "N/A"}</div>
                   <div><strong>Invoice No:</strong> {selectedTrip.invoice_no || 0}</div>
                   <div><strong>Buyar Name:</strong> {selectedTrip.buyar_name || "N/A"}</div>
