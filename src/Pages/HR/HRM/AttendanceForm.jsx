@@ -28,12 +28,12 @@ const AdvanceSalaryForm = () => {
         ]);
 
         if (empRes.data?.success) {
-        //  active employee filter
-        const activeEmployees = empRes.data.data.filter(
-          (employee) => employee.status?.toLowerCase() === "active"
-        );
-        setEmployees(activeEmployees);
-      }
+          //  active employee filter
+          const activeEmployees = empRes.data.data.filter(
+            (employee) => employee.status?.toLowerCase() === "active"
+          );
+          setEmployees(activeEmployees);
+        }
         if (userRes.data?.name) setUserName(userRes.data.name);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -42,27 +42,32 @@ const AdvanceSalaryForm = () => {
     fetchData();
   }, [userId]);
 
-  // Fetch existing advance salary (for edit mode)
-  // useEffect(() => {
-  //   if (id) {
-  //     const fetchAdvanceSalary = async () => {
-  //       try {
-  //         const res = await api.get(`/attendence/${id}`);
-  //         const data = res.data?.data;
-  //         if (data) {
-  //           setValue("employee_id", data.employee_id);
-  //           setValue("working_day", data.working_day);
-  //           setValue("month", data.month);
-  //           setValue("created_by", data.created_by);
-  //         }
-  //       } catch (err) {
-  //         console.error("Error fetching salary data:", err);
-  //         toast.error("Failed to load advance salary info!");
-  //       }
-  //     };
-  //     fetchAdvanceSalary();
-  //   }
-  // }, [id, employees, setValue]);
+     // month yeayr options
+    const currentYear = new Date().getFullYear();
+const months = [
+  { num: "01", name: "January" },
+  { num: "02", name: "February" },
+  { num: "03", name: "March" },
+  { num: "04", name: "April" },
+  { num: "05", name: "May" },
+  { num: "06", name: "Jun" },
+  { num: "07", name: "July" },
+  { num: "08", name: "August" },
+  { num: "09", name: "September" },
+  { num: "10", name: "October" },
+  { num: "11", name: "November" },
+  { num: "12", name: "December" },
+];
+    const monthYearOptions = [];
+
+    for (let y = currentYear; y <= currentYear + 10; y++) {
+        months.forEach((m) => {
+            monthYearOptions.push({
+                value: `${y}-${m.num}`,
+                label: `${y}-${m.name}`
+            });
+        });
+    }
 
   useEffect(() => {
     if (id && employees.length > 0) {
@@ -176,11 +181,12 @@ const AdvanceSalaryForm = () => {
           {/* Salary Month + Status */}
           <div className="md:flex justify-between gap-3">
             <div className="w-[50%]">
-              <InputField
-                name="month"
+              <SelectField
+               name="month"
                 label="Month(YYYY-MM)"
-                placeholder="2025-09"
+                placeholder="2025-January"
                 required
+                options={monthYearOptions}
               />
             </div>
           </div>

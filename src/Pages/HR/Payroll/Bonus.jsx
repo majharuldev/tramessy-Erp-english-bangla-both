@@ -5,7 +5,7 @@ import api from "../../../../utils/axiosConfig";
 import Pagination from "../../../components/Shared/Pagination";
 import { tableFormatDate } from "../../../hooks/formatDate";
 import { FormProvider, useForm } from "react-hook-form";
-import { InputField } from "../../../components/Form/FormFields";
+import { InputField, SelectField } from "../../../components/Form/FormFields";
 import BtnSubmit from "../../../components/Button/BtnSubmit";
 import { AuthContext } from "../../../providers/AuthProvider";
 import toast, { Toaster } from "react-hot-toast";
@@ -41,14 +41,15 @@ const Bonus = () => {
       }
     };
 
+    // employee fetch
     const fetchEmployee = async () => {
       try {
         const res = await api.get(`/employee`);
         if (res.data?.success) {
           const activeEmployees = res.data.data.filter(
-          (employee) => employee.status?.toLowerCase() === "active"
-        );
-        setEmployee(activeEmployees);
+            (employee) => employee.status?.toLowerCase() === "active"
+          );
+          setEmployee(activeEmployees);
         }
       } catch (error) {
         console.error("Error fetching employees:", error);
@@ -82,7 +83,32 @@ const Bonus = () => {
     }
   };
 
+  // month yeayr options
+  const currentYear = new Date().getFullYear();
+  const months = [
+    { num: "01", name: "January" },
+    { num: "02", name: "February" },
+    { num: "03", name: "March" },
+    { num: "04", name: "April" },
+    { num: "05", name: "May" },
+    { num: "06", name: "Jun" },
+    { num: "07", name: "July" },
+    { num: "08", name: "August" },
+    { num: "09", name: "September" },
+    { num: "10", name: "October" },
+    { num: "11", name: "November" },
+    { num: "12", name: "December" },
+  ];
+  const monthYearOptions = [];
 
+  for (let y = currentYear; y <= currentYear + 10; y++) {
+    months.forEach((m) => {
+      monthYearOptions.push({
+        value: `${y}-${m.num}`,
+        label: `${y}-${m.name}`
+      });
+    });
+  }
   // Handle modal open for add/edit
   const handleEdit = (bonous) => {
     setSelectedBonous(bonous);
@@ -137,13 +163,13 @@ const Bonus = () => {
       toast.error("Failed to save loan!");
     }
   };
-  
+
   // helper to get employee name
   const getEmployeeName = (empId) => {
     const emp = employee.find((e) => e.id === Number(empId));
     return emp ? emp.employee_name || emp.email : empId;
   };
-    // Pagination & Search
+  // Pagination & Search
   const filteredItems = advanceSalary.filter(
     (item) =>
       getEmployeeName(item.employee_id).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -157,7 +183,7 @@ const Bonus = () => {
   const currentItems = filteredItems.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
- // Export Excel
+  // Export Excel
   const exportExcel = () => {
     const data = filteredItems.map((item, index) => ({
       SL: index + 1,
@@ -385,12 +411,28 @@ const Bonus = () => {
                     type="number"
                     required={selectedBonous ? false : true}
                   />
-                  <InputField
+                  {/* <InputField
                     name="month_of"
                     label="Monthly Bonous"
                     placeholder="2025-05(Year-Month)"
                     required={selectedBonous ? false : true}
-                  />
+                  /> */}
+                  <div className="">
+                    <label className="block text-sm font-medium mb-1">Month Bonus</label>
+
+                    <select
+                      {...methods.register("month_of", { required: "Month is required" })}
+                      className="w-full border px-3 py-2 rounded"
+                    >
+                      <option value="">Select Month</option>
+
+                      {monthYearOptions.map((opt, index) => (
+                        <option key={index} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="w-full">
                     <label className="block text-sm font-medium mb-1">
                       Status <span className="text-red-500">*</span>

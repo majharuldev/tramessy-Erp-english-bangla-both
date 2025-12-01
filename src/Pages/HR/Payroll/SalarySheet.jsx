@@ -66,60 +66,82 @@ const SalarySheet = () => {
     fetchData();
   }, []);
 
+  
   // Merge data for salary sheet
-  // useEffect(() => {
-  //   if (employees.length === 0) return;
-  //   console.log(employees, "em")
+// useEffect(() => {
+//   if (employees.length === 0) return;
 
-  //   const merged = employees.map((emp, index) => {
-  //     const empSalary = salaryAdvances.find(s => s.employee_id == emp.id) || {};
-  //     const empAttend = attendences.find(a => a.employee_id == emp.id) || {};
-  //     const empLoan = loanData.find(l => l.employee_id == emp.id) || {};
-  // const empBonus = bonusData.filter(b => b.employee_id == emp.id && b.status === "Completed")
-  //                           .reduce((sum, b) => sum + Number(b.amount), 0);
-  //     // Dynamic month-year & net pay in words
-  //     const loanMonth = l.date?.slice(0, 7); 
-  //     const monthYear =
-  //       empAttend?.month ||
-  //       empSalary?.salary_month ||
-  //       new Date().toISOString().slice(0, 7);
+//   const merged = employees.map((emp) => {
+//     const empSalary = salaryAdvances.find(s => s.employee_id == emp.id) || {};
+//     const empAttend = attendences.find(a => a.employee_id == emp.id) || {};
 
-  //     const basic = emp.basic ? Number(emp.basic) : "";
-  //     const rent = emp.house_rent ? Number(emp.house_rent) : "";
-  //     const conv = emp.conv ? Number(emp.conv) : "";
-  //     const medical = emp.medical ? Number(emp.medical) : "";
-  //     const allowance = emp.allowan ? Number(emp.allowan) : "";
-  //     const totalEarnings = basic + rent + conv + medical + allowance + empBonus;
-  //     // const total = [basic, rent, conv, medical, allowance].reduce((acc, v) => acc + (v || 0), 0);
-  //     const advance = empSalary.amount ? Number(empSalary.amount) : 0;
-  //     const loanDeduction = Number(empLoan.monthly_deduction || 0);
-  //     const deductionTotal = advance + loanDeduction;
-  //     const netPay = totalEarnings - deductionTotal;
+//     // বর্তমান মাস নির্ধারণ
+//     const monthYear =
+//       empAttend?.month ||
+//       empSalary?.salary_month ||
+//       new Date().toISOString().slice(0, 7);
 
-  //     return {
-  //       empId: emp.id,
-  //       name: emp.employee_name,
-  //       designation: emp.designation || "",
-  //       days: empAttend.working_day || "",
-  //       monthYear,
-  //       basic,
-  //       rent,
-  //       conv,
-  //       medical,
-  //       allowance,
-  //       total: basic + rent + conv + medical + allowance,
-  //   bonus: empBonus,
-  //       advance,
-  //       monthly_deduction: loanDeduction,
-  //       deductionTotal,
-  //       netPay
-  //     };
-  //   });
+//     //  loan শুধুমাত্র ঐ মাসেরটিই দেখাবে
+//     // const empLoans = loanData.filter(l => {
+//     //   if (l.employee_id != emp.id) return false;
+//     //   const loanMonth = l.date?.slice(0, 7);
+//     //   return loanMonth === monthYear;
+//     // });
+//     const empLoans = loanData.filter(l => {
+//       if (l.employee_id !== emp.id) return false;
+//       const loanMonth = l.date?.slice(0, 7);
+//       return loanMonth === monthYear && Number(l.adjustment) > 0;
+//     });
 
-  //   setData(merged);
-  // }, [employees, salaryAdvances, attendences]);
- 
-  // Merge data for salary sheet
+//     //  যদি ঐ মাসে একাধিক loan থাকে, সবগুলোর monthly_deduction যোগ করো
+//     const totalLoanDeduction = empLoans.reduce(
+//       (sum, l) => sum + Number(l.monthly_deduction || 0),
+//       0
+//     );
+
+//     //  Bonus হিসাব
+//     const empBonus = bonusData
+//       .filter(b => b.employee_id == emp.id && b.status === "Completed")
+//       .reduce((sum, b) => sum + Number(b.amount), 0);
+
+//     //  Salary অংশ
+//     const basic = emp.basic ? Number(emp.basic) : 0;
+//     const rent = emp.house_rent ? Number(emp.house_rent) : 0;
+//     const conv = emp.conv ? Number(emp.conv) : 0;
+//     const medical = emp.medical ? Number(emp.medical) : 0;
+//     const allowance = emp.allowan ? Number(emp.allowan) : 0;
+//     const totalEarnings = basic + rent + conv + medical + allowance + empBonus;
+
+//     //  Deduction হিসাব
+//     const advance = empSalary.amount ? Number(empSalary.amount) : 0;
+//     const loanDeduction = totalLoanDeduction;
+//     const deductionTotal = advance + loanDeduction;
+//     const netPay = totalEarnings - deductionTotal;
+
+//     //  Return merged data row
+//     return {
+//       empId: emp.id,
+//       name: emp.employee_name,
+//       designation: emp.designation || "",
+//       days: empAttend.working_day || "",
+//       monthYear,
+//       basic,
+//       rent,
+//       conv,
+//       medical,
+//       allowance,
+//       bonus: empBonus,
+//       total: basic + rent + conv + medical + allowance + empBonus,
+//       advance,
+//       monthly_deduction: loanDeduction,
+//       deductionTotal,
+//       netPay
+//     };
+//   });
+
+//   setData(merged);
+// }, [employees, salaryAdvances, attendences, loanData, bonusData]);
+
 useEffect(() => {
   if (employees.length === 0) return;
 
@@ -127,36 +149,36 @@ useEffect(() => {
     const empSalary = salaryAdvances.find(s => s.employee_id == emp.id) || {};
     const empAttend = attendences.find(a => a.employee_id == emp.id) || {};
 
-    // বর্তমান মাস নির্ধারণ
     const monthYear =
       empAttend?.month ||
       empSalary?.salary_month ||
       new Date().toISOString().slice(0, 7);
 
-    //  loan শুধুমাত্র ঐ মাসেরটিই দেখাবে
-    // const empLoans = loanData.filter(l => {
-    //   if (l.employee_id != emp.id) return false;
-    //   const loanMonth = l.date?.slice(0, 7);
-    //   return loanMonth === monthYear;
-    // });
     const empLoans = loanData.filter(l => {
-      if (l.employee_id != emp.id) return false;
-      const loanMonth = l.date?.slice(0, 7);
-      return loanMonth === monthYear && Number(l.adjustment) > 0;
+      if (l.employee_id !== emp.id) return false;
+
+      const loanStartMonth = l.date?.slice(0, 7);
+      let adjustmentLeft = Number(l.adjustment || 0);
+
+      // Monthly deduction cannot be more than remaining adjustment
+      let deductionThisMonth = Math.min(adjustmentLeft, Number(l.monthly_deduction || 0));
+
+      // Deduction will apply only if adjustment > 0
+      return deductionThisMonth > 0 && loanStartMonth <= monthYear;
     });
 
-    //  যদি ঐ মাসে একাধিক loan থাকে, সবগুলোর monthly_deduction যোগ করো
-    const totalLoanDeduction = empLoans.reduce(
-      (sum, l) => sum + Number(l.monthly_deduction || 0),
-      0
-    );
+    const totalLoanDeduction = empLoans.reduce((sum, l) => {
+      let adjustmentLeft = Number(l.adjustment || 0);
+      let deductionThisMonth = Math.min(adjustmentLeft, Number(l.monthly_deduction || 0));
+      return sum + deductionThisMonth;
+    }, 0);
 
-    //  Bonus হিসাব
+    // Bonus calculation
     const empBonus = bonusData
       .filter(b => b.employee_id == emp.id && b.status === "Completed")
       .reduce((sum, b) => sum + Number(b.amount), 0);
 
-    //  Salary অংশ
+    // Salary components
     const basic = emp.basic ? Number(emp.basic) : 0;
     const rent = emp.house_rent ? Number(emp.house_rent) : 0;
     const conv = emp.conv ? Number(emp.conv) : 0;
@@ -164,13 +186,10 @@ useEffect(() => {
     const allowance = emp.allowan ? Number(emp.allowan) : 0;
     const totalEarnings = basic + rent + conv + medical + allowance + empBonus;
 
-    //  Deduction হিসাব
     const advance = empSalary.amount ? Number(empSalary.amount) : 0;
-    const loanDeduction = totalLoanDeduction;
-    const deductionTotal = advance + loanDeduction;
+    const deductionTotal = advance + totalLoanDeduction;
     const netPay = totalEarnings - deductionTotal;
 
-    //  Return merged data row
     return {
       empId: emp.id,
       name: emp.employee_name,
@@ -182,10 +201,10 @@ useEffect(() => {
       conv,
       medical,
       allowance,
-      total: basic + rent + conv + medical + allowance,
       bonus: empBonus,
+      total: totalEarnings,
       advance,
-      monthly_deduction: loanDeduction,
+      monthly_deduction: totalLoanDeduction,
       deductionTotal,
       netPay
     };
@@ -193,6 +212,7 @@ useEffect(() => {
 
   setData(merged);
 }, [employees, salaryAdvances, attendences, loanData, bonusData]);
+
 
     // Month options
   const months = [...new Set(data.map(d => d.monthYear))]; 
@@ -423,7 +443,7 @@ const handlePrintTable = () => {
               <tr className=" text-black text-center">
                 <th className="border border-gray-400 px-2 py-1" rowSpan={2}>SL</th>
                 <th className="border border-gray-400 px-2 py-1" colSpan={1} rowSpan={2}>
-                  Name &<br />Designation
+                  Name 
                 </th>
                 <th className="border border-gray-400 px-2 py-1" rowSpan={3}>Working<br />DAY</th>
                 <th className="border border-gray-400 px-2 py-1" rowSpan={3}>Designation</th>

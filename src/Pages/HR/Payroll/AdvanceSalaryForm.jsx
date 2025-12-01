@@ -19,7 +19,7 @@ const AdvanceSalaryForm = () => {
   const userId = user?.id;
   const { id } = useParams();
   const navigate = useNavigate()
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
 
   // Fetch employees & user info
@@ -40,151 +40,136 @@ const AdvanceSalaryForm = () => {
     fetchData();
   }, [userId]);
 
-  // Fetch existing advance salary (for edit mode)
-  // useEffect(() => {
-  //   if (id) {
-  //     const fetchAdvanceSalary = async () => {
-  //        if (!id) {
-  //       setLoading(false);
-  //       return;
-  //     }
+  // month yeayr options
+  const currentYear = new Date().getFullYear();
+  const months = [
+    { num: "01", name: "January" },
+    { num: "02", name: "February" },
+    { num: "03", name: "March" },
+    { num: "04", name: "April" },
+    { num: "05", name: "May" },
+    { num: "06", name: "Jun" },
+    { num: "07", name: "July" },
+    { num: "08", name: "August" },
+    { num: "09", name: "September" },
+    { num: "10", name: "October" },
+    { num: "11", name: "November" },
+    { num: "12", name: "December" },
+  ];
+  const monthYearOptions = [];
 
-  //       try {
-  //         const res = await api.get(`/salaryAdvanced/${id}`);
-  //         const data = res.data?.data;
-  //         if (data) {
-  //            // Wait until employees loaded
-  //         const waitForEmployees = new Promise((resolve) => {
-  //           const interval = setInterval(() => {
-  //             if (employees.length > 0) {
-  //               clearInterval(interval);
-  //               resolve();
-  //             }
-  //           }, 100);
-  //         });
-
-  //         await waitForEmployees;
-  //           setValue("employee_id", data.employee_id);
-  //           setValue("amount", data.amount);
-  //           setValue("salary_month", data.salary_month);
-  //           setValue("adjustment", data.adjustment);
-  //           setValue("status", data.status);
-  //           setValue("created_by", data.created_by);
-  //         }
-  //       } catch (err) {
-  //         console.error("Error fetching salary data:", err);
-  //         toast.error("Failed to load advance salary info!");
-  //       }finally {
-  //       setLoading(false);
-  //     }
-  //     };
-  //     fetchAdvanceSalary();
-  //   }
-  // }, [id, id, setValue]);
+  for (let y = currentYear; y <= currentYear + 10; y++) {
+    months.forEach((m) => {
+      monthYearOptions.push({
+        value: `${y}-${m.num}`,
+        label: `${y}-${m.name}`
+      });
+    });
+  }
 
   useEffect(() => {
-  const fetchAdvanceSalary = async () => {
-    // new record হলে সরাসরি loading false
-    if (!id) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const res = await api.get(`/salaryAdvanced/${id}`);
-      const data = res.data?.data;
-
-      if (data) {
-        // Wait until employees loaded
-        const waitForEmployees = new Promise((resolve) => {
-          const interval = setInterval(() => {
-            if (employees.length > 0) {
-              clearInterval(interval);
-              resolve();
-            }
-          }, 100);
-        });
-
-        await waitForEmployees;
-
-        // এখন employees ready, তাই value set করা নিরাপদ
-        setValue("employee_id", data.employee_id);
-        setValue("amount", data.amount);
-        setValue("salary_month", data.salary_month);
-        setValue("adjustment", data.adjustment);
-        setValue("status", data.status);
-        setValue("created_by", data.created_by);
+    const fetchAdvanceSalary = async () => {
+      // new record হলে সরাসরি loading false
+      if (!id) {
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      console.error("Error fetching salary data:", err);
-      toast.error("Failed to load advance salary info!");
-    } finally {
-      // সবশেষে loading বন্ধ
-      setLoading(false);
-    }
-  };
 
-  fetchAdvanceSalary();
-}, [id, employees, setValue]);
+      try {
+        const res = await api.get(`/salaryAdvanced/${id}`);
+        const data = res.data?.data;
+
+        if (data) {
+          // Wait until employees loaded
+          const waitForEmployees = new Promise((resolve) => {
+            const interval = setInterval(() => {
+              if (employees.length > 0) {
+                clearInterval(interval);
+                resolve();
+              }
+            }, 100);
+          });
+
+          await waitForEmployees;
+
+          // এখন employees ready, তাই value set করা নিরাপদ
+          setValue("employee_id", data.employee_id);
+          setValue("amount", data.amount);
+          setValue("salary_month", data.salary_month);
+          setValue("adjustment", data.adjustment);
+          setValue("status", data.status);
+          setValue("created_by", data.created_by);
+        }
+      } catch (err) {
+        console.error("Error fetching salary data:", err);
+        toast.error("Failed to load advance salary info!");
+      } finally {
+        // সবশেষে loading বন্ধ
+        setLoading(false);
+      }
+    };
+
+    fetchAdvanceSalary();
+  }, [id, employees, setValue]);
 
 
   // Auto set adjustment same as amount when adding new
-useEffect(() => {
-  const subscription = methods.watch((value, { name }) => {
-    if (name === "amount" && !id) {
-      setValue("adjustment", value.amount || 0);
-    }
-  });
-  return () => subscription.unsubscribe();
-}, [methods, setValue, id]);
+  useEffect(() => {
+    const subscription = methods.watch((value, { name }) => {
+      if (name === "amount" && !id) {
+        setValue("adjustment", value.amount || 0);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [methods, setValue, id]);
 
   // Submit handler (Add or Update)
- const onSubmit = async (data) => {
-  const payload = {
-    employee_id: data.employee_id,
-    amount: data.amount,
-    salary_month: data.salary_month,
-    adjustment: data.adjustment,
-    status: data.status,
-    created_by: userName,
+  const onSubmit = async (data) => {
+    const payload = {
+      employee_id: data.employee_id,
+      amount: data.amount,
+      salary_month: data.salary_month,
+      adjustment: data.adjustment,
+      status: data.status,
+      created_by: userName,
+    };
+
+    try {
+      const res = id
+        ? await api.put(`/salaryAdvanced/${id}`, payload)
+        : await api.post(`/salaryAdvanced`, payload)
+
+      // Success check
+      if (res?.data?.status === "Success") {
+        toast.success(
+          id
+            ? "Advance Salary Updated Successfully!"
+            : "Advance Salary Added Successfully!"
+        );
+        reset();
+        navigate("/tramessy/HR/Payroll/Advance-Salary");
+        return;
+      }
+
+      // API returned something other than success
+      toast.error(res?.data?.message || "Something went wrong!");
+    } catch (err) {
+      // Prevent duplicate toast if response exists
+      if (!err.response) {
+        toast.error("Failed to submit advance salary!");
+      }
+      console.error("Error submitting form:", err);
+    }
   };
-
-  try {
-    const res = id
-      ? await api.put(`/salaryAdvanced/${id}`, payload)
-      : await api.post(`/salaryAdvanced`, payload)
-
-    // Success check
-    if (res?.data?.status === "Success") {
-      toast.success(
-        id
-          ? "Advance Salary Updated Successfully!"
-          : "Advance Salary Added Successfully!"
-      );
-      reset();
-      navigate("/tramessy/HR/Payroll/Advance-Salary");
-      return;
-    }
-
-    // API returned something other than success
-    toast.error(res?.data?.message || "Something went wrong!");
-  } catch (err) {
-    // Prevent duplicate toast if response exists
-    if (!err.response) {
-      toast.error("Failed to submit advance salary!");
-    }
-    console.error("Error submitting form:", err);
-  }
-};
 
   return (
     <div className="p-2">
       <FormProvider {...methods}>
         {loading && id ? (
-                <div className="p-4 bg-white rounded-md shadow border-t-2 border-primary">
-                  <FormSkeleton />
-                </div>
-              ) : (<form
+          <div className="p-4 bg-white rounded-md shadow border-t-2 border-primary">
+            <FormSkeleton />
+          </div>
+        ) : (<form
           onSubmit={handleSubmit(onSubmit)}
           className="mx-auto p-6 border-t-2 border-primary rounded-md shadow space-y-4 max-w-3xl bg-white"
         >
@@ -196,7 +181,7 @@ useEffect(() => {
 
           {/* Employee + Amount */}
           <div className="md:flex justify-between gap-3">
-           <div className="w-full">
+            <div className="w-full">
               <label className="block text-sm font-medium mb-1">
                 Select Employee <span className="text-red-500">*</span>
               </label>
@@ -230,14 +215,30 @@ useEffect(() => {
           {/* Salary Month + Status */}
           <div className="md:flex justify-between gap-3">
             <div className="w-full">
-              <InputField
+              {/* <InputField
                 name="salary_month"
                 label="Salary Month (YYYY-MM)"
                 placeholder="2025-09"
                 required
-              />
+              /> */}
+              <div className="">
+                <label className="block text-sm !font-medium mb-1">Salary Month</label>
+
+                <select
+                  {...methods.register("salary_month", { required: "Month is required" })}
+                  className="w-full border px-3 py-2 rounded"
+                >
+                  <option value="">Select Month</option>
+
+                  {monthYearOptions.map((opt, index) => (
+                    <option key={index} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-             <div className="w-full">
+            <div className="w-full">
               <InputField
                 name="adjustment"
                 label="After Adjustment Amount"

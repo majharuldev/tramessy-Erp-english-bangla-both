@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import { FaPen, FaPlus, FaTrashAlt, FaUserSecret } from "react-icons/fa";
 import api from "../../../../utils/axiosConfig";
 import Pagination from "../../../components/Shared/Pagination";
-import { tableFormatDate } from "../../../hooks/formatDate";
+import { formatDate, tableFormatDate } from "../../../hooks/formatDate";
 import { FormProvider, useForm } from "react-hook-form";
 import { InputField, SelectField } from "../../../components/Form/FormFields";
 import BtnSubmit from "../../../components/Button/BtnSubmit";
@@ -12,6 +12,7 @@ import { AuthContext } from "../../../providers/AuthProvider";
 import { IoMdClose } from "react-icons/io";
 import * as XLSX from "xlsx";
 import toNumber from "../../../hooks/toNumber";
+import dayjs from "dayjs";
 
 const Loan = () => {
   const [loanData, setLoanData] = useState([]);
@@ -30,9 +31,14 @@ const Loan = () => {
 
   const methods = useForm();
   const { handleSubmit, reset, control, setValue, register, watch } = methods;
+  
+useEffect(() => {
+  fetchLoans();
+  fetchEmployee();
+}, [user?.id]);
 
   // Fetch loan & employee data
-  useEffect(() => {
+
     const fetchLoans = async () => {
       try {
         const res = await api.get(`/loan`);
@@ -58,12 +64,6 @@ const Loan = () => {
         console.error("Error fetching employees:", error);
       }
     };
-
-
-
-    fetchLoans();
-    fetchEmployee();
-  }, [user?.id]);
 
   // delete by id
   const handleDelete = async (id) => {
@@ -94,7 +94,7 @@ const Loan = () => {
       if (selectedLoan) {
         reset(selectedLoan); // Edit mode
       } else {
-        reset({ employee_id: "", amount: "", monthly_deduction: "", status: "Due" }); // Add mode
+        reset({ date: "", employee_id: "", amount: "", monthly_deduction: "", status: "Due" }); // Add mode
       }
     }
   }, [isModalOpen, selectedLoan, reset]);
@@ -229,6 +229,7 @@ useEffect(() => {
     setSelectedLoan(loan);
     setIsModalOpen(true);
     if (loan) {
+      setValue("date", loan.date);
       setValue("employee_id", loan.employee_id);
       setValue("amount", loan.amount);
       setValue("monthly_deduction", loan.monthly_deduction);
@@ -238,37 +239,38 @@ useEffect(() => {
     }
   };
 
-  // Submit handler
-  const onSubmit = async (data) => {
-    const payload = {
-      employee_id: data.employee_id,
-      amount: data.amount,
-      monthly_deduction: data.monthly_deduction,
-      adjustment: data.adjustment,
-      status: data.status,
-      created_by: user.name,
-    };
-
-    try {
-      const res = selectedLoan
-        ? await api.put(`/loan/${selectedLoan.id}`, payload)
-        : await api.post(`/loan`, payload);
-
-      if (res?.data?.status === "Success") {
-        toast.success(
-          selectedLoan ? "Loan Updated Successfully!" : "Loan Added Successfully!"
-        );
-        setIsModalOpen(false);
-        reset();
-        window.location.reload();
-      } else {
-        toast.error("Something went wrong!");
-      }
-    } catch (err) {
-      console.error("Error submitting loan:", err);
-      toast.error("Failed to save loan!");
-    }
+  // Submit handler  
+const onSubmit = async (data) => {
+  const payload = {
+    date: dayjs(data.date).format("YYYY-MM-DD"),
+    employee_id: data.employee_id,
+    amount: Number(data.amount) || 0,
+    monthly_deduction: Number(data.monthly_deduction) || 0,
+    adjustment: Number(data.adjustment) || 0,
+    status: data.status,
+    created_by: user.name,
   };
+
+  try {
+    const res = selectedLoan
+      ? await api.put(`/loan/${selectedLoan.id}`, payload)
+      : await api.post(`/loan`, payload);
+
+    if (res?.data?.status === "Success") {
+      toast.success(
+        selectedLoan ? "Loan Updated Successfully!" : "Loan Added Successfully!"
+      );
+      await fetchLoans(); // fetch updated list
+      reset();             // reset form
+      setIsModalOpen(false);
+    } else {
+      toast.error("Something went wrong!");
+    }
+  } catch (err) {
+    console.error("Error submitting loan:", err);
+    toast.error("Failed to save loan!");
+  }
+};
 
   return (
     <div className="p-2">
@@ -356,7 +358,7 @@ useEffect(() => {
                     className="hover:bg-gray-50 transition-all border border-gray-200"
                   >
                     <td className="p-2 font-bold">{indexOfFirst + index + 1}</td>
-                    <td className="p-2">{tableFormatDate(item.created_at)}</td>
+                    <td className="p-2">{tableFormatDate(item.date)}</td>
                     <td className="p-2">{getEmployeeName(item.employee_id)}</td>
                     <td className="p-2">{item.amount} ৳</td>
                     <td className="p-2">{item.monthly_deduction}</td>
@@ -364,12 +366,12 @@ useEffect(() => {
                     <td className="p-2">{item.status}</td>
                     <td className="p-2">{item.created_by}</td>
                     <td className="p-2 flex gap-2 items-center">
-                      <button
+                     { item.adjustment !== 0 && <button
                         onClick={() => handleEdit(item)}
                         className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer"
                       >
                         <FaPen className="text-[12px]" />
-                      </button>
+                      </button>}
                       <button
                         onClick={() => {
                           setSelectedLoanId(item.id);
@@ -408,7 +410,7 @@ useEffect(() => {
 
       {/* Loan Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 overflow-auto">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 overflow-auto scroll-hidden">
           <div className="bg-white w-full max-w-2xl rounded-md shadow-lg p-6 relative">
             <h3 className="text-lg font-semibold text-primary mb-4">
               {selectedLoan ? "Edit Loan" : "Add Loan"}
