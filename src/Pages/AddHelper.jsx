@@ -106,12 +106,21 @@ const HelperForm = () => {
                 <InputField name="address" label="Address" required />
               </div>
               <div className="mt-2 md:mt-0 w-full">
-                <InputField
-                  name="salary"
-                  label="Salary"
-                  type="number"
-                  required
-                />
+                <SelectField
+                name="salary"
+                label="Vehicle Category"
+                required={id? false:true}
+                options={[
+                  // { value: "", label: "Select Vehicle category..." },
+                  { value: "pickup", label: "Pickup" },
+                  { value: "covered_van", label: "Covered Van" },
+                  { value: "open_truck", label: "Open Truck" },
+                  { value: "trailer", label: "Trailer" },
+                  { value: "freezer_van", label: "Freezer Van" },
+                  { value: "Oil Tanker", label: "Oil Tanker" },
+                ]}
+           
+              />
               </div>
             </div>
 

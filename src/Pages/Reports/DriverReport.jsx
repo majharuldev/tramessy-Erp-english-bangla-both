@@ -966,13 +966,13 @@ console.log('currentDriverReport:', currentDriverReport);
               ) : (
                 currentDriverReport.map((d, i) => (
                   <tr key={`${d.name}-${d.monthKey}`} className="hover:bg-gray-50">
-                    <td className="px-2 py-3">{i + 1 + indexOfFirstItem}</td>
-                    <td className="px-2 py-3">{d.month}</td>
-                    <td className="px-2 py-3">{d.name}</td>
-                    <td className="px-2 py-3">{d.mobile}</td>
-                    <td className="px-2 py-3">{d.totalTrips}</td>
-                    <td className="px-2 py-3">{d.totalRent}</td>
-                    <td className="px-2 py-3">{d.totalExp}</td>
+                    <td className="px-2 py-3 border border-gray-300">{i + 1 + indexOfFirstItem}</td>
+                    <td className="px-2 py-3 border border-gray-300">{d.month}</td>
+                    <td className="px-2 py-3 border border-gray-300">{d.name}</td>
+                    <td className="px-2 py-3 border border-gray-300">{d.mobile}</td>
+                    <td className="px-2 py-3 border border-gray-300">{d.totalTrips}</td>
+                    <td className="px-2 py-3 border border-gray-300">{d.totalRent}</td>
+                    <td className="px-2 py-3 border border-gray-300">{d.totalExp}</td>
                     <td className={d.totalProfit >= 0 ? "text-green-600" : "text-red-600"}>
                       {d.totalProfit}
                     </td>

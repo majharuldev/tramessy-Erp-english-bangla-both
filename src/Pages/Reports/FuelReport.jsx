@@ -439,12 +439,12 @@ export default function FuelReport() {
                     <tr key={index} className="hover:bg-gray-50 transition-all border border-gray-200">
                       <td className="p-3">{item.date}</td>
                       {/* <td className="p-3">{item.ref_id}</td> */}
-                      <td className="p-3">{item.vehicle}</td>
-                      <td className="p-3">{item.driver}</td>
-                      <td className="p-3">{item.customer}</td>
-                      <td className="p-3">{item.route}</td>
-                      <td className="p-3">{item.fuel_cost}</td>
-                      <td className="p-3">{item.total_rent}</td>
+                      <td className="p-3 border border-gray-300">{item.vehicle}</td>
+                      <td className="p-3 border border-gray-300">{item.driver}</td>
+                      <td className="p-3 border border-gray-300">{item.customer}</td>
+                      <td className="p-3 border border-gray-300">{item.route}</td>
+                      <td className="p-3 border border-gray-300">{item.fuel_cost}</td>
+                      <td className="p-3 border border-gray-300">{item.total_rent}</td>
                       {/* <td className="p-3">{item.fuel_percentage}%</td> */}
                     </tr>
                   ))

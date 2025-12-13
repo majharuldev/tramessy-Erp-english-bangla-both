@@ -315,6 +315,7 @@ const EmployeeList = () => {
                 <th className="px-2 py-4">Designation</th>
                 <th className="px-2 py-4">Mobile</th>
                 <th className="px-2 py-4">Status</th>
+                <th className="px-2 py-4">Action</th>
               </tr>
             </thead>
             <tbody className="text-gray-700 ">
@@ -346,6 +347,7 @@ const EmployeeList = () => {
                         <td className="px-2 py-1">{tableFormatDate(dt.join_date)}</td>
                         <td className="px-2 py-1">{dt.designation}</td>
                         <td className="px-2 py-1">{dt.mobile}</td>
+                        <td className="px-2 py-1">{dt.status}</td>
                         <td className="px-2 action_column">
                           <div className="flex gap-1">
                             <Link to={`/tramessy/UpdateEmployeeForm/${dt.id}`}>

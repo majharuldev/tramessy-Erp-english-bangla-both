@@ -158,6 +158,23 @@ const AddDriverForm = () => {
 
             {/* Status & License Image */}
             <div className="md:flex justify-between gap-3">
+              <div className="w-full relative">
+                <SelectField
+                name="salary"
+                label="Vehicle Category"
+                required={id? false:true}
+                options={[
+                  // { value: "", label: "Select Vehicle category..." },
+                  { value: "pickup", label: "Pickup" },
+                  { value: "covered_van", label: "Covered Van" },
+                  { value: "open_truck", label: "Open Truck" },
+                  { value: "trailer", label: "Trailer" },
+                  { value: "freezer_van", label: "Freezer Van" },
+                  { value: "Oil Tanker", label: "Oil Tanker" },
+                ]}
+           
+              />
+              </div>
               <div className="mt-2 md:mt-0 w-full relative">
                 <InputField name="opening_balance" label="Opening Balance" />
               </div>

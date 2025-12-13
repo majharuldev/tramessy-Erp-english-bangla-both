@@ -456,7 +456,7 @@ const normalizeDate = (dateStr) => {
               <th>Parts Cost</th>
               <th>Fuel Cost</th>
               <th>Engine Oil</th>
-              <th>Net Profit</th>
+              <th>Gross Profit</th>
             </tr>
           </thead>
           <tbody>
@@ -630,25 +630,25 @@ const normalizeDate = (dateStr) => {
                       key={`${vehicleDate.vehicle_no}-${vehicleDate.date}-${index}`}
                       className="hover:bg-gray-50 transition-all"
                     >
-                      <td className="px-4 py-4 font-medium text-[#11375B]">{tableFormatDate(vehicleDate.date)}</td>
-                      <td className="px-4 py-4 font-bold">{vehicleDate.vehicle_no}</td>
-                      <td className="px-4 py-4 text-gray-700">{vehicleDate.trip_count}</td>
-                      <td className="px-4 py-4 text-gray-700 font-semibold">
+                      <td className="border border-gray-300 px-4 py-4 font-medium text-[#11375B]">{tableFormatDate(vehicleDate.date)}</td>
+                      <td className="border border-gray-300 px-4 py-4 font-bold">{vehicleDate.vehicle_no}</td>
+                      <td className="border border-gray-300 px-4 py-4 text-gray-700">{vehicleDate.trip_count}</td>
+                      <td className="border border-gray-300 px-4 py-4 text-gray-700 font-semibold">
                         {vehicleDate.total_revenue.toLocaleString()}
                       </td>
-                      <td className="px-4 py-4 text-gray-700">
+                      <td className="border border-gray-300 px-4 py-4 text-gray-700">
                         {vehicleDate.trip_expenses.toLocaleString()}
                       </td>
-                      <td className="px-4 py-4 text-gray-700">
+                      <td className="border border-gray-300 px-4 py-4 text-gray-700">
                         {vehicleDate.parts_cost.toLocaleString()}
                       </td>
-                      <td className="px-4 py-4 text-gray-700">
+                      <td className="border border-gray-300 px-4 py-4 text-gray-700">
                         {vehicleDate.fuel_cost.toLocaleString()}
                       </td>
-                      <td className="px-4 py-4 text-gray-700">
+                      <td className="border border-gray-300 px-4 py-4 text-gray-700">
                         {vehicleDate.engine_oil_cost.toLocaleString()}
                       </td>
-                      <td className={`px-4 py-4 font-bold ${vehicleDate.net_profit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                      <td className={`border border-gray-300 px-4 py-4 font-bold ${vehicleDate.net_profit >= 0 ? "text-green-600" : "text-red-600"}`}>
                         {vehicleDate.net_profit.toLocaleString()}
                       </td>
                     </tr>

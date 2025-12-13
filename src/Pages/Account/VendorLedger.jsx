@@ -60,7 +60,7 @@ const VendorLedger = () => {
     (v) => v.vendor_name === selectedVendor
   );
   const openingBalance = selectedVendorInfo
-    ? Number(selectedVendorInfo.opening_balance || 0)
+    ? toNumber(selectedVendorInfo.opening_balance || 0)
     : 0;
 
   if (loading)
@@ -162,7 +162,7 @@ const VendorLedger = () => {
         Unload: item.unload_point || "--",
         Vehicle: item.vehicle_no || "--",
         Driver: item.driver_name || "--",
-        "Trip Rent": item.trip_rent ? toNumber(item.trip_rent) : "--",
+        "Trip Rent": item.total_rent ? toNumber(item.total_rent) : "--",
         Advance: item.advance ? toNumber(item.advance) : "--",
         "Pay Amount": item.pay_amount ? toNumber(item.pay_amount) : "--",
         Due: item.running_balance,

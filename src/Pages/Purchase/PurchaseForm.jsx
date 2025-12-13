@@ -94,7 +94,7 @@ const PurchaseForm = () => {
   //   }
   // }, [selectedVehicle, vehicle, setValue]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (watch("vehicle_no")) {
       const selectedVehicleData = vehicle.find(
         (v) => `${v.reg_zone} ${v.reg_serial} ${v.reg_no}`.trim() === watch("vehicle_no").trim(),
@@ -193,7 +193,7 @@ const PurchaseForm = () => {
     label: driver.driver_name,
   }));
 
- const vehicleOptions = vehicle.map((dt) => ({
+  const vehicleOptions = vehicle.map((dt) => ({
     value: `${dt.reg_zone} ${dt.reg_serial} ${dt.reg_no}`,
     label: `${dt.reg_zone} ${dt.reg_serial} ${dt.reg_no}`,
   }))
@@ -207,7 +207,41 @@ const PurchaseForm = () => {
     value: supply.supplier_name,
     label: supply.supplier_name,
   }));
-
+useEffect(() => {
+  return () => {
+    // প্রিভিউ URL মেমরি লিক এড়াতে
+    if (previewImage) {
+      URL.revokeObjectURL(previewImage);
+    }
+  };
+}, [previewImage]);
+  // Preview image or PDF remove
+  const removePreview = () => {
+  setPreviewImage(null);
+  setExistingImage(null);
+  setValue("bill_image", null);
+};
+// handleFileChange ফাংশন আপডেট করুন
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    // react-hook-form এ ফাইল সেট করুন
+    setValue("bill_image", file);
+    
+    // প্রিভিউ তৈরি করুন
+    if (file.type === "application/pdf") {
+      const pdfURL = URL.createObjectURL(file);
+      setPreviewImage(pdfURL);
+    } else if (file.type.startsWith("image/")) {
+      const imageURL = URL.createObjectURL(file);
+      setPreviewImage(imageURL);
+    } else {
+      // অন্য ফাইল টাইপের ক্ষেত্রে
+      setPreviewImage(null);
+      toast.error("Please upload only images or PDF files");
+    }
+  }
+};
 
   // Handle form submission for both add and update
   const onSubmit = async (data) => {
@@ -221,7 +255,7 @@ const PurchaseForm = () => {
         }
       });
 
-    const createdByValue = user?.name || user?.email || "Unknown";
+      const createdByValue = user?.name || user?.email || "Unknown";
       //  items array আলাদা করে নেওয়া
       const item_name = data.items.map((item) => item.item_name);
       const quantity = data.items.map((item) => Number(item.quantity));
@@ -286,26 +320,26 @@ const PurchaseForm = () => {
           const userName = user.name || "";
           const purchaseCategory = purchase?.category || "";
           const vehicleNo = purchase?.vehicle_no || "";
-        // Build message content
-     const messageContent = `Dear Sir, A new Maintenance created by ${userName}.\nPurchase Id: ${purchaseId}\nPurchase Date: ${purchaseDate}\nSupplier: ${supplierName}\nVehicle: ${vehicleNo}\nPurchase Name: ${purchaseCategory}`;
-         // SMS Config
+          // Build message content
+          const messageContent = `Dear Sir, A new Maintenance created by ${userName}.\nPurchase Id: ${purchaseId}\nPurchase Date: ${purchaseDate}\nSupplier: ${supplierName}\nVehicle: ${vehicleNo}\nPurchase Name: ${purchaseCategory}`;
+          // SMS Config
           const adminNumber = "01872121862"; // or multiple separated by commas
           const API_KEY = "3b82495582b99be5";
           const SECRET_KEY = "ae771458";
           const CALLER_ID = "1234";
-           // Correct URL (same structure as your given example)
+          // Correct URL (same structure as your given example)
           const smsUrl = `https://smpp.revesms.com:7790/sendtext?apikey=${API_KEY}&secretkey=${SECRET_KEY}&callerID=${CALLER_ID}&toUser=${adminNumber}&messageContent=${encodeURIComponent(
-        messageContent
-      )}`;
+            messageContent
+          )}`;
           try {
-             await axios.post(smsUrl);
+            await axios.post(smsUrl);
             toast.success("SMS sent to admin!");
           } catch (smsError) {
             console.error("SMS sending failed:", smsError);
             // toast.error("Trip saved, but SMS failed to send.");
           }
         }
-     navigate("/tramessy/Purchase/maintenance");
+        navigate("/tramessy/Purchase/maintenance");
         reset();
       } else {
         throw new Error("Failed to save purchase");
@@ -329,7 +363,7 @@ const PurchaseForm = () => {
           {isEditMode ? "Update Maintenance Purchase " : "Add Maintenance Purchase"}
         </h3>
         <FormProvider {...methods}>
-          {isLoading  ? (
+          {isLoading ? (
             <div className="p-4 bg-white rounded-md shadow border-t-2 border-primary">
               <FormSkeleton />
             </div>
@@ -491,7 +525,7 @@ const PurchaseForm = () => {
                     name="service_date"
                     label="Service Date"
                     type="date"
-                    required={!isEditMode}
+                    required={false}
                     inputRef={(e) => {
                       register("date").ref(e);
                       purChaseDateRef.current = e;
@@ -504,7 +538,7 @@ const PurchaseForm = () => {
                     name="next_service_date"
                     label="Next Service Date"
                     type="date"
-                    required={!isEditMode}
+                    required={false}
                     inputRef={(e) => {
                       register("date").ref(e);
                       purChaseDateRef.current = e;
@@ -591,7 +625,7 @@ const PurchaseForm = () => {
               </div>
             </div>}
 
-            <div className="md:flex justify-between gap-3">
+            {/* <div className="md:flex justify-between gap-3">
               <div className="w-full">
                 <label className="text-gray-700 text-sm font-semibold">
                   Bill Image {!isEditMode && "(Required)"}
@@ -614,20 +648,22 @@ const PurchaseForm = () => {
                       <input
                         id="bill_image"
                         type="file"
-                        accept="image/*"
+                        // accept="image/*"
+                         accept="image/*,application/pdf" 
                         ref={ref}
                         className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const url = URL.createObjectURL(file);
-                            setPreviewImage(url);
-                            onChange(file);
-                          } else {
-                            setPreviewImage(null);
-                            onChange(null);
-                          }
-                        }}
+                        // onChange={(e) => {
+                        //   const file = e.target.files[0];
+                        //   if (file) {
+                        //     const url = URL.createObjectURL(file);
+                        //     setPreviewImage(url);
+                        //     onChange(file);
+                        //   } else {
+                        //     setPreviewImage(null);
+                        //     onChange(null);
+                        //   }
+                        // }}
+                         onChange={handleFileChange}
                       />
                       {error && (
                         <span className="text-red-600 text-sm">
@@ -643,10 +679,45 @@ const PurchaseForm = () => {
                   )}
                 />
               </div>
-            </div>
+            </div> */}
+            <div className="md:flex justify-between gap-3">
+  <div className="w-[50%]">
+    <label className="text-gray-700 text-sm font-semibold">
+      Bill Image {!isEditMode && "(Required)"}
+    </label>
+    <Controller
+      name="bill_image"
+      control={control}
+      rules={isEditMode ? {} : { required: "This field is required" }}
+      render={({ field: { onChange, ref }, fieldState: { error } }) => (
+        <div>
+          <input
+            type="file"
+            accept="image/*,application/pdf"
+            ref={ref}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              handleFileChange(e);
+              onChange(file);
+            }}
+            className="border p-2 rounded w-full"
+          />
+          {error && (
+            <span className="text-red-600 text-sm">{error.message}</span>
+          )}
+          {isEditMode && existingImage && !previewImage && (
+            <p className="text-green-600 text-sm mt-1">
+              Current file: {existingImage}
+            </p>
+          )}
+        </div>
+      )}
+    />
+  </div>
+</div>
 
             {/* Preview */}
-            {previewImage && (
+            {/* {previewImage && (
               <div className="mt-2 relative flex justify-end">
                 <button
                   type="button"
@@ -671,7 +742,64 @@ const PurchaseForm = () => {
                   className="max-w-xs h-auto rounded border border-gray-300"
                 />
               </div>
-            )}
+            )} */}
+           {previewImage && (
+  <div className="mt-3 relative  flex !justify-end">
+    <button
+      type="button"
+      onClick={() => {
+        setPreviewImage(null);
+        setValue("bill_image", null);
+        removePreview()
+        // ফাইল ইনপুট রিসেট করুন
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) fileInput.value = "";
+        
+        if (isEditMode && existingImage) {
+          // এডিট মোডে থাকলে এক্সিস্টিং ইমেজ দেখান
+          const imageUrl = `https://ajenterprise.tramessy.com/backend/uploads/purchase/${existingImage}`;
+          setPreviewImage(imageUrl);
+        } else {
+          setExistingImage(null);
+        }
+      }}
+      className="absolute top-2 right-2 text-red-600 bg-white shadow rounded-sm hover:text-white hover:bg-secondary transition-all duration-300 cursor-pointer font-bold text-xl p-[2px] z-10"
+      title="Remove preview"
+      
+    >
+      <IoMdClose />
+    </button>
+    
+    {/* PDF বা ইমেজ প্রিভিউ */}
+    {previewImage.includes("application/pdf") || previewImage.endsWith(".pdf") ? (
+      <div className="border rounded p-2 bg-gray-50">
+        <p className="text-sm text-gray-600 mb-2">PDF Preview:</p>
+        <iframe
+          src={previewImage}
+          className="w-full h-64 border"
+          title="PDF Preview"
+        />
+        <a
+          href={previewImage}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 text-sm mt-2 inline-block"
+        >
+          Open PDF in new tab
+        </a>
+      </div>
+    ) : (
+      <div className="border rounded p-2 bg-gray-50">
+        <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
+        <img
+          src={previewImage}
+          alt="Bill Preview"
+          className="max-w-full h-auto max-h-64 object-contain rounded"
+        />
+      </div>
+    )}
+  </div>
+)}
 
             <BtnSubmit>{isEditMode ? "Update Purchase" : "Submit"}</BtnSubmit>
           </form>)}

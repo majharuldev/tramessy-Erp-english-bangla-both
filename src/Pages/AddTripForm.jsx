@@ -82,6 +82,7 @@ export default function AddTripForm() {
       challan_cost: "",
       remarks: "",
       status: "pending",
+      helper_name:""
     },
   })
 
@@ -245,7 +246,7 @@ export default function AddTripForm() {
             api.get(`/vendor`),
             api.get(`/office`),
           ])
-           const activeFilter = (arr) => arr?.filter((item) => item?.status === "Active") || [];
+        const activeFilter = (arr) => arr?.filter((item) => item?.status === "Active") || [];
         setVehicle(activeFilter(vehicleRes.data))
         setDriver(activeFilter(driverRes.data))
         setVendorVehicle(activeFilter(vendorVehicleRes.data.data))
@@ -321,6 +322,10 @@ export default function AddTripForm() {
     label: `${v.reg_zone} ${v.reg_serial} ${v.reg_no}`,
     category: v.vehicle_category,
     size: v.vehicle_size,
+    // 👉 Add these:
+    driver: v.driver_name,
+    mobile: v.driver_mobile,
+    helper: v.helper_name,
   }))
 
   const driverOptions = driver.map((d) => ({
@@ -328,7 +333,7 @@ export default function AddTripForm() {
     label: d.driver_name,
     mobile: d.driver_mobile,
   }))
-  console.log(vendorVehicle)
+
   const vendorVehicleOptions = vendorVehicle.map((v) => ({
     value: `${v?.registration_zone} ${v?.registration_serial} ${v?.registration_number}`,
     label: `${v.registration_zone} ${v.registration_serial} ${v.registration_number}`,
@@ -377,21 +382,38 @@ export default function AddTripForm() {
   // Handle vehicle selection to auto-fill category and size
   const selectedVehicle = useWatch({ control, name: "vehicle_no" })
 
-  useEffect(() => {
-    if (selectedTransport === "own_transport") {
-      const vehicle = vehicleOptions.find((v) => v.value === selectedVehicle)
-      if (vehicle) {
-        // setValue("vehicle_category", vehicle.category || "");
-        // setValue("vehicle_size", vehicle.size || "");
-      }
-    } else if (selectedTransport === "vendor_transport") {
-      const vehicle = vendorVehicleOptions.find((v) => v.value === selectedVehicle)
-      if (vehicle) {
-        // setValue("vehicle_category", vehicle.category || "");
-        // setValue("vehicle_size", vehicle.size || "");
-      }
-    }
-  }, [selectedVehicle, selectedTransport, setValue])
+useEffect(() => {
+  if (!selectedVehicle) return;
+
+  const vData =
+    selectedTransport === "own_transport"
+      ? vehicleOptions.find((v) => v.value === selectedVehicle)
+      : vendorVehicleOptions.find((v) => v.value === selectedVehicle);
+
+  if (vData) {
+    setValue("driver_name", vData.driver || "");
+    setValue("driver_mobile", vData.mobile || "");
+    setValue("helper_name", vData.helper || "");
+  }
+}, [selectedVehicle, selectedTransport]);
+
+
+  // useEffect(() => {
+  //   if (selectedTransport === "own_transport") {
+  //     const vehicle = vehicleOptions.find((v) => v.value === selectedVehicle)
+  //     if (vehicle) {
+  //       // setValue("vehicle_category", vehicle.category || "");
+  //       // setValue("vehicle_size", vehicle.size || "");
+  //     }
+  //   } else if (selectedTransport === "vendor_transport") {
+  //     const vehicle = vendorVehicleOptions.find((v) => v.value === selectedVehicle)
+  //     if (vehicle) {
+  //       // setValue("vehicle_category", vehicle.category || "");
+  //       // setValue("vehicle_size", vehicle.size || "");
+  //     }
+  //   }
+  // }, [selectedVehicle, selectedTransport, setValue])
+
 
   // Fixed rate calculation based on load point, unload point, vehicle category and size
   useEffect(() => {
@@ -485,8 +507,8 @@ export default function AddTripForm() {
 
           // Correct URL (same structure as your given example)
           const smsUrl = `https://smpp.revesms.com:7790/sendtext?apikey=${API_KEY}&secretkey=${SECRET_KEY}&callerID=${CALLER_ID}&toUser=${adminNumber}&messageContent=${encodeURIComponent(
-        messageContent
-      )}`
+            messageContent
+          )}`
           try {
             await axios.post(smsUrl);
             toast.success("SMS sent to admin!")
@@ -700,6 +722,17 @@ export default function AddTripForm() {
                       control={control}
                     />
                   )}
+                  {
+                    selectedTransport === "own_transport" ? (
+                      <InputField
+                        name="helper_name"
+                        label="Helper Name"
+                        required={id ? false : true}
+                        // options={helperOptions}
+                        control={control}
+                      />
+                    ) : ""
+                  }
 
                   {isFixedRateCustomer && (
                     <>

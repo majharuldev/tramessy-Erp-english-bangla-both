@@ -59,8 +59,14 @@ const numberToWords = (num) => {
 }
 import logo from "../../../assets/AJ_Logo.png"
 import React, { forwardRef } from "react";
+import toNumber from "../../../hooks/toNumber"
 const PaySlipPrint = forwardRef(({ data }, ref) => {
-console.log(data, "data")
+  const calculateNetPay = (data) => {
+    const earnings = toNumber(data.e_total || 0);
+    const deduction = toNumber(data.d_total || 0);
+    return earnings - deduction;
+  };
+
   return (
     <div ref={ref} className="max-w-4xl mx-auto bg-white p-8 font-sans text-sm">
       {/* Header Section */}
@@ -97,7 +103,7 @@ console.log(data, "data")
               <tbody>
                 <tr>
                   <td className="border-r border-black p-2 font-semibold bg-gray-100 w-32">Employee ID</td>
-                  <td className="border-r border-black p-2 w-40">{data.empId}</td>
+                  <td className="border-r border-black p-2 w-40">{data.id}</td>
                   <td className="border-r border-black p-2 font-semibold bg-gray-100 w-32">Employee Name</td>
                   <td className="p-2">{data.name}</td>
                 </tr>
@@ -125,15 +131,15 @@ console.log(data, "data")
                   <td className="border-r border-black p-2 font-semibold">Basic</td>
                   <td className="border-r border-black p-2 text-right">{data?.basic}</td>
                   <td className="border-r border-black p-2 font-semibold">Advance</td>
-                  <td className="p-2 text-right">{data?.advance}</td>
+                  <td className="p-2 text-right">{data?.adv}</td>
                 </tr>
                 <tr className="border-t border-black">
                   <td className="border-r border-black p-2 font-semibold">House Rent</td>
-                  <td className="border-r border-black p-2 text-right">{data?.rent}</td>
+                  <td className="border-r border-black p-2 text-right">{data?.house_rent}</td>
                   <td className="border-r border-black p-2 font-semibold rounded-full border  mx-2 text-center">
                     Loan
                   </td>
-                  <td className="p-2 text-right">{data?.monthly_deduction}</td>
+                  <td className="p-2 text-right">{data?.loan}</td>
                 </tr>
                 <tr className="border-t border-black">
                   <td className="border-r border-black p-2 font-semibold">Medical</td>
@@ -151,21 +157,21 @@ console.log(data, "data")
                 </tr>
                 <tr className="border-t border-black">
                   <td className="border-r border-black p-2 font-semibold">Allowance</td>
-                  <td className="border-r border-black p-2 text-right">{data?.allowance}</td>
+                  <td className="border-r border-black p-2 text-right">{data?.allown}</td>
                   <td className="border-r border-black p-2"></td>
                   <td className="p-2"></td>
                 </tr>
                 <tr className="border-t border-black">
                   <td className="border-r border-black p-2 font-semibold">Bonus</td>
-                  <td className="border-r border-black p-2 text-right">{data?.bonus}</td>
+                  <td className="border-r border-black p-2 text-right">{data?.bonous}</td>
                   <td className="border-r border-black p-2"></td>
                   <td className="p-2"></td>
                 </tr>
                 <tr className="border-t border-r border-black bg-gray-100">
                   <td className="border-r border-black p-2 font-bold">Total Addition</td>
-                  <td className="border-r border-black p-2 text-right font-bold"> {data?.total}</td>
+                  <td className="border-r border-black p-2 text-right font-bold"> {data?.e_total}</td>
                   <td className="border-r border-black p-2 font-bold">Total Deductions</td>
-                  <td className=" border-black p-2 text-right font-bold">{data?.deductionTotal}.00</td>
+                  <td className=" border-black p-2 text-right font-bold">{data?.d_total}.00</td>
                 </tr>
               </tbody>
             </table>
@@ -177,12 +183,12 @@ console.log(data, "data")
               <tbody>
                 <tr className="border-t border-black">
                   <td className=" p-2 font-bold bg-gray-100 w-1/4">Net Salary</td>
-                  <td className="p-2 text-center font-bold text-lg"> {data.netPay} </td>
+                  <td className="p-2 text-center font-bold text-lg"> {calculateNetPay(data)} </td>
                   <td className="p-2"></td>
                 </tr>
                 <tr className="border-t border-black">
                   <td className=" p-2 font-bold bg-gray-100">Salary in Words:</td>
-                  <td className="p-2 font-semibold">{numberToWords(data.netPay).toUpperCase()}</td>
+                  <td className="p-2 font-semibold">{numberToWords(calculateNetPay(data)).toUpperCase()}</td>
                 </tr>
               </tbody>
             </table>

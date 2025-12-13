@@ -19,7 +19,7 @@ const DriverLedger = () => {
   const openingBalance = selectedDriver
     ? driverOpeningBalances[selectedDriver] || 0
     : 0;
-  const TADA_RATE = 300;
+  const TADA_RATE = 0;
 
   // helper states
   const [helpers, setHelpers] = useState([]);
@@ -598,13 +598,13 @@ const toNumber = (val) => {
         {selectedDriver && tadaAmounts[selectedDriver] && (
           <div className="mb-4 p-3 bg-blue-50 rounded-md">
             <h3 className="font-semibold text-primary">
-              TADA Summary for {selectedDriver}
+              Present Summary for {selectedDriver}
             </h3>
             <p>Total Days Present: {tadaAmounts[selectedDriver].days}</p>
-            <p>
+            {/* <p>
               Total TADA Amount: {tadaAmounts[selectedDriver].amount} BDT (300
               BDT per day)
-            </p>
+            </p> */}
           </div>
         )}
         {/* Table with scroll */}
@@ -715,17 +715,17 @@ const toNumber = (val) => {
                       </div>
                     </td>
                   </tr>
-                  <tr className="font-bold bg-gray-100">
+                  {/* <tr className="font-bold bg-gray-100">
                     <td colSpan={17} className="border px-2 py-1">
                       <div className="flex justify-between">
                         <span>TADA Calculation:</span>
                         <span>
-                          {tadaAmounts[selectedDriver].days} days × 300 ={" "}
+                          {tadaAmounts[selectedDriver].days} days × {TADA_RATE} ={" "}
                           {tadaAmounts[selectedDriver].amount} BDT
                         </span>
                       </div>
                     </td>
-                  </tr>
+                  </tr> */}
                   <tr className="font-bold bg-gray-100">
                     {/* <td colSpan={17} className="border px-2 py-1">
                       <div className="flex justify-between">

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FiCalendar } from "react-icons/fi";
-import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import BtnSubmit from "../components/Button/BtnSubmit";
 import { InputField, SelectField } from "../components/Form/FormFields";
@@ -42,6 +41,27 @@ const driverOptions = drivers.map((driver) => ({
   label: driver.driver_name,
 }));
 
+ // select helper from api
+  const [helpers, setHelpers] = useState([]);
+  useEffect(() => {
+  const fetchHelpers = async () => {
+    try {
+      const response = await api.get("/helper"); 
+       const activeHelpers = response.data.data.filter(
+        (helper) => helper.status === "Active"
+      );
+      setHelpers(activeHelpers);
+    } catch (error) {
+      console.error("Error fetching helper data:", error);
+    }
+  };
+
+  fetchHelpers();
+}, []);
+const helperOptions = helpers.map((helper) => ({
+  value: helper.helper_name,
+  label: helper.helper_name,
+}));
    const selectedCategory = watch("vehicle_category");
 const vehicleSizes = {
   pickup: ["1 Ton", "2 Ton", "3 Ton", "7 Feet", "9 Feet"],
@@ -154,6 +174,15 @@ const vehicleSizes = {
                 label="Driver Name"
                 required={id? false:true}
                 options={driverOptions}
+                control={control}
+              />
+            </div>
+            <div className="relative mt-2 md:mt-0 w-full">
+              <SelectField
+                name="helper_name"
+                label="Helper Name"
+                required={id? false:true}
+                options={helperOptions}
                 control={control}
               />
             </div>

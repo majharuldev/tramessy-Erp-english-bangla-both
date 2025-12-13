@@ -87,10 +87,10 @@ const HelperList = () => {
   const exportHelpersToExcel = () => {
     const tableData = filteredHelper.map((Helper, index) => ({
       "SL.": indexOfFirstItem + index + 1,
-      Name: Helper.Helper_name,
+      Name: Helper.helper_name,
       Mobile: Helper.phone,
       Address: Helper.address,
-      Emergency: toNumber(Helper.salary),
+      // Emergency: toNumber(Helper.salary),
       Status: Helper.status,
     }));
 
@@ -159,7 +159,6 @@ const HelperList = () => {
         <th>Name</th>
         <th>Mobile</th>
         <th>Address</th>
-        <th>Salary</th>
       </tr>
     </thead>
   `;
@@ -170,7 +169,6 @@ const HelperList = () => {
       <td>${helper.helper_name || ""}</td>
       <td>${helper.phone || ""}</td>
       <td>${helper.address || ""}</td>
-      <td>${helper.salary || ""}</td>
     </tr>
   `).join("");
 
@@ -313,7 +311,7 @@ const HelperList = () => {
                 <th className="p-2">Name</th>
                 <th className="p-2">Mobile</th>
                 <th className="p-2">Address</th>
-                <th className="p-2">Salary</th>
+                <th className="p-2">Vehicle Category</th>
                 <th className="p-2">Status</th>
                 <th className="p-2 action_column">Action</th>
               </tr>

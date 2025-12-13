@@ -817,7 +817,7 @@ const PurchaseList = () => {
               </section>
 
               {/* Creator Info */}
-              <section>
+              {/* <section>
                 <h3 className="text-lg font-semibold text-primary border-b pb-2 mb-4">
                   System Info
                 </h3>
@@ -832,7 +832,76 @@ const PurchaseList = () => {
                     />
                   </div>
                 </div>
-              </section>
+              </section> */}
+
+              <section>
+  <h3 className="text-lg font-semibold text-primary border-b pb-2 mb-4">
+    System Info
+  </h3>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm md:text-base">
+    <p>
+      <span className="font-medium text-gray-600">Created By:</span>{" "}
+      {selectedPurchase.created_by}
+    </p>
+    <div className="flex flex-col items-start">
+      <span className="font-medium mb-2">Bill Document:</span>
+      {selectedPurchase.image ? (
+        <div>
+          {/* Check if file is PDF or Image */}
+          {selectedPurchase.image.toLowerCase().endsWith(".pdf") ||
+          selectedPurchase.image.includes("pdf") ? (
+            // PDF Preview
+            <div className="border rounded-lg p-2 bg-gray-50">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-red-600 font-bold">PDF</span>
+                <span className="text-sm text-gray-600">
+                  {selectedPurchase.image}
+                </span>
+              </div>
+              <a
+                href={`https://ajenterprise.tramessy.com/backend/uploads/purchase/${selectedPurchase.image}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 text-sm underline"
+              >
+                View PDF
+              </a>
+              {/* Optional: Embed PDF preview */}
+              {/* <iframe
+                src={`https://ajenterprise.tramessy.com/backend/uploads/purchase/${selectedPurchase.image}`}
+                className="w-full h-48 mt-2 border rounded"
+                title="PDF Preview"
+              /> */}
+            </div>
+          ) : (
+            // Image Preview
+            <img
+              src={`https://ajenterprise.tramessy.com/backend/uploads/purchase/${selectedPurchase.image}`}
+              alt="Bill"
+              className="w-32 h-32 object-cover rounded-lg border"
+              onError={(e) => {
+                // If image fails to load, show placeholder
+                e.target.onerror = null;
+                e.target.src = "/placeholder-image.png";
+                e.target.className = "w-32 h-32 object-contain rounded-lg border p-2";
+              }}
+            />
+          )}
+          {/* Download link for both */}
+          <a
+            href={`https://ajenterprise.tramessy.com/backend/uploads/purchase/${selectedPurchase.image}`}
+            download
+            className="block mt-2 text-blue-600 hover:text-blue-800 text-sm"
+          >
+            Download File
+          </a>
+        </div>
+      ) : (
+        <span className="text-gray-500 italic">No bill image uploaded</span>
+      )}
+    </div>
+  </div>
+</section>
 
               {/* Purchase Items */}
               {(

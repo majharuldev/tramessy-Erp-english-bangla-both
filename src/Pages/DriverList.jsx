@@ -328,7 +328,7 @@ const CarList = () => {
                 <th className="px-2 py-4">Name</th>
                 <th className="px-2 py-4">Mobile</th>
                 <th className="px-2 py-4 w-40 ">Address</th>
-                {/* <th className="p-2">OpeningBalance</th> */}
+                <th className="p-2">Vehicle Category</th>
                 <th className="px-2 py-4">License</th>
                 <th className="px-2 py-4">Expired</th>
                 <th className="px-2 py-4">Status</th>
@@ -353,7 +353,7 @@ const CarList = () => {
                   <td className="p-2">{driver.driver_name}</td>
                   <td className="p-2">{driver.driver_mobile}</td>
                   <td className="p-2 ">{driver.address}</td>
-                  {/* <td className="p-2">{driver.opening_balance}</td> */}
+                  <td className="p-2">{driver.vehicle_category}</td>
                   <td className="p-2">{driver.lincense}</td>
                   <td className="p-2">{tableFormatDate(driver.expire_date)}</td>
                   <td className="p-2">

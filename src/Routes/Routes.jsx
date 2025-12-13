@@ -487,7 +487,11 @@ export const router = createBrowserRouter([
         element: <Bonus />,
       },  
       {
-        path: "/tramessy/HR/payrol/salary-sheet",
+        path: "/tramessy/HR/payroll/generate-salary",
+        element: <GenerateSalary/>,
+      },
+      {
+        path: "/tramessy/HR/payrol/salary-sheet/:id",
         element: <SalarySheet/>,
       },
       {

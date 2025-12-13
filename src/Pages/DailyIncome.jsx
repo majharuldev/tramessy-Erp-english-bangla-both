@@ -371,15 +371,15 @@ const DailyIncome = () => {
                     <td className="px-4 py-4">
                       {tableFormatDate(trip.start_date)}
                     </td>
-                    <td className="px-4 py-4">{trip.customer}</td>
-                    <td className="px-4 py-4">{trip.vehicle_no}</td>
-                    <td className="px-4 py-4">{trip.load_point}</td>
-                    <td className="px-4 py-4">{trip.unload_point}</td>
-                    <td className="px-4 py-4">{trip.total_rent}</td>
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-4 border border-gray-300">{trip.customer}</td>
+                    <td className="px-4 py-4 border border-gray-300">{trip.vehicle_no}</td>
+                    <td className="px-4 py-4 border border-gray-300">{trip.load_point}</td>
+                    <td className="px-4 py-4 border border-gray-300">{trip.unload_point}</td>
+                    <td className="px-4 py-4 border border-gray-300">{trip.total_rent}</td>
+                    <td className="px-4 py-4 border border-gray-300">
                       {Number(trip.total_exp || 0)}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-4 border border-gray-300">
                       {(Number(trip.total_rent || 0) - Number(trip.total_exp || 0))}{" "}
                       {/* Corrected profit calculation */}
                     </td>

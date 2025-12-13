@@ -886,18 +886,18 @@ const PurchaseReport = () => {
                 <th className="p-2">Purchase Amount</th>
               </tr>
             </thead>
-            <tbody className="text-gray-700">
+            <tbody className="text-gray-700 ">
               {currentPurchase.map((p, i) => (
-                <tr key={p.id}>
-                  <td className="p-2">{i + 1}</td>
-                  <td className="p-2">{tableFormatDate(p.date)}</td>
-                  <td className="p-2">{p.supplier_name}</td>
-                  <td className="p-2">{p.category}</td>
-                  <td className="p-2">{p.items?.[0]?.item_name}</td>
-                  <td className="p-2">{p.items?.[0]?.quantity}</td>
-                  <td className="p-2">{p.items?.[0]?.unit_price}</td>
-                  <td className="p-2">{p.service_charge}</td>
-                  <td className="p-2">{p.purchase_amount}</td>
+                <tr key={p.id} className="border border-gray-300">
+                  <td className="p-2 border border-gray-300">{i + 1}</td>
+                  <td className="p-2 border border-gray-300">{tableFormatDate(p.date)}</td>
+                  <td className="p-2 border border-gray-300">{p.supplier_name}</td>
+                  <td className="p-2 border border-gray-300">{p.category}</td>
+                  <td className="p-2 border border-gray-300">{p.items?.[0]?.item_name}</td>
+                  <td className="p-2 border border-gray-300">{p.items?.[0]?.quantity}</td>
+                  <td className="p-2 border border-gray-300">{p.items?.[0]?.unit_price}</td>
+                  <td className="p-2 border border-gray-300">{p.service_charge}</td>
+                  <td className="p-2 border border-gray-300">{p.purchase_amount}</td>
                 </tr>
               ))}
               {currentPurchase.length === 0 && (

@@ -7,6 +7,7 @@ import Pagination from "../../../components/Shared/Pagination";
 import { IoMdClose } from "react-icons/io";
 import toast from "react-hot-toast";
 import { tableFormatDate } from "../../../hooks/formatDate";
+import logo from "../../../assets/AJ_Logo.png"
 
 const Requisition = () => {
   const [requisition, setRequisition] = useState([]);
@@ -16,6 +17,7 @@ const Requisition = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const toggleModal = () => setIsOpen(!isOpen);
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,10 +54,253 @@ const Requisition = () => {
     return emp ? emp.employee_name || emp.email : empId;
   };
 
+  const filteredData = requisition.filter((item) => {
+  const employeeName = getEmployeeName(item.employee_id)?.toLowerCase() || "";
+  const purpose = item.purpose?.toLowerCase() || "";
+  const amount = String(item.amount)?.toLowerCase() || "";
+
+  return (
+    employeeName.includes(searchTerm.toLowerCase()) ||
+    purpose.includes(searchTerm.toLowerCase()) ||
+    amount.includes(searchTerm.toLowerCase())
+  );
+});
+
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentItems = requisition.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(requisition.length / itemsPerPage);
+  const currentItems = filteredData.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  // excel
+  const exportExcel = () => {
+  const header = ["SL", "Date", "Employee", "Purpose", "Amount", "Remarks"];
+  
+  const rows = filteredData.map((item, index) => ({
+    SL: index + 1,
+    Date: tableFormatDate(item.date),
+    Employee: getEmployeeName(item.employee_id),
+    Purpose: item.purpose,
+    Amount: Number(item.amount), // numeric format
+    Remarks: item.remarks,
+  }));
+
+  const csvData = [
+    header.join(","),
+    ...rows.map(row =>
+      `${row.SL},${row.Date},${row.Employee},${row.Purpose},${row.Amount},${row.Remarks}`
+    )
+  ].join("\n");
+
+  const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "Requisition_List.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// print
+// const printTable = () => {
+//   const printWindow = window.open("", "", "width=900,height=600");
+
+//   const printContent = `
+//     <html>
+//       <head>
+//         <title>Requisition List</title>
+//         <style>
+//           table { width: 100%; border-collapse: collapse; font-size: 12px; }
+//           th, td { border: 1px solid #333; padding: 6px; }
+//           th { background: #f0f0f0; }
+//         </style>
+//       </head>
+//       <body>
+//         <h2 style="text-align:center">Requisition List</h2>
+//         <table>
+//           <thead>
+//             <tr>
+//               <th>#</th><th>Date</th><th>Employee</th>
+//               <th>Purpose</th><th>Amount</th><th>Remarks</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             ${filteredData
+//               .map(
+//                 (item, index) => `
+//               <tr>
+//                 <td>${index + 1}</td>
+//                 <td>${tableFormatDate(item.date)}</td>
+//                 <td>${getEmployeeName(item.employee_id)}</td>
+//                 <td>${item.purpose}</td>
+//                 <td>${item.amount}</td>
+//                 <td>${item.remarks}</td>
+//               </tr>`
+//               )
+//               .join("")}
+//           </tbody>
+//         </table>
+//       </body>
+//     </html>
+//   `;
+
+//   printWindow.document.write(printContent);
+//   printWindow.document.close();
+//   printWindow.print();
+// };
+
+const printTable = () => {
+  const printWindow = window.open("", "", "width=900,height=600");
+
+  const printContent = `
+  <html>
+    <head>
+      <title>Requisition List</title>
+      <style>
+        @media print {
+          @page {
+            margin: 20mm;
+          }
+
+          body {
+            font-family: Arial, sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          /* Header repeat on every page */
+          .print-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+          }
+
+          .header-space {
+            height: 120px; /* Space for repeated header */
+          }
+
+          table { page-break-inside: auto; }
+          tr { page-break-inside: avoid; page-break-after: auto; }
+        }
+
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          text-align: center;
+          width: 100%;
+        }
+
+        .header-logo {
+          width: 100px;
+          text-align: left;
+        }
+
+        .header-logo img {
+          width: 70px;
+          height: auto;
+        }
+
+        .header-title {
+          flex: 1;
+          text-align: center;
+          font-size: 14px;
+          font-weight: bold;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 12px;
+          margin-top: 10px;
+        }
+
+        th, td {
+          border: 1px solid #333;
+          padding: 6px;
+        }
+
+        th {
+          background: #f0f0f0;
+        }
+      </style>
+    </head>
+
+    <body>
+
+      <!-- Repeatable Header -->
+      <div class="print-header">
+        <div class="header">
+          
+          <!-- Left Logo Section -->
+          <div class="header-logo">
+            <img src="${logo}" />
+            <div style="font-size:12px; font-weight:bold;">
+              M/S A J ENTERPRISE
+            </div>
+          </div>
+
+          <!-- Center Header Section -->
+          <div class="header-title">
+            <h2 style="margin:0;">M/S AJ Enterprise</h2>
+            <div style="font-size:12px; font-weight:normal;">
+              Razzak Plaza, 11th Floor, Room J-12<br/>
+              2 Sahid Tajuddin Sarani, Moghbazar, Dhaka-1217
+            </div>
+          </div>
+
+          <div style="width:100px;"></div>
+
+        </div>
+      </div>
+
+      <!-- Push Content Below Header -->
+      <div class="header-space"></div>
+
+      <h2 style="text-align:center; margin-top:0;">Requisition List</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Employee</th>
+            <th>Purpose</th>
+            <th>Amount</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredData
+            .map(
+              (item, index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${tableFormatDate(item.date)}</td>
+              <td>${getEmployeeName(item.employee_id)}</td>
+              <td>${item.purpose}</td>
+              <td>${item.amount}</td>
+              <td>${item.remarks}</td>
+            </tr>
+          `
+            )
+            .join("")}
+        </tbody>
+      </table>
+
+    </body>
+  </html>
+  `;
+
+  printWindow.document.write(printContent);
+  printWindow.document.close();
+  printWindow.print();
+};
+
+
 
   return (
     <div className="p-2">
@@ -70,6 +315,54 @@ const Requisition = () => {
               <FaPlus /> Add Requisition
             </button>
           </Link>
+        </div>
+        <div className="md:flex justify-between items-center mb-5">
+          <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
+            <button
+              onClick={exportExcel}
+              className="py-1 px-5 hover:bg-primary bg-white shadow hover:text-white rounded transition-all duration-300 cursor-pointer"
+            >
+              Excel
+            </button>
+            {/* <button
+              onClick={exportPDF}
+              className="py-1 px-5 hover:bg-primary bg-white shadow hover:text-white rounded transition-all duration-300 cursor-pointer"
+            >
+              PDF
+            </button> */}
+            <button
+              onClick={printTable}
+              className="py-1 px-5 hover:bg-primary bg-white shadow hover:text-white rounded transition-all duration-300 cursor-pointer"
+            >
+              Print
+            </button>
+          </div>
+          {/*  */}
+          <div className="mt-3 md:mt-0">
+            {/* <span className="text-primary font-semibold pr-3">Search: </span> */}
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search Requisition..."
+              className="border border-gray-300 rounded-md outline-none text-xs py-2 ps-2 pr-5"
+            />
+             {/*  Clear button */}
+    {searchTerm && (
+      <button
+        onClick={() => {
+          setSearchTerm("");
+          setCurrentPage(1);
+        }}
+        className="absolute right-5 top-[5.3rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
+      >
+        ✕
+      </button>
+    )}
+          </div>
         </div>
 
         <table className="min-w-full text-sm text-left border">

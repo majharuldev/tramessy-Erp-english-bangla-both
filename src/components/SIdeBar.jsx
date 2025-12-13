@@ -43,9 +43,12 @@ const Sidebar = () => {
     <div className="overflow-y-scroll hide-scrollbar">
       <main>
         {/* Logo */}
-        <div className="py-[15px] flex justify-center border-b border-gray-300">
+        <div className="py-[9px] flex justify-center border-b border-gray-300">
           <Link to="/tramessy">
-            <img src={logo} alt="Logo" className="w-11" />
+            <img src={logo} alt="Logo" className="w-10" />
+            <div className="text-xs text-secondary">
+              <div className="font-semibold">M/S A J ENTERPRISE</div>
+            </div>
           </Link>
         </div>
 
@@ -66,11 +69,10 @@ const Sidebar = () => {
           <ul className="space-y-3">
             {/* Dashboard */}
             <li
-              className={`py-3 px-2 rounded-sm cursor-pointer ${
-                isActive("/tramessy")
+              className={`py-3 px-2 rounded-sm cursor-pointer ${isActive("/tramessy")
                   ? "text-gray-700 bg-gray-200"
                   : "text-gray-700 "
-              }`}
+                }`}
             >
               <Link
                 to="/tramessy"
@@ -80,40 +82,38 @@ const Sidebar = () => {
                 <span className="ps-2">Dashboard</span>
               </Link>
             </li>
-              <>
-               
-                    <ul className=" text-sm mt-2">
-                      <li>
-                        <Link
-                          to="/tramessy/TripList"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/TripList")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-700 hover:text-primary"
-                          }`}
-                        >
-                          <FaTruckPickup />
-                          <span>Trip Management</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/tramessy/CarList"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/CarList")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-700 hover:text-primary"
-                          }`}
-                        >
-                          <FaCarRear />
-                          <span>Vehicle Info</span>
-                        </Link>
-                      </li>
-                      
-                    </ul>
-              
-                {/* Fleet Management */}
-                {/* <li className="text-gray-700 font-medium rounded-sm">
+            <>
+
+              <ul className=" text-sm mt-2">
+                <li>
+                  <Link
+                    to="/tramessy/TripList"
+                    className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/TripList")
+                        ? "text-gray-700 bg-gray-200"
+                        : "text-gray-700 hover:text-primary"
+                      }`}
+                  >
+                    <FaTruckPickup />
+                    <span>Trip Management</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/tramessy/CarList"
+                    className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/CarList")
+                        ? "text-gray-700 bg-gray-200"
+                        : "text-gray-700 hover:text-primary"
+                      }`}
+                  >
+                    <FaCarRear />
+                    <span>Vehicle Info</span>
+                  </Link>
+                </li>
+
+              </ul>
+
+              {/* Fleet Management */}
+              {/* <li className="text-gray-700 font-medium rounded-sm">
                   <div
                     role="button"
                     tabIndex={0}
@@ -135,62 +135,58 @@ const Sidebar = () => {
 
                   
                 </li> */}
-                {/* Vendor management */}
-                <li className="text-gray-700 font-medium rounded-sm">
-                  <div
-                    onClick={() => toggleMenu("vendor")}
-                    className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
-                  >
-                    <span className="flex items-center gap-2">
-                      <FaUsers />
-                      <span>Vendor Management</span>
-                    </span>
-                    <span
-                      className={`transform transition-transform duration-900 ${
-                        openMenu.vendor ? "rotate-180" : ""
+              {/* Vendor management */}
+              <li className="text-gray-700 font-medium rounded-sm">
+                <div
+                  onClick={() => toggleMenu("vendor")}
+                  className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
+                >
+                  <span className="flex items-center gap-2">
+                    <FaUsers />
+                    <span>Vendor Management</span>
+                  </span>
+                  <span
+                    className={`transform transition-transform duration-900 ${openMenu.vendor ? "rotate-180" : ""
                       }`}
-                    >
-                      <FaChevronDown />
-                    </span>
-                  </div>
-
-                  <div
-                    className={`transition-all duration-900 ease-in-out overflow-hidden ${
-                      openMenu.vendor ? "max-h-[100px]" : "max-h-0"
-                    }`}
                   >
-                    <ul className="space-y-3 px-2 text-sm mt-2">
-                      <li>
-                        <Link
-                          to="/tramessy/VendorList"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/VendorList")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
+                    <FaChevronDown />
+                  </span>
+                </div>
+
+                <div
+                  className={`transition-all duration-900 ease-in-out overflow-hidden ${openMenu.vendor ? "max-h-[100px]" : "max-h-0"
+                    }`}
+                >
+                  <ul className="space-y-3 px-2 text-sm mt-2">
+                    <li>
+                      <Link
+                        to="/tramessy/VendorList"
+                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/VendorList")
+                            ? "text-gray-700 bg-gray-200"
+                            : "text-gray-500 hover:text-primary"
                           }`}
-                        >
-                         
-                          <span>Vendor </span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/tramessy/RentList"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/RentList")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
+                      >
+
+                        <span>Vendor </span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tramessy/RentList"
+                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/RentList")
+                            ? "text-gray-700 bg-gray-200"
+                            : "text-gray-500 hover:text-primary"
                           }`}
-                        >
-                          
-                          <span>Rent Vehicle</span>
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-                {/* Rent management */}
-                {/* <li className="text-primary font-medium rounded-sm">
+                      >
+
+                        <span>Rent Vehicle</span>
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              {/* Rent management */}
+              {/* <li className="text-primary font-medium rounded-sm">
                   <div
                     onClick={() => toggleMenu("rentVehicle")}
                     className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
@@ -230,36 +226,34 @@ const Sidebar = () => {
                     </ul>
                   </div>
                 </li> */}
-                {/* HR management */}
-                <li className="text-gray-700 font-medium rounded-sm">
-                  {/* HR main toggle */}
-                  <div
-                    onClick={() => toggleMenu("hrManagement")}
-                    className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-900"
-                  >
-                    <span className="flex items-center gap-2">
-                      <FaUsersCog />
-                      <span>HR</span>
-                    </span>
-                    <span
-                      className={`transform transition-transform duration-900 ${
-                        openMenu.hrManagement ? "rotate-180" : ""
+              {/* HR management */}
+              <li className="text-gray-700 font-medium rounded-sm">
+                {/* HR main toggle */}
+                <div
+                  onClick={() => toggleMenu("hrManagement")}
+                  className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-900"
+                >
+                  <span className="flex items-center gap-2">
+                    <FaUsersCog />
+                    <span>HR</span>
+                  </span>
+                  <span
+                    className={`transform transition-transform duration-900 ${openMenu.hrManagement ? "rotate-180" : ""
                       }`}
-                    >
-                      <FaChevronDown />
-                    </span>
-                  </div>
-
-                  {/* Animate HR submenu */}
-                  <div
-                    className={`transition-all duration-900 overflow-hidden px-1 ${
-                      openMenu.hrManagement ? "max-h-[700px]" : "max-h-0"
-                    }`}
                   >
-                    <ul className="space-y-2 px-2 text-sm mt-2">
-                      <li>
-                        {/* HRM toggle inside HR */}
-                        {/* <div
+                    <FaChevronDown />
+                  </span>
+                </div>
+
+                {/* Animate HR submenu */}
+                <div
+                  className={`transition-all duration-900 overflow-hidden px-1 ${openMenu.hrManagement ? "max-h-[700px]" : "max-h-0"
+                    }`}
+                >
+                  <ul className="space-y-2 px-2 text-sm mt-2">
+                    <li>
+                      {/* HRM toggle inside HR */}
+                      {/* <div
                           onClick={() => toggleMenu("hrm")}
                           className="flex justify-between items-center p-2 cursor-pointer hover:text-primary rounded-sm"
                         >
@@ -275,112 +269,105 @@ const Sidebar = () => {
                             <FaChevronDown />
                           </span>
                         </div> */}
-                        {/* Animate HRM nested submenu */}
-                        {/* <div
+                      {/* Animate HRM nested submenu */}
+                      {/* <div
                           className={`transition-all duration-900 overflow-hidden ${
                             openMenu.hrm ? "max-h-[500px]" : "max-h-0"
                           }`}
                         > */}
-                          <ul className="pl-6 space-y-2 mt-1">
-                            <li>
-                              <Link
-                                to="/tramessy/HR/HRM/employee-list"
-                                className={`flex gap-2 items-center block p-2 rounded-sm ${
-                                  isActive("/tramessy/HR/HRM/employee-list")
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                               
-                                Employee Info
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/tramessy/DriverList"
-                                className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                                  isActive("/tramessy/DriverList")
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                                
-                                <span>Driver Info</span>
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/tramessy/HelperList"
-                                className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                                  isActive("/tramessy/HelperList")
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                               
-                                <span>Helper Info</span>
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/tramessy/HR/HRM/Office"
-                                className={`flex gap-2 items-center p-2 rounded-sm ${
-                                  isActive("/tramessy/HR/HRM/Office")
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                                
-                                Office
-                              </Link>
-                            </li>
-                             <li>
-                              <Link
-                                to="/tramessy/HR/salary-dispatch"
-                                className={`flex gap-2 items-center block p-2 rounded-sm ${
-                                  isActive("/tramessy/HR/salary-dispatch")
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                                
-                                Salary Dispatch
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/tramessy/HR/HRM/office-expense"
-                                className={`flex gap-2 items-center block p-2 rounded-sm ${
-                                  isActive("/tramessy/HR/HRM/office-expense")
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                               
-                                Office Expense
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/tramessy/HR/advance-requisition"
-                                className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                                  isActive("/tramessy/HR/advance-requisition")
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                                
-                                <span>Requisition</span>
-                              </Link>
-                            </li>
-                          </ul>
-                        {/* </div> */}
-                      </li>
-                    </ul>
-                  </div>
+                      <ul className="pl-6 space-y-2 mt-1">
+                        <li>
+                          <Link
+                            to="/tramessy/HR/HRM/employee-list"
+                            className={`flex gap-2 items-center block p-2 rounded-sm ${isActive("/tramessy/HR/HRM/employee-list")
+                                ? "text-gray-700 bg-gray-200"
+                                : "text-gray-500 hover:text-primary"
+                              }`}
+                          >
 
-                  {/* Animate HR submenu attendance*/}
-                  {/* <div
+                            Employee Info
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/tramessy/DriverList"
+                            className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/DriverList")
+                                ? "text-gray-700 bg-gray-200"
+                                : "text-gray-500 hover:text-primary"
+                              }`}
+                          >
+
+                            <span>Driver Info</span>
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/tramessy/HelperList"
+                            className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/HelperList")
+                                ? "text-gray-700 bg-gray-200"
+                                : "text-gray-500 hover:text-primary"
+                              }`}
+                          >
+
+                            <span>Helper Info</span>
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/tramessy/HR/HRM/Office"
+                            className={`flex gap-2 items-center p-2 rounded-sm ${isActive("/tramessy/HR/HRM/Office")
+                                ? "text-gray-700 bg-gray-200"
+                                : "text-gray-500 hover:text-primary"
+                              }`}
+                          >
+
+                            Office
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/tramessy/HR/salary-dispatch"
+                            className={`flex gap-2 items-center block p-2 rounded-sm ${isActive("/tramessy/HR/salary-dispatch")
+                                ? "text-gray-700 bg-gray-200"
+                                : "text-gray-500 hover:text-primary"
+                              }`}
+                          >
+
+                            Salary Dispatch
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/tramessy/HR/HRM/office-expense"
+                            className={`flex gap-2 items-center block p-2 rounded-sm ${isActive("/tramessy/HR/HRM/office-expense")
+                                ? "text-gray-700 bg-gray-200"
+                                : "text-gray-500 hover:text-primary"
+                              }`}
+                          >
+
+                            Office Expense
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/tramessy/HR/advance-requisition"
+                            className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/HR/advance-requisition")
+                                ? "text-gray-700 bg-gray-200"
+                                : "text-gray-500 hover:text-primary"
+                              }`}
+                          >
+
+                            <span>Requisition</span>
+                          </Link>
+                        </li>
+                      </ul>
+                      {/* </div> */}
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Animate HR submenu attendance*/}
+                {/* <div
                     className={`transition-all duration-300 overflow-hidden px-1 ${
                       openMenu.hrManagement ? "max-h-[200px]" : "max-h-0"
                     }`}
@@ -433,8 +420,8 @@ const Sidebar = () => {
                       </li>
                     </ul>
                   </div> */}
-                  {/* Animate HR submenu leave*/}
-                  {/* <div
+                {/* Animate HR submenu leave*/}
+                {/* <div
                     className={`transition-all duration-300 overflow-hidden px-1 ${
                       openMenu.hrManagement ? "max-h-[200px]" : "max-h-0"
                     }`}
@@ -488,112 +475,118 @@ const Sidebar = () => {
                       </li>
                     </ul>
                   </div> */}
-                  {/* Animate HR submenu Payroll*/}
-                  <div
-                    className={`transition-all duration-300 overflow-hidden px-1 ${
-                      openMenu.hrManagement ? "max-h-[400px]" : "max-h-0"
+                {/* Animate HR submenu Payroll*/}
+                <div
+                  className={`transition-all duration-300 overflow-hidden px-1 ${openMenu.hrManagement ? "max-h-[400px]" : "max-h-0"
                     }`}
-                  >
-                    <ul className="space-y-2 px-2 text-sm mt-2">
-                      <li>
-                        <div
-                          onClick={() => toggleMenu("payroll")}
-                          className="flex justify-between items-center p-2 cursor-pointer hover:text-primary rounded-sm"
-                        >
-                          <span className="flex gap-2 items-center">
-                            <span>Payroll</span>
-                          </span>
-                          <span
-                            className={`transform transition-transform duration-900 ${
-                              openMenu.payroll ? "rotate-180" : ""
+                >
+                  <ul className="space-y-2 px-2 text-sm mt-2">
+                    <li>
+                      <div
+                        onClick={() => toggleMenu("payroll")}
+                        className="flex justify-between items-center p-2 cursor-pointer hover:text-primary rounded-sm"
+                      >
+                        <span className="flex gap-2 items-center">
+                          <span>Payroll</span>
+                        </span>
+                        <span
+                          className={`transform transition-transform duration-900 ${openMenu.payroll ? "rotate-180" : ""
                             }`}
-                          >
-                            <FaChevronDown />
-                          </span>
-                        </div>
-                      
-                        <div
-                          className={`transition-all duration-900 overflow-hidden ${
-                            openMenu.payroll ? "max-h-[500px]" : "max-h-0"
-                          }`}
                         >
-                          <ul className="pl-6 space-y-2 mt-1">
-                            <li>
+                          <FaChevronDown />
+                        </span>
+                      </div>
+
+                      <div
+                        className={`transition-all duration-900 overflow-hidden ${openMenu.payroll ? "max-h-[500px]" : "max-h-0"
+                          }`}
+                      >
+                        <ul className="pl-6 space-y-2 mt-1">
+                          <li>
                             <Link
                               to="/tramessy/HR/Payroll/Attendance"
-                              className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                                isActive("/tramessy/HR/Payroll/Attendance")
+                              className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/HR/Payroll/Attendance")
                                   ? "text-gray-700 bg-gray-200"
                                   : "text-gray-500 hover:text-primary"
-                              }`}
+                                }`}
                             >
-                             
+
                               <span>Attendance</span>
                             </Link>
                           </li>
-                           <li>
-                              <Link
-                                to="/tramessy/HR/payroll/bonus"
-                                className={`block p-2 rounded-sm ${
-                                  isActive(
-                                    "/tramessy/HR/payroll/bonus"
-                                  )
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
+                          <li>
+                            <Link
+                              to="/tramessy/HR/payroll/bonus"
+                              className={`block p-2 rounded-sm ${isActive(
+                                "/tramessy/HR/payroll/bonus"
+                              )
+                                  ? "text-gray-700 bg-gray-200"
+                                  : "text-gray-500 hover:text-primary"
                                 }`}
-                              >
-                                Bonus
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/tramessy/HR/Payroll/Advance-Salary"
-                                className={`flex items-center gap-2 p-2 rounded-sm ${
-                                  isActive(
-                                    "/tramessy/HR/Payroll/Advance-Salary"
-                                  )
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
+                            >
+                              Bonus
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/tramessy/HR/Payroll/Advance-Salary"
+                              className={`flex items-center gap-2 p-2 rounded-sm ${isActive(
+                                "/tramessy/HR/Payroll/Advance-Salary"
+                              )
+                                  ? "text-gray-700 bg-gray-200"
+                                  : "text-gray-500 hover:text-primary"
                                 }`}
-                              >
-                                Salary Advance
-                              </Link>
-                            </li>
-                             <li>
-                              <Link
-                                to="/tramessy/HR/payroll/loan"
-                                className={`block p-2 rounded-sm ${
-                                  isActive(
-                                    "/tramessy/HR/payroll/loan"
-                                  )
-                                    ? "text-gray-700 bg-gray-200"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                                Loan
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/tramessy/HR/payrol/salary-sheet"
-                                className={`block p-2 rounded-sm ${
-                                  isActive("/HR/salary-sheet")
-                                    ? "text-white bg-primary"
-                                    : "text-gray-500 hover:text-primary"
-                                }`}
-                              >
-                                 Salary Sheet
-                              </Link>
-                            </li>
-                          </ul>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
+                            >
+                              Salary Advance
+                            </Link>
+                          </li>
 
-                {/* Inventory management */}
-                {/* <li className="text-primary font-medium rounded-sm">
+                          <li>
+                            <Link
+                              to="/tramessy/HR/payroll/loan"
+                              className={`block p-2 rounded-sm ${isActive(
+                                "/tramessy/HR/payroll/loan"
+                              )
+                                  ? "text-gray-700 bg-gray-200"
+                                  : "text-gray-500 hover:text-primary"
+                                }`}
+                            >
+                              Loan
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/tramessy/HR/payroll/generate-salary"
+                              className={`flex items-center gap-2 p-2 rounded-sm ${isActive(
+                                "/tramessy/HR/payroll/generate-salary"
+                              )
+                                  ? "text-gray-700 bg-gray-200"
+                                  : "text-gray-500 hover:text-primary"
+                                }`}
+                            >
+                              Generate Salary
+                            </Link>
+                          </li>
+                          {/* <li>
+                            <Link
+                              to="/tramessy/HR/payrol/salary-sheet"
+                              className={`block p-2 rounded-sm ${isActive("/HR/salary-sheet")
+                                  ? "text-white bg-primary"
+                                  : "text-gray-500 hover:text-primary"
+                                }`}
+                            >
+                              Salary Sheet
+                            </Link>
+                          </li> */}
+                        </ul>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+
+              {/* Inventory management */}
+              {/* <li className="text-primary font-medium rounded-sm">
                   <div
                     onClick={() => toggleMenu("inventory")}
                     className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-900"
@@ -670,156 +663,19 @@ const Sidebar = () => {
                     </ul>
                   </div>
                 </li> */}
-                {/* Purchase */}
-                <li className="text-gray-700 font-medium rounded-sm">
-                  <div
-                    onClick={() => toggleMenu("purchase")}
-                    className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-900 outline-none"
-                  >
-                    <span className="flex items-center gap-2">
-                      <RiLuggageCartLine />
-                      <span>Purchase</span>
-                    </span>
-                    <span
-                      className={`transform transition-transform duration-900 ${
-                        openMenu.purchase ? "rotate-180" : ""
-                      }`}
-                    >
-                      <FaChevronDown />
-                    </span>
-                  </div>
-
-                  {/* Dropdown container with smooth expand/collapse */}
-                  <div
-                    className={`transition-all duration-900 ease-in-out overflow-hidden ${
-                      openMenu.purchase ? "max-h-[200px]" : "max-h-0"
-                    }`}
-                  >
-                    <ul className="space-y-3 px-2 text-sm mt-2">
-                      <li>
-                        <Link
-                          to="/tramessy/Purchase/maintenance"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/Purchase/maintenance")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
-                          }`}
-                        >
-                          
-                          <span>Maintenance</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/tramessy/Purchase/official-product"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/Purchase/official-product")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
-                          }`}
-                        >
-                          
-                          <span>Official Products</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/tramessy/Purchase/SupplierList"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/Purchase/SupplierList")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
-                          }`}
-                        >
-                          
-                          <span>Supplier List</span>
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-                {/* Customer */}
-                <li className="text-gray-700 font-medium rounded-sm">
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => toggleMenu("customer")}
-                    onKeyDown={(e) =>
-                      (e.key === "Enter" || e.key === " ") &&
-                      toggleMenu("customer")
-                    }
-                    className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300 outline-none"
-                  >
-                    <span className="flex items-center gap-2">
-                      <PiUsersFour />
-                      <span>Customer</span>
-                    </span>
-                    <span
-                      className={`transform transition-transform duration-500 ${
-                        openMenu.customer ? "rotate-180" : ""
-                      }`}
-                    >
-                      <FaChevronDown />
-                    </span>
-                  </div>
-
-                  {/* Dropdown container with smooth expand/collapse */}
-                  <div
-                    className={`transition-all duration-700 ease-in-out overflow-hidden ${
-                      openMenu.customer ? "max-h-[500px]" : "max-h-0"
-                    }`}
-                  >
-                    <ul className="space-y-3 px-2 text-sm mt-2">
-                      <li>
-                        <Link
-                          to="/tramessy/Customer"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/Customer")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
-                          }`}
-                        >
-                          
-                          <span>Customer Info</span>
-                        </Link>
-                      </li>
-                      {isAdmin&&<li>
-                        <Link
-                          to="/tramessy/route-pricing"
-                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                            isActive("/tramessy/route-pricing")
-                              ? "text-gray-700 bg-gray-200"
-                              : "text-gray-500 hover:text-primary"
-                          }`}
-                        >
-                          
-                          <span>Route Pricing</span>
-                        </Link>
-                      </li>}
-                    </ul>
-                  </div>
-                </li>
-                {/* Business */}
-              {isAdmin &&( <>
-                <li className="text-gray-700 font-medium rounded-sm">
+              {/* Purchase */}
+              <li className="text-gray-700 font-medium rounded-sm">
                 <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => toggleMenu("business")}
-                  onKeyDown={(e) =>
-                    (e.key === "Enter" || e.key === " ") &&
-                    toggleMenu("business")
-                  }
-                  className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300 outline-none"
+                  onClick={() => toggleMenu("purchase")}
+                  className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-900 outline-none"
                 >
                   <span className="flex items-center gap-2">
-                      <FaNewspaper />
-                    <span>Financial Report</span>
+                    <RiLuggageCartLine />
+                    <span>Purchase</span>
                   </span>
                   <span
-                    className={`transform transition-transform duration-500 ${
-                      openMenu.business ? "rotate-180" : ""
-                    }`}
+                    className={`transform transition-transform duration-900 ${openMenu.purchase ? "rotate-180" : ""
+                      }`}
                   >
                     <FaChevronDown />
                   </span>
@@ -827,39 +683,163 @@ const Sidebar = () => {
 
                 {/* Dropdown container with smooth expand/collapse */}
                 <div
-                  className={`transition-all duration-700 ease-in-out overflow-hidden ${
-                    openMenu.business ? "max-h-[500px]" : "max-h-0"
-                  }`}
+                  className={`transition-all duration-900 ease-in-out overflow-hidden ${openMenu.purchase ? "max-h-[200px]" : "max-h-0"
+                    }`}
                 >
                   <ul className="space-y-3 px-2 text-sm mt-2">
                     <li>
                       <Link
-                        to="/tramessy/DailyIncome"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/DailyIncome")
+                        to="/tramessy/Purchase/maintenance"
+                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/Purchase/maintenance")
                             ? "text-gray-700 bg-gray-200"
                             : "text-gray-500 hover:text-primary"
-                        }`}
+                          }`}
                       >
-                        
-                        <span>Daily Income</span>
+
+                        <span>Maintenance</span>
                       </Link>
                     </li>
-                    
                     <li>
                       <Link
-                        to="/tramessy/monthly-statement"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/monthly-statement")
+                        to="/tramessy/Purchase/official-product"
+                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/Purchase/official-product")
                             ? "text-gray-700 bg-gray-200"
                             : "text-gray-500 hover:text-primary"
-                        }`}
+                          }`}
                       >
-                        
-                        <span>Monthly Profit/loss</span>
+
+                        <span>Official Products</span>
                       </Link>
                     </li>
-                    {/* <li>
+                    <li>
+                      <Link
+                        to="/tramessy/Purchase/SupplierList"
+                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/Purchase/SupplierList")
+                            ? "text-gray-700 bg-gray-200"
+                            : "text-gray-500 hover:text-primary"
+                          }`}
+                      >
+
+                        <span>Supplier List</span>
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              {/* Customer */}
+              <li className="text-gray-700 font-medium rounded-sm">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => toggleMenu("customer")}
+                  onKeyDown={(e) =>
+                    (e.key === "Enter" || e.key === " ") &&
+                    toggleMenu("customer")
+                  }
+                  className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300 outline-none"
+                >
+                  <span className="flex items-center gap-2">
+                    <PiUsersFour />
+                    <span>Customer</span>
+                  </span>
+                  <span
+                    className={`transform transition-transform duration-500 ${openMenu.customer ? "rotate-180" : ""
+                      }`}
+                  >
+                    <FaChevronDown />
+                  </span>
+                </div>
+
+                {/* Dropdown container with smooth expand/collapse */}
+                <div
+                  className={`transition-all duration-700 ease-in-out overflow-hidden ${openMenu.customer ? "max-h-[500px]" : "max-h-0"
+                    }`}
+                >
+                  <ul className="space-y-3 px-2 text-sm mt-2">
+                    <li>
+                      <Link
+                        to="/tramessy/Customer"
+                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/Customer")
+                            ? "text-gray-700 bg-gray-200"
+                            : "text-gray-500 hover:text-primary"
+                          }`}
+                      >
+
+                        <span>Customer Info</span>
+                      </Link>
+                    </li>
+                    {isAdmin && <li>
+                      <Link
+                        to="/tramessy/route-pricing"
+                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/route-pricing")
+                            ? "text-gray-700 bg-gray-200"
+                            : "text-gray-500 hover:text-primary"
+                          }`}
+                      >
+
+                        <span>Route Pricing</span>
+                      </Link>
+                    </li>}
+                  </ul>
+                </div>
+              </li>
+              {/* Business */}
+              {isAdmin && (<>
+                <li className="text-gray-700 font-medium rounded-sm">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => toggleMenu("business")}
+                    onKeyDown={(e) =>
+                      (e.key === "Enter" || e.key === " ") &&
+                      toggleMenu("business")
+                    }
+                    className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300 outline-none"
+                  >
+                    <span className="flex items-center gap-2">
+                      <FaNewspaper />
+                      <span>Financial Report</span>
+                    </span>
+                    <span
+                      className={`transform transition-transform duration-500 ${openMenu.business ? "rotate-180" : ""
+                        }`}
+                    >
+                      <FaChevronDown />
+                    </span>
+                  </div>
+
+                  {/* Dropdown container with smooth expand/collapse */}
+                  <div
+                    className={`transition-all duration-700 ease-in-out overflow-hidden ${openMenu.business ? "max-h-[500px]" : "max-h-0"
+                      }`}
+                  >
+                    <ul className="space-y-3 px-2 text-sm mt-2">
+                      <li>
+                        <Link
+                          to="/tramessy/DailyIncome"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/DailyIncome")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Daily Income</span>
+                        </Link>
+                      </li>
+
+                      <li>
+                        <Link
+                          to="/tramessy/monthly-statement"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/monthly-statement")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Monthly Profit/loss</span>
+                        </Link>
+                      </li>
+                      {/* <li>
                       <Link
                         to="/tramessy/Reports/Employee-Report"
                         className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
@@ -878,59 +858,55 @@ const Sidebar = () => {
                         <span>Employee Report</span>
                       </Link>
                     </li> */}
-                    <li>
-                      <Link
-                        to="/tramessy/Reports/vehicle-report"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/Reports/vehicle-report")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Vehicle Report</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/Reports/Driver-Report"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/Reports/Driver-Report")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Driver Report</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/Reports/Fuel-Report"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/Reports/Fuel-Report")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Fuel Report</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/Reports/Purchase-Report"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/Reports/Purchase-Report")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Purchase Report</span>
-                      </Link>
-                    </li>
-                    {/* <li>
+                      <li>
+                        <Link
+                          to="/tramessy/Reports/vehicle-report"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/Reports/vehicle-report")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Vehicle Report</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/Reports/Driver-Report"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/Reports/Driver-Report")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Driver Report</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/Reports/Fuel-Report"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/Reports/Fuel-Report")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Fuel Report</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/Reports/Purchase-Report"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/Reports/Purchase-Report")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Purchase Report</span>
+                        </Link>
+                      </li>
+                      {/* <li>
                       <Link
                         to="/tramessy/DailyExpense"
                         className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
@@ -943,7 +919,7 @@ const Sidebar = () => {
                         <span>Daily Trip Expense</span>
                       </Link>
                     </li> */}
-                    {/* <li>
+                      {/* <li>
                       <Link
                         to="/tramessy/Reports/Inventory-Report"
                         className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
@@ -962,7 +938,7 @@ const Sidebar = () => {
                         <span>Inventory Report</span>
                       </Link>
                     </li> */}
-                    {/* <li>
+                      {/* <li>
                       <Link
                         to="/tramessy/Reports/Trip-Report"
                         className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
@@ -975,243 +951,226 @@ const Sidebar = () => {
                         <span>Trip Report</span>
                       </Link>
                     </li> */}
-                  </ul>
-                </div>
-              </li>
-              {/* Accounts */}
-              <li className="text-gray-700 font-medium rounded-sm">
-                <div
-                  onClick={() => toggleMenu("accounts")}
-                  className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
-                >
-                  <span className="flex items-center gap-2">
-                    <FaBriefcase />
-                    <span>Accounts</span>
-                  </span>
-                  <span
-                    className={`transform transition-transform duration-900 ${
-                      openMenu.accounts ? "rotate-180" : ""
-                    }`}
+                    </ul>
+                  </div>
+                </li>
+                {/* Accounts */}
+                <li className="text-gray-700 font-medium rounded-sm">
+                  <div
+                    onClick={() => toggleMenu("accounts")}
+                    className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
                   >
-                    <FaChevronDown />
-                  </span>
-                </div>
-                <div
-                  className={`transition-all duration-900 ease-in-out overflow-hidden ${
-                    openMenu.accounts ? "max-h-[500px]" : "max-h-0"
-                  }`}
-                >
-                  {" "}
-                  <ul className="space-y-3 px-2 text-sm mt-2">
-                    <li>
-                      <Link
-                        to="/tramessy/account/CashDispatch"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/CashDispatch")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
+                    <span className="flex items-center gap-2">
+                      <FaBriefcase />
+                      <span>Accounts</span>
+                    </span>
+                    <span
+                      className={`transform transition-transform duration-900 ${openMenu.accounts ? "rotate-180" : ""
                         }`}
-                      >
-                        
-                        <span>Fund Transfer</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/account/PaymentList"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/PaymentList")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Payment List</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/account/PaymentReceive"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/PaymentReceive")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Payment Receive</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/account/vendor-payment"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/vendor-payment")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                      
-                        <span>Vendor Payment</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/account/SupplierLedger"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/SupplierLedger")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        {/* <div
+                    >
+                      <FaChevronDown />
+                    </span>
+                  </div>
+                  <div
+                    className={`transition-all duration-900 ease-in-out overflow-hidden ${openMenu.accounts ? "max-h-[500px]" : "max-h-0"
+                      }`}
+                  >
+                    {" "}
+                    <ul className="space-y-3 px-2 text-sm mt-2">
+                      <li>
+                        <Link
+                          to="/tramessy/account/CashDispatch"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/CashDispatch")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Fund Transfer</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/account/PaymentList"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/PaymentList")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Payment List</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/account/PaymentReceive"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/PaymentReceive")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Payment Receive</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/account/vendor-payment"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/vendor-payment")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Vendor Payment</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/account/SupplierLedger"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/SupplierLedger")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+                          {/* <div
                           className={`w-[6px] h-[6px] rounded-full bg-primary ${
                             isActive("/tramessy/account/SupplierLedger")
                               ? "bg-white"
                               : "bg-primary"
                           }`}
                         ></div> */}
-                        <span>Supplier Ledger</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/account/DriverLedger"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/DriverLedger")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                  
-                        <span>Driver Ledger</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/account/VendorLedger"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/VendorLedger")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Vendor Ledger</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/account/CustomerLedger"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/CustomerLedger")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Customer Ledger</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tramessy/account/OfficeLedger"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/account/OfficeLedger")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
-                        }`}
-                      >
-                        
-                        <span>Office Ledger</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              {/* Billing Control */}
-              <li className="text-gray-700 font-medium rounded-sm">
-                <div
-                  onClick={() => toggleMenu("billing")}
-                  className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
-                >
-                  <span className="flex items-center gap-2">
-                    <HiCurrencyBangladeshi className="text-xl" />
-                    <span>Billing</span>
-                  </span>
-                  <span
-                    className={`transform transition-transform duration-900 ${
-                      openMenu.billing ? "rotate-180" : ""
-                    }`}
+                          <span>Supplier Ledger</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/account/DriverLedger"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/DriverLedger")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Driver Ledger</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/account/VendorLedger"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/VendorLedger")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Vendor Ledger</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/account/CustomerLedger"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/CustomerLedger")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Customer Ledger</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tramessy/account/OfficeLedger"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/account/OfficeLedger")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Office Ledger</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                {/* Billing Control */}
+                <li className="text-gray-700 font-medium rounded-sm">
+                  <div
+                    onClick={() => toggleMenu("billing")}
+                    className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
                   >
-                    <FaChevronDown />
-                  </span>
-                </div>
-                <div
-                  className={`transition-all duration-900 ease-in-out overflow-hidden ${
-                    openMenu.billing ? "max-h-[300px]" : "max-h-0"
-                  }`}
-                >
-                  <ul className="space-y-3 px-2 text-sm mt-2">
-                    <li>
-                      <Link
-                        to="/tramessy/billing/bill"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/billing/bill")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
+                    <span className="flex items-center gap-2">
+                      <HiCurrencyBangladeshi className="text-xl" />
+                      <span>Billing</span>
+                    </span>
+                    <span
+                      className={`transform transition-transform duration-900 ${openMenu.billing ? "rotate-180" : ""
                         }`}
-                      >
-                        
-                        <span>Bill</span>
-                      </Link>
-                    </li>
-                    
-                  </ul>
-                </div>
-              </li>
-              {/* User Control */}
-              <li className="text-gray-700 font-medium rounded-sm mb-10">
-                <div
-                  onClick={() => toggleMenu("user")}
-                  className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
-                >
-                  <span className="flex items-center gap-2">
-                    <FaUser />
-                    <span>Users Control</span>
-                  </span>
-                  <span
-                    className={`transform transition-transform duration-900 ${
-                      openMenu.user ? "rotate-180" : ""
-                    }`}
+                    >
+                      <FaChevronDown />
+                    </span>
+                  </div>
+                  <div
+                    className={`transition-all duration-900 ease-in-out overflow-hidden ${openMenu.billing ? "max-h-[300px]" : "max-h-0"
+                      }`}
                   >
-                    <FaChevronDown />
-                  </span>
-                </div>
-                <div
-                  className={`transition-all duration-900 ease-in-out overflow-hidden ${
-                    openMenu.user ? "max-h-[100px]" : "max-h-0"
-                  }`}
-                >
-                  <ul className="space-y-3 px-2 text-sm mt-2">
-                    <li>
-                      <Link
-                        to="/tramessy/AllUsers"
-                        className={`flex gap-2 items-center p-2 rounded-sm font-medium ${
-                          isActive("/tramessy/AllUsers")
-                            ? "text-gray-700 bg-gray-200"
-                            : "text-gray-500 hover:text-primary"
+                    <ul className="space-y-3 px-2 text-sm mt-2">
+                      <li>
+                        <Link
+                          to="/tramessy/billing/bill"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/billing/bill")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>Bill</span>
+                        </Link>
+                      </li>
+
+                    </ul>
+                  </div>
+                </li>
+                {/* User Control */}
+                <li className="text-gray-700 font-medium rounded-sm mb-10">
+                  <div
+                    onClick={() => toggleMenu("user")}
+                    className="flex justify-between items-center py-3 px-2 cursor-pointer hover:bg-primary hover:text-white hover:rounded-sm duration-300"
+                  >
+                    <span className="flex items-center gap-2">
+                      <FaUser />
+                      <span>Users Control</span>
+                    </span>
+                    <span
+                      className={`transform transition-transform duration-900 ${openMenu.user ? "rotate-180" : ""
                         }`}
-                      >
-                        
-                        <span>All Users</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </li>
+                    >
+                      <FaChevronDown />
+                    </span>
+                  </div>
+                  <div
+                    className={`transition-all duration-900 ease-in-out overflow-hidden ${openMenu.user ? "max-h-[100px]" : "max-h-0"
+                      }`}
+                  >
+                    <ul className="space-y-3 px-2 text-sm mt-2">
+                      <li>
+                        <Link
+                          to="/tramessy/AllUsers"
+                          className={`flex gap-2 items-center p-2 rounded-sm font-medium ${isActive("/tramessy/AllUsers")
+                              ? "text-gray-700 bg-gray-200"
+                              : "text-gray-500 hover:text-primary"
+                            }`}
+                        >
+
+                          <span>All Users</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
               </>)}
-              </>
+            </>
           </ul>
         </div>
       </main>

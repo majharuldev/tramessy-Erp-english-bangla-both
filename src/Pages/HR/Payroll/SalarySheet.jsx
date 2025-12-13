@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaPlus } from "react-icons/fa6"
 import { FaFileExcel, FaFilePdf, FaFilter, FaPrint, FaTruck } from "react-icons/fa"
@@ -11,227 +12,102 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import toNumber from '../../../hooks/toNumber';
+import { useNavigate, useParams } from "react-router-dom";
 const SalarySheet = () => {
-  const [employees, setEmployees] = useState([]);
-  const [salaryAdvances, setSalaryAdvances] = useState([]);
-  const [attendences, setAttendences] = useState([]);
-  const [data, setData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const { id } = useParams();
+  const [salarySheetApiData, setSalarySheetApiData] = useState([])
   const [showFilter, setShowFilter] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const printRef = useRef();
-  const printTableRef = useRef();
+  const [selectedMonth, setSelectedMonth] = useState("")
+  const [selectedEmployee, setSelectedEmployee] = useState(null)
+  const [employees, setEmployees] = useState([])
+  const [loading, setLoading] = useState(true)
   const [selectedSlip, setSelectedSlip] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [loanData, setLoanData] = useState([]);
-  const [bonusData, setBonusData] = useState([]);
-
-  // Fetch all API data
+  const printRef = useRef();
+  // Fetch API
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
-        const [empRes, salaryRes, attRes, loanRes, bonusRes] = await Promise.all([
-          api.get('/employee'),
-          api.get('/salaryAdvanced'),
-          api.get('/attendence'),
-           api.get('/loan'),
-        api.get('/bonous'),
+        const [emp, sheet] = await Promise.all([
+          api.get("/employee"),
+          api.get(`/salarySheet/${id}`),
         ]);
 
-        // setEmployees(empRes.data.data || []);
-         if (empRes.data?.success) {
-        //  active employee filter
-        const activeEmployees = empRes.data.data.filter(
-          (employee) => employee.status?.toLowerCase() === "active"
+        const activeEmp = emp.data.data.filter(
+          (e) => e.status?.toLowerCase() === "active"
         );
-        setEmployees(activeEmployees);
-      }
-        setSalaryAdvances(salaryRes.data.data || []);
-        setAttendences(attRes.data.data || []);
-        setLoanData(loanRes.data.data || []); 
-      setBonusData(bonusRes.data.data || []);
-      } catch (err) {
-        toast.error("Failed to fetch data");
-        console.error(err);
-      } finally {
-      setLoading(false); // stop loading
-    }
 
+        setEmployees(activeEmp);
+        setSalarySheetApiData(sheet.data.items);
+      } catch (err) {
+        toast.error("Failed to load data");
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
   }, []);
+  console.log(salarySheetApiData, "salary")
 
-  
-  // Merge data for salary sheet
-// useEffect(() => {
-//   if (employees.length === 0) return;
+  // month yeayr options
+  const currentYear = new Date().getFullYear();
+  const monthsName = [
+    { num: "01", name: "January" },
+    { num: "02", name: "February" },
+    { num: "03", name: "March" },
+    { num: "04", name: "April" },
+    { num: "05", name: "May" },
+    { num: "06", name: "Jun" },
+    { num: "07", name: "July" },
+    { num: "08", name: "August" },
+    { num: "09", name: "September" },
+    { num: "10", name: "October" },
+    { num: "11", name: "November" },
+    { num: "12", name: "December" },
+  ];
+  const monthYearOptions = [];
 
-//   const merged = employees.map((emp) => {
-//     const empSalary = salaryAdvances.find(s => s.employee_id == emp.id) || {};
-//     const empAttend = attendences.find(a => a.employee_id == emp.id) || {};
-
-//     // বর্তমান মাস নির্ধারণ
-//     const monthYear =
-//       empAttend?.month ||
-//       empSalary?.salary_month ||
-//       new Date().toISOString().slice(0, 7);
-
-//     //  loan শুধুমাত্র ঐ মাসেরটিই দেখাবে
-//     // const empLoans = loanData.filter(l => {
-//     //   if (l.employee_id != emp.id) return false;
-//     //   const loanMonth = l.date?.slice(0, 7);
-//     //   return loanMonth === monthYear;
-//     // });
-//     const empLoans = loanData.filter(l => {
-//       if (l.employee_id !== emp.id) return false;
-//       const loanMonth = l.date?.slice(0, 7);
-//       return loanMonth === monthYear && Number(l.adjustment) > 0;
-//     });
-
-//     //  যদি ঐ মাসে একাধিক loan থাকে, সবগুলোর monthly_deduction যোগ করো
-//     const totalLoanDeduction = empLoans.reduce(
-//       (sum, l) => sum + Number(l.monthly_deduction || 0),
-//       0
-//     );
-
-//     //  Bonus হিসাব
-//     const empBonus = bonusData
-//       .filter(b => b.employee_id == emp.id && b.status === "Completed")
-//       .reduce((sum, b) => sum + Number(b.amount), 0);
-
-//     //  Salary অংশ
-//     const basic = emp.basic ? Number(emp.basic) : 0;
-//     const rent = emp.house_rent ? Number(emp.house_rent) : 0;
-//     const conv = emp.conv ? Number(emp.conv) : 0;
-//     const medical = emp.medical ? Number(emp.medical) : 0;
-//     const allowance = emp.allowan ? Number(emp.allowan) : 0;
-//     const totalEarnings = basic + rent + conv + medical + allowance + empBonus;
-
-//     //  Deduction হিসাব
-//     const advance = empSalary.amount ? Number(empSalary.amount) : 0;
-//     const loanDeduction = totalLoanDeduction;
-//     const deductionTotal = advance + loanDeduction;
-//     const netPay = totalEarnings - deductionTotal;
-
-//     //  Return merged data row
-//     return {
-//       empId: emp.id,
-//       name: emp.employee_name,
-//       designation: emp.designation || "",
-//       days: empAttend.working_day || "",
-//       monthYear,
-//       basic,
-//       rent,
-//       conv,
-//       medical,
-//       allowance,
-//       bonus: empBonus,
-//       total: basic + rent + conv + medical + allowance + empBonus,
-//       advance,
-//       monthly_deduction: loanDeduction,
-//       deductionTotal,
-//       netPay
-//     };
-//   });
-
-//   setData(merged);
-// }, [employees, salaryAdvances, attendences, loanData, bonusData]);
-
-useEffect(() => {
-  if (employees.length === 0) return;
-
-  const merged = employees.map((emp) => {
-    const empSalary = salaryAdvances.find(s => s.employee_id == emp.id) || {};
-    const empAttend = attendences.find(a => a.employee_id == emp.id) || {};
-
-    const monthYear =
-      empAttend?.month ||
-      empSalary?.salary_month ||
-      new Date().toISOString().slice(0, 7);
-
-    const empLoans = loanData.filter(l => {
-      if (l.employee_id !== emp.id) return false;
-
-      const loanStartMonth = l.date?.slice(0, 7);
-      let adjustmentLeft = Number(l.adjustment || 0);
-
-      // Monthly deduction cannot be more than remaining adjustment
-      let deductionThisMonth = Math.min(adjustmentLeft, Number(l.monthly_deduction || 0));
-
-      // Deduction will apply only if adjustment > 0
-      return deductionThisMonth > 0 && loanStartMonth <= monthYear;
+  for (let y = currentYear; y <= currentYear + 10; y++) {
+    monthsName.forEach((m) => {
+      monthYearOptions.push({
+        value: `${y}-${m.num}`,
+        label: `${y}-${m.name}`
+      });
     });
+  }
+  const months = [...new Set(salarySheetApiData.map((d) => d.working_day))];
 
-    const totalLoanDeduction = empLoans.reduce((sum, l) => {
-      let adjustmentLeft = Number(l.adjustment || 0);
-      let deductionThisMonth = Math.min(adjustmentLeft, Number(l.monthly_deduction || 0));
-      return sum + deductionThisMonth;
-    }, 0);
+  const getEmployee = useMemo(() => {
+    const map = {};
+    employees.forEach(emp => {
+      map[emp.id] = emp.employee_name;
+    });
+    return map;
+  }, [employees]);
 
-    // Bonus calculation
-    const empBonus = bonusData
-      .filter(b => b.employee_id == emp.id && b.status === "Completed")
-      .reduce((sum, b) => sum + Number(b.amount), 0);
-
-    // Salary components
-    const basic = emp.basic ? Number(emp.basic) : 0;
-    const rent = emp.house_rent ? Number(emp.house_rent) : 0;
-    const conv = emp.conv ? Number(emp.conv) : 0;
-    const medical = emp.medical ? Number(emp.medical) : 0;
-    const allowance = emp.allowan ? Number(emp.allowan) : 0;
-    const totalEarnings = basic + rent + conv + medical + allowance + empBonus;
-
-    const advance = empSalary.amount ? Number(empSalary.amount) : 0;
-    const deductionTotal = advance + totalLoanDeduction;
-    const netPay = totalEarnings - deductionTotal;
-
-    return {
-      empId: emp.id,
-      name: emp.employee_name,
-      designation: emp.designation || "",
-      days: empAttend.working_day || "",
-      monthYear,
-      basic,
-      rent,
-      conv,
-      medical,
-      allowance,
-      bonus: empBonus,
-      total: totalEarnings,
-      advance,
-      monthly_deduction: totalLoanDeduction,
-      deductionTotal,
-      netPay
-    };
-  });
-
-  setData(merged);
-}, [employees, salaryAdvances, attendences, loanData, bonusData]);
-
-
-    // Month options
-  const months = [...new Set(data.map(d => d.monthYear))]; 
-  // Filtered data based on dropdowns
   const filteredData = useMemo(() => {
-    return data
-      .filter(row => (selectedMonth ? row.monthYear === selectedMonth : true))
-      .filter(row => (selectedEmployee ? row.empId === Number(selectedEmployee) : true))
-      .sort((a, b) => b.monthYear.localeCompare(a.monthYear));
-  }, [data, selectedMonth, selectedEmployee]);
+    return salarySheetApiData.filter((item) => {
+      const empName =
+        getEmployee[item.employee_id]?.toLowerCase() || "";
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      // const matchSearch = searchTerm
+      //   ? empName.includes(searchTerm.toLowerCase())
+      //   : true;
 
-  const grandTotal = useMemo(() => filteredData.reduce((sum, row) => sum + row.total, 0), [filteredData]);
-  const grandNetPay = useMemo(() => filteredData.reduce((sum, row) => sum + row.netPay, 0), [filteredData]);
+      const matchEmployee = selectedEmployee
+        ? String(item.employee_id) === String(selectedEmployee)
+        : true;
 
+      const matchMonth = selectedMonth
+        ? item.month === selectedMonth || true
+        : true;
+
+      return matchEmployee && matchMonth;
+    });
+  }, [salarySheetApiData, selectedEmployee, selectedMonth, getEmployee]);
+
+  // payslip print
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: "Salary Sheet",
@@ -255,82 +131,233 @@ useEffect(() => {
     }, 100)
   }
 
-  // Excel export
+// net pay
+  const calculateNetPay = (row) => {
+    const earnings = toNumber(row.e_total || 0);
+    const deduction = toNumber(row.d_total || 0);
+    return earnings - deduction;
+  };
+
+  // confirm status change modal
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+const [confirmId, setConfirmId] = useState(null);
+
+const openConfirmModal = (id) => {
+  setConfirmId(id);
+  setIsConfirmModalOpen(true);
+};
+
+// const handleConfirmStatus = async () => {
+//   try {
+//     await api.put(`/salarySheet/salary-item/${confirmId}`, { status: "Paid", });
+
+//     setSalarySheetApiData((prev) =>
+//       prev.map((item) =>
+//         item.id === confirmId ? { ...item, status: "Paid" } : item
+//       )
+//     );
+
+//     toast.success("Status updated to Paid");
+//   } catch (err) {
+//     toast.error("Failed to update status");
+//   } finally {
+//     setIsConfirmModalOpen(false);
+//     setConfirmId(null);
+//   }
+// };
+
+
+
+const handleConfirmStatus = async () => {
+  try {
+    // Find the salary item to update
+    const itemToUpdate = salarySheetApiData.find(item => item.id === confirmId);
+
+    if (!itemToUpdate) {
+      toast.error("Salary item not found");
+      return;
+    }
+
+    // Prepare payload with status + other data
+    const payload = {
+      ...itemToUpdate,
+      status: "Paid"
+    };
+
+    // Send PUT request
+    await api.put(`/salary-item/${confirmId}`, payload);
+
+    // Update local state
+    setSalarySheetApiData((prev) =>
+      prev.map((item) =>
+        item.id === confirmId ? { ...item, status: "Paid" } : item
+      )
+    );
+
+    toast.success("Status updated to Paid");
+  } catch (err) {
+    console.log(err);
+    toast.error("Failed to update status");
+  } finally {
+    setIsConfirmModalOpen(false);
+    setConfirmId(null);
+  }
+};
+
+  const [currentPage, setCurrentPage] = useState([1])
+  const itemsPerPage = 10;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const grandTotal = useMemo(() => filteredData.reduce((sum, row) => sum + toNumber(row.e_total), 0), [filteredData]);
+  const grandNetPay = useMemo(() => filteredData.reduce((sum, row) => sum + toNumber(calculateNetPay(row)), 0), [filteredData]);
+
+
+  //   // Excel export
   const exportExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    const excelData = filteredData.map((row, index) => ({
+      SL: index + 1,
+      Name: getEmployee[row.employee_id],
+      "Working Day": toNumber(row.working_day),
+      Designation: row.designation,
+      Basic: toNumber(row.basic),
+      HouseRent: toNumber(row.house_rent),
+      Conv: toNumber(row.conv),
+      Medical: toNumber(row.medical),
+      Allowance: toNumber(row.allown),
+      Bonus: toNumber(row.bonous),
+      "Earning Total": toNumber(row.e_total),
+      Advance: toNumber(row.adv),
+      Loan: toNumber(row.loan),
+      "Deduction Total": toNumber(row.d_total),
+      "Net Pay": calculateNetPay(row),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Salary Sheet");
     XLSX.writeFile(workbook, "SalarySheet.xlsx");
   };
 
-  // PDF export
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    autoTable(doc, {
-      head: [['Name', 'Designation', 'Days', 'Basic', 'H/Rent', 'Conv', 'Medical', 'Allowance', 'Total', 'Advance', 'NetPay']],
-      body: filteredData.map(d => [d.name, d.designation, toNumber(d.days), toNumber(d.basic), toNumber(d.rent), toNumber(d.conv), toNumber(d.medical), toNumber( d.allowance), toNumber(d.total), toNumber(d.advance), toNumber(d.netPay)]),
-    });
-    doc.save('SalarySheet.pdf');
-  };
-// Full filtered table print function
-const handlePrintTable = () => {
-  // Get the table element
-  const table = document.getElementById('salary-table');
-  if (!table) return;
+  // // Full filtered table print function
+  const handlePrintTable = () => {
+    const originalTable = document.getElementById("salary-table");
+    if (!originalTable) return;
 
-  // Clone the table to remove unwanted columns (Action)
-  const clone = table.cloneNode(true);
+    // clone table (structure same থাকবে)
+    const tableClone = originalTable.cloneNode(true);
 
-  // Remove Action column from header
-  const headerRow = clone.querySelector('thead tr:last-child'); // last header row
-  if (headerRow) {
-    const actionTh = headerRow.querySelector('th:last-child');
-    if (actionTh) actionTh.remove();
+    //  Action column hide
+    tableClone.querySelectorAll(".action_column").forEach(el => el.remove());
+
+    //  replace tbody with FULL data
+    const tbody = tableClone.querySelector("tbody");
+    tbody.innerHTML = filteredData
+      .map((row, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="text-align:left">${getEmployee[row.employee_id] || "N/A"}</td>
+          <td>${row.working_day}</td>
+          <td>${row.designation}</td>
+          <td>${row.basic?.toLocaleString() || 0}</td>
+          <td>${row.house_rent?.toLocaleString() || 0}</td>
+          <td>${row.conv?.toLocaleString() || 0}</td>
+          <td>${row.medical?.toLocaleString() || 0}</td>
+          <td>${row.allown?.toLocaleString() || 0}</td>
+          <td>${row.bonous?.toLocaleString() || 0}</td>
+          <td>${row.e_total?.toLocaleString() || 0}</td>
+          <td>${row.adv?.toLocaleString() || 0}</td>
+          <td>${row.loan?.toLocaleString() || 0}</td>
+          <td>${row.d_total?.toLocaleString() || 0}</td>
+          <td>${calculateNetPay(row).toLocaleString()}</td>
+        </tr>
+      `)
+      .join("");
+
+    const logo = "/logo.png";
+
+    const printWindow = window.open("", "", "width=1200,height=800");
+
+    printWindow.document.write(`
+  <html>
+  <head>
+  <title>Salary Sheet</title>
+
+  <style>
+  @page {
+    size: A4 landscape;
+    margin: 140px 20px 40px 20px;
   }
-  // Remove Action column from all header rows
-  clone.querySelectorAll('thead tr').forEach(tr => {
-    const ths = tr.querySelectorAll('th');
-    ths.forEach(th => {
-      if (th.innerText.toLowerCase().includes('action')) {
-        th.remove();
-      }
-    });
-  });
 
-  // Remove Action column from each body row
-  clone.querySelectorAll('tbody tr').forEach(tr => {
-    const actionTd = tr.querySelector('td:last-child');
-    if (actionTd) actionTd.remove();
-  });
+  body {
+    font-family: Arial;
+    font-size: 11px;
+  }
 
-  // Remove pagination if exists
-  const pag = document.querySelector('.pagination');
-  if (pag) pag.remove();
+  .print-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+  }
 
-  // Open new window for print
-  const newWin = window.open('', '', 'width=900,height=700');
-  newWin.document.write(`
-    <html>
-      <head>
-        <title>Salary Sheet</title>
-        <style>
-          table { width: 100%; border-collapse: collapse; font-size: 12px; }
-          th, td { border: 1px solid #333; padding: 4px; text-align: center; }
-          th { background-color: #f0f0f0; }
-        </style>
-      </head>
-      <body>
-        <h3>Salary Sheet</h3>
-        ${clone.outerHTML}
-      </body>
-    </html>
-  `);
-  newWin.document.close();
-  newWin.focus();
-  newWin.print();
-  newWin.close();
-};
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  th, td {
+    border: 1px solid #000;
+    padding: 4px;
+    text-align: center;
+  }
+
+  th {
+    background: #f0f0f0;
+  }
+  </style>
+  </head>
+
+  <body>
+
+  <!-- HEADER -->
+  <!-- <div class="print-header">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #000;padding-bottom:8px">
+      <div>
+        <img src="${logo}" width="60"/>
+        <div><b>M/S A J ENTERPRISE</b></div>
+      </div>
+      <div style="text-align:center">
+        <h2 style="margin:0">Salary Sheet</h2>
+        <div style="font-size:11px">
+          Razzak Plaza, Dhaka-1217
+        </div>
+      </div>
+      <div style="width:60px"></div>
+    </div>
+  </div> -->
+
+  ${tableClone.outerHTML}
+
+  </body>
+  </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
 
   return (
     <div className='p-2'>
@@ -342,11 +369,6 @@ const handlePrintTable = () => {
             Salary Sheet
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
-            {/* <Link to="/tramessy/AddSallaryExpenseForm">
-            <button onClick={() => showModal()} className="bg-primary text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
-              <FaPlus /> Add
-            </button>
-            </Link> */}
             <button
               onClick={() => setShowFilter((prev) => !prev)} // Toggle filter
               className=" text-primary border border-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
@@ -367,13 +389,13 @@ const handlePrintTable = () => {
               Excel
             </button>
 
-            <button
+            {/* <button
               onClick={exportPDF}
               className="flex items-center gap-2 py-1 px-3 hover:bg-primary bg-white shadow  hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaFilePdf className="" />
               PDF
-            </button>
+            </button> */}
 
             <button
               onClick={handlePrintTable}
@@ -409,11 +431,18 @@ const handlePrintTable = () => {
         {/* Conditional Filter Section */}
         {showFilter && (
           <div className="md:flex gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
-           <select value={selectedMonth} onChange={e => { setSelectedMonth(e.target.value); setCurrentPage(1); }}
-              className="border px-3 py-2 rounded-md w-full">
-              <option value="">-- Select Month --</option>
-              {months.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
+            {/* <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="border px-3 py-2 rounded"
+              >
+                <option value="">Select Month</option>
+                {monthYearOptions.map((m, index) => (
+                  <option key={index} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select> */}
 
             <select value={selectedEmployee} onChange={e => { setSelectedEmployee(e.target.value); setCurrentPage(1); }}
               className="border px-3 py-2 rounded-md w-full">
@@ -443,7 +472,7 @@ const handlePrintTable = () => {
               <tr className=" text-black text-center">
                 <th className="border border-gray-400 px-2 py-1" rowSpan={2}>SL</th>
                 <th className="border border-gray-400 px-2 py-1" colSpan={1} rowSpan={2}>
-                  Name 
+                  Name
                 </th>
                 <th className="border border-gray-400 px-2 py-1" rowSpan={3}>Working<br />DAY</th>
                 <th className="border border-gray-400 px-2 py-1" rowSpan={3}>Designation</th>
@@ -455,7 +484,7 @@ const handlePrintTable = () => {
                 </th>
                 {/* <th className="border border-gray-400 px-2 py-1">By CEO</th> */}
                 <th className="border border-gray-400 px-2 py-1">Net Pay Half</th>
-                <th className="border border-gray-400 px-2 py-1">Action</th>
+                <th className="border border-gray-400 px-2 py-1 action_column">Action</th>
               </tr>
               {/* Main header row */}
               <tr className=" text-black text-center">
@@ -482,27 +511,27 @@ const handlePrintTable = () => {
                   </td>
                 </tr>
               ) :
-                currentItems.map((row, i) => (
-                  <tr key={i} className="text-center hover:bg-gray-100">
-                    <td className="border border-gray-400 px-2 py-1">{i + 1}</td>
-                    <td className="border border-gray-400 px-2 py-1 text-left">{row.name}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row.days}</td>
+                currentItems.map((row, ind) => (
+                  <tr key={ind} className="text-center hover:bg-gray-100">
+                    <td className="border border-gray-400 px-2 py-1"> {indexOfFirstItem + ind + 1}</td>
+                    <td className="border border-gray-400 px-2 py-1 text-left">{getEmployee[row.employee_id] || "N/A"}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row.working_day}</td>
                     <td className="border border-gray-400 px-2 py-1">{row.designation}</td>
                     <td className="border border-gray-400 px-2 py-1">{row?.basic?.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row?.rent?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.house_rent?.toLocaleString()}</td>
                     <td className="border border-gray-400 px-2 py-1">{row?.conv?.toLocaleString()}</td>
                     <td className="border border-gray-400 px-2 py-1">{row?.medical?.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row?.allowance?.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row?.bonus?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.allown?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.bonous?.toLocaleString()}</td>
                     <td className="border border-gray-400 px-2 py-1 font-semibold">
-                      {row?.total?.toLocaleString()}
+                      {row?.e_total?.toLocaleString()}
                     </td>
-                    <td className="border border-gray-400 px-2 py-1">{row?.advance?.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row?.monthly_deduction?.toLocaleString()}</td>
-                    <td className="border border-gray-400 px-2 py-1">{row?.deductionTotal?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.adv?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.loan?.toLocaleString()}</td>
+                    <td className="border border-gray-400 px-2 py-1">{row?.d_total?.toLocaleString()}</td>
                     {/* <td className="border border-gray-400 px-2 py-1">C</td> */}
                     <td className="border border-gray-400 px-2 py-1  font-bold">
-                      {row?.netPay?.toLocaleString()}
+                      {calculateNetPay(row).toLocaleString()}
                     </td>
                     <td className="border border-gray-400 px-2 py-1 action_column flex items-center gap-2">
                       <button
@@ -515,13 +544,14 @@ const handlePrintTable = () => {
                         <BiPrinter className="mr-1 h-4 w-4" />
                         PaySlip
                       </button>
-                      <button
-                       
-                        className="flex items-center w-full px-3 py-1 text-sm text-gray-700 bg-white shadow rounded"
-                      >
-                
-                        Unpaid
-                      </button>
+                     
+                        <button
+                          onClick={() => openConfirmModal(row.id)}
+                          className="bg-yellow-500 text-white px-2 py-1 rounded shadow-md hover:bg-yellow-600"
+                        >
+                          {row?.status === "Paid" ? "Paid" : "Unpaid"}
+                        </button>
+                    
                     </td>
                   </tr>
                 ))}
@@ -534,7 +564,7 @@ const handlePrintTable = () => {
                 <td className="border border-gray-400 px-2 py-1">
                   {grandTotal.toLocaleString()}
                 </td>
-                <td className="border border-gray-400 px-2 py-1" colSpan={4}></td>
+                <td className="border border-gray-400 px-2 py-1" colSpan={3}></td>
                 <td className="border border-gray-400 px-2 py-1">
                   {grandNetPay.toLocaleString()}
                 </td>
@@ -558,6 +588,31 @@ const handlePrintTable = () => {
           }
         </div>
       </div>
+      {isConfirmModalOpen && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white w-[380px] rounded-lg shadow-lg p-6">
+      <h2 className="text-lg font-bold text-gray-800 mb-3">Confirm Payment</h2>
+      <p className="text-sm text-gray-600 mb-5">
+        Are you sure you want to mark this salary as Paid?
+      </p>
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setIsConfirmModalOpen(false)}
+          className="px-4 py-2 border rounded hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleConfirmStatus}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
 
   );
