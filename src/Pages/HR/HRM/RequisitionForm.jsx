@@ -24,7 +24,10 @@ const { handleSubmit, reset, setValue } = methods;
     const fetchEmployees = async () => {
       try {
         const res = await api.get(`/employee`);
-        if (res.data?.success) setEmployees(res.data.data);
+         if (res.data?.success){ const activeEmployee = res?.data?.data?.filter(
+        (employee) => employee.status === "Active"
+      );
+          setEmployees(activeEmployee);}
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
@@ -45,6 +48,7 @@ const { handleSubmit, reset, setValue } = methods;
             setValue("purpose", data.purpose);
             setValue("amount", data.amount);
             setValue("remarks", data.remarks);
+            setValue("status", data.status);
           }
         } catch (err) {
           console.error("Error fetching requisition:", err);

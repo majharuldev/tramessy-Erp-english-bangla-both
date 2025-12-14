@@ -8,6 +8,8 @@ import { IoMdClose } from "react-icons/io";
 import toast from "react-hot-toast";
 import { tableFormatDate } from "../../../hooks/formatDate";
 import logo from "../../../assets/AJ_Logo.png"
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const Requisition = () => {
   const [requisition, setRequisition] = useState([]);
@@ -27,10 +29,12 @@ const Requisition = () => {
           api.get(`/employee`),
         ]);
         if (reqRes.data?.success) setRequisition(reqRes.data.data);
-        if (empRes.data?.success){ const activeEmployee = response?.data?.data?.filter(
-        (employee) => employee.status?.toLowerCase() === "active"
-      );
-          setEmployee(activeEmployee);}
+        if (empRes.data?.success) {
+          const activeEmployee = empRes?.data?.data?.filter(
+            (employee) => employee.status?.toLowerCase() === "active"
+          );
+          setEmployee(activeEmployee);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -55,16 +59,16 @@ const Requisition = () => {
   };
 
   const filteredData = requisition.filter((item) => {
-  const employeeName = getEmployeeName(item.employee_id)?.toLowerCase() || "";
-  const purpose = item.purpose?.toLowerCase() || "";
-  const amount = String(item.amount)?.toLowerCase() || "";
+    const employeeName = getEmployeeName(item.employee_id)?.toLowerCase() || "";
+    const purpose = item.purpose?.toLowerCase() || "";
+    const amount = String(item.amount)?.toLowerCase() || "";
 
-  return (
-    employeeName.includes(searchTerm.toLowerCase()) ||
-    purpose.includes(searchTerm.toLowerCase()) ||
-    amount.includes(searchTerm.toLowerCase())
-  );
-});
+    return (
+      employeeName.includes(searchTerm.toLowerCase()) ||
+      purpose.includes(searchTerm.toLowerCase()) ||
+      amount.includes(searchTerm.toLowerCase())
+    );
+  });
 
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
@@ -73,86 +77,46 @@ const Requisition = () => {
 
   // excel
   const exportExcel = () => {
-  const header = ["SL", "Date", "Employee", "Purpose", "Amount", "Remarks"];
-  
-  const rows = filteredData.map((item, index) => ({
-    SL: index + 1,
-    Date: tableFormatDate(item.date),
-    Employee: getEmployeeName(item.employee_id),
-    Purpose: item.purpose,
-    Amount: Number(item.amount), // numeric format
-    Remarks: item.remarks,
-  }));
+    if (!filteredData.length) {
+      toast.error("No data to export");
+      return;
+    }
 
-  const csvData = [
-    header.join(","),
-    ...rows.map(row =>
-      `${row.SL},${row.Date},${row.Employee},${row.Purpose},${row.Amount},${row.Remarks}`
-    )
-  ].join("\n");
+    const excelData = filteredData.map((item, index) => ({
+      SL: index + 1,
+      Date: tableFormatDate(item.date),
+      Employee: getEmployeeName(item.employee_id),
+      Purpose: item.purpose,
+      Amount: Number(item.amount),
+      Remarks: item.remarks,
+      Status: item.status,
+    }));
 
-  const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.setAttribute("download", "Requisition_List.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Requisition");
 
-// print
-// const printTable = () => {
-//   const printWindow = window.open("", "", "width=900,height=600");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
 
-//   const printContent = `
-//     <html>
-//       <head>
-//         <title>Requisition List</title>
-//         <style>
-//           table { width: 100%; border-collapse: collapse; font-size: 12px; }
-//           th, td { border: 1px solid #333; padding: 6px; }
-//           th { background: #f0f0f0; }
-//         </style>
-//       </head>
-//       <body>
-//         <h2 style="text-align:center">Requisition List</h2>
-//         <table>
-//           <thead>
-//             <tr>
-//               <th>#</th><th>Date</th><th>Employee</th>
-//               <th>Purpose</th><th>Amount</th><th>Remarks</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             ${filteredData
-//               .map(
-//                 (item, index) => `
-//               <tr>
-//                 <td>${index + 1}</td>
-//                 <td>${tableFormatDate(item.date)}</td>
-//                 <td>${getEmployeeName(item.employee_id)}</td>
-//                 <td>${item.purpose}</td>
-//                 <td>${item.amount}</td>
-//                 <td>${item.remarks}</td>
-//               </tr>`
-//               )
-//               .join("")}
-//           </tbody>
-//         </table>
-//       </body>
-//     </html>
-//   `;
+    const file = new Blob([excelBuffer], {
+      type:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
-//   printWindow.document.write(printContent);
-//   printWindow.document.close();
-//   printWindow.print();
-// };
+    saveAs(
+      file,
+      `Requisition_List_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
+  };
 
-const printTable = () => {
-  const printWindow = window.open("", "", "width=900,height=600");
+  // print
+  const printTable = () => {
+    const printWindow = window.open("", "", "width=900,height=600");
 
-  const printContent = `
+    const printContent = `
   <html>
     <head>
       <title>Requisition List</title>
@@ -232,31 +196,6 @@ const printTable = () => {
     <body>
 
       <!-- Repeatable Header -->
-      <div class="print-header">
-        <div class="header">
-          
-          <!-- Left Logo Section -->
-          <div class="header-logo">
-            <img src="${logo}" />
-            <div style="font-size:12px; font-weight:bold;">
-              M/S A J ENTERPRISE
-            </div>
-          </div>
-
-          <!-- Center Header Section -->
-          <div class="header-title">
-            <h2 style="margin:0;">M/S AJ Enterprise</h2>
-            <div style="font-size:12px; font-weight:normal;">
-              Razzak Plaza, 11th Floor, Room J-12<br/>
-              2 Sahid Tajuddin Sarani, Moghbazar, Dhaka-1217
-            </div>
-          </div>
-
-          <div style="width:100px;"></div>
-
-        </div>
-      </div>
-
       <!-- Push Content Below Header -->
       <div class="header-space"></div>
 
@@ -271,12 +210,13 @@ const printTable = () => {
             <th>Purpose</th>
             <th>Amount</th>
             <th>Remarks</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           ${filteredData
-            .map(
-              (item, index) => `
+        .map(
+          (item, index) => `
             <tr>
               <td>${index + 1}</td>
               <td>${tableFormatDate(item.date)}</td>
@@ -284,10 +224,11 @@ const printTable = () => {
               <td>${item.purpose}</td>
               <td>${item.amount}</td>
               <td>${item.remarks}</td>
+              <td>${item.status}</td>
             </tr>
           `
-            )
-            .join("")}
+        )
+        .join("")}
         </tbody>
       </table>
 
@@ -295,10 +236,10 @@ const printTable = () => {
   </html>
   `;
 
-  printWindow.document.write(printContent);
-  printWindow.document.close();
-  printWindow.print();
-};
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
+  };
 
 
 
@@ -350,18 +291,18 @@ const printTable = () => {
               placeholder="Search Requisition..."
               className="border border-gray-300 rounded-md outline-none text-xs py-2 ps-2 pr-5"
             />
-             {/*  Clear button */}
-    {searchTerm && (
-      <button
-        onClick={() => {
-          setSearchTerm("");
-          setCurrentPage(1);
-        }}
-        className="absolute right-5 top-[5.3rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
-      >
-        ✕
-      </button>
-    )}
+            {/*  Clear button */}
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setCurrentPage(1);
+                }}
+                className="absolute right-5 top-[5.3rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
@@ -390,11 +331,13 @@ const printTable = () => {
                   <td className="p-2">{item.remarks}</td>
                   <td className="p-2">{item.status}</td>
                   <td className="p-2 flex gap-2">
-                    <Link to={`/tramessy/HR/update-advance-requisition/${item.id}`}>
-                      <button className=" text-primary px-2 py-1 rounded hover:bg-primary hover:text-white transition bg-white shadow">
-                        <FaPen size={12}/>
-                      </button>
-                    </Link>
+                    <div className="w-7">
+                      {item.status === "Pending" && <Link to={`/tramessy/HR/update-advance-requisition/${item.id}`}>
+                        <button className=" text-primary px-2 py-1 rounded hover:bg-primary hover:text-white transition bg-white shadow">
+                          <FaPen size={12} />
+                        </button>
+                      </Link>}
+                    </div>
                     <button
                       onClick={() => {
                         setSelectedId(item.id);
