@@ -11,6 +11,7 @@ import { tableFormatDate } from "../../../hooks/formatDate";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import toNumber from "../../../hooks/toNumber";
+import logo from "../../../../src/assets/AJ_Logo.png"
 
 const EmployeeList = () => {
   const [employee, setEmployee] = useState([]);
@@ -95,47 +96,47 @@ const EmployeeList = () => {
 
   // excel
   const exportExcel = () => {
-  if (!filteredEmployeeList || filteredEmployeeList.length === 0) {
-    toast.error("No data to export!");
-    return;
-  }
+    if (!filteredEmployeeList || filteredEmployeeList.length === 0) {
+      toast.error("No data to export!");
+      return;
+    }
 
-  const data = filteredEmployeeList.map((dt, index) => ({
-    SL: index + 1,
-    FullName: dt.employee_name,
-    Email: dt.email,
-    JoinDate: tableFormatDate(dt.join_date),
-    Designation: dt.designation,
-    Mobile: dt.mobile,
-    NID: dt.nid,
-    Gender: dt.gender,
-    "Blood Group" : dt.blood_group,
-    "Basic Salary": toNumber(dt.basic),
-    "House Rent": toNumber(dt.house_rent),
-    "Alowance": dt.allowan,
-    Conveance: toNumber(dt.conv),
-    Medical: toNumber(dt.medical),
-    Status: dt.status
-  }));
+    const data = filteredEmployeeList.map((dt, index) => ({
+      SL: index + 1,
+      FullName: dt.employee_name,
+      Email: dt.email,
+      JoinDate: tableFormatDate(dt.join_date),
+      Designation: dt.designation,
+      Mobile: dt.mobile,
+      NID: dt.nid,
+      Gender: dt.gender,
+      "Blood Group": dt.blood_group,
+      "Basic Salary": toNumber(dt.basic),
+      "House Rent": toNumber(dt.house_rent),
+      "Alowance": dt.allowan,
+      Conveance: toNumber(dt.conv),
+      Medical: toNumber(dt.medical),
+      Status: dt.status
+    }));
 
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Employees");
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Employees");
 
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const file = new Blob([excelBuffer], { type: "application/octet-stream" });
-  saveAs(file, `EmployeeList_${new Date().toISOString().slice(0,10)}.xlsx`);
-};
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const file = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(file, `EmployeeList_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
   // print
   const printTable = () => {
-  const filteredData = filteredEmployeeList; // all filtered employees
+    const filteredData = filteredEmployeeList; // all filtered employees
 
-  if (!filteredData || filteredData.length === 0) {
-    toast.error("No data to print!");
-    return;
-  }
+    if (!filteredData || filteredData.length === 0) {
+      toast.error("No data to print!");
+      return;
+    }
 
-  const tableHeader = `
+    const tableHeader = `
     <thead>
       <tr>
         <th>SL.</th>
@@ -149,9 +150,9 @@ const EmployeeList = () => {
     </thead>
   `;
 
-  const tableRows = filteredData
-    .map(
-      (dt, index) => `
+    const tableRows = filteredData
+      .map(
+        (dt, index) => `
     <tr>
       <td>${index + 1}</td>
       <td>${dt.employee_name}</td>
@@ -161,18 +162,18 @@ const EmployeeList = () => {
       <td>${dt.mobile}</td>
       <td>${dt.status}</td>
     </tr>`
-    )
-    .join("");
+      )
+      .join("");
 
-  const printContent = `
+    const printContent = `
     <table border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse: collapse;">
       ${tableHeader}
       <tbody>${tableRows}</tbody>
     </table>
   `;
 
-  const WinPrint = window.open("", "", "width=900,height=650");
-  WinPrint.document.write(`
+    const WinPrint = window.open("", "", "width=900,height=650");
+    WinPrint.document.write(`
     <html>
     <head>
       <title>-</title>
@@ -214,7 +215,10 @@ const EmployeeList = () => {
 
         <div class="print-header">
           <div class="header">
-          <div></div>
+          <div class="header-logo">
+          <img src="${logo}" />
+          <div style="font-size:12px; font-weight:bold;">M/S A J ENTERPRISE</div>
+          </div>
             <div>
               <h2>M/S A J ENTERPRISE</h2>
               <div>Razzak Plaza, 11th Floor, Room J-12<br/>Moghbazar, Dhaka-1217</div>
@@ -232,10 +236,10 @@ const EmployeeList = () => {
     </body>
     </html>
   `);
-  WinPrint.document.close();
-  WinPrint.focus();
-  WinPrint.print();
-};
+    WinPrint.document.close();
+    WinPrint.focus();
+    WinPrint.print();
+  };
 
 
   return (

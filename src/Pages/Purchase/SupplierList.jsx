@@ -9,6 +9,8 @@ import { Link } from "react-router-dom";
 import Pagination from "../../components/Shared/Pagination";
 import api from "../../../utils/axiosConfig";
 import { tableFormatDate } from "../../hooks/formatDate";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const SupplierList = () => {
   const [supply, setSupply] = useState([]);
@@ -89,6 +91,137 @@ const SupplierList = () => {
       toast.error("There was a problem retrieving driver information.");
     }
   };
+
+    // excel
+   const exportExcel = () => {
+  if (!filteredSupply || filteredSupply.length === 0) {
+    toast.error("No data to export!");
+    return;
+  }
+
+  const data = filteredSupply.map((dt, index) => ({
+    "SL": index + 1,
+    "Date": tableFormatDate(dt.created_at),
+    "Supplier": dt.supplier_name,
+    "Business Category": dt.business_category,
+    "Phone": dt.phone,
+    "Address": dt.address,
+    "Opening Balance": dt.opening_balance,
+    "Status": dt.status,
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Suppliers");
+
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const file = new Blob([excelBuffer], {
+    type: "application/octet-stream",
+  });
+
+  saveAs(
+    file,
+    `Supplier_List_${new Date().toISOString().slice(0, 10)}.xlsx`
+  );
+};
+    // print
+    const printTable = () => {
+  if (!filteredSupply || filteredSupply.length === 0) {
+    toast.error("No data to print!");
+    return;
+  }
+
+  const tableHeader = `
+    <thead>
+      <tr>
+        <th>SL</th>
+        <th>Date</th>
+        <th>Supplier</th>
+        <th>Business Category</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Opening Balance</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+  `;
+
+  const tableRows = filteredSupply
+    .map(
+      (dt, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${tableFormatDate(dt.created_at)}</td>
+        <td>${dt.supplier_name}</td>
+        <td>${dt.business_category}</td>
+        <td>${dt.phone}</td>
+        <td>${dt.address}</td>
+        <td>${dt.opening_balance}</td>
+        <td>${dt.status}</td>
+      </tr>
+    `
+    )
+    .join("");
+
+  const WinPrint = window.open("", "", "width=1000,height=650");
+
+  WinPrint.document.write(`
+    <html>
+      <head>
+        <title>Supplier List</title>
+        <style>
+          @media print {
+            thead { display: table-header-group; }
+            tr { page-break-inside: avoid; }
+          }
+
+          body {
+            font-family: Arial, sans-serif;
+          }
+
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+          }
+
+          th, td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: left;
+          }
+
+          th {
+            background: #f2f2f2;
+          }
+        </style>
+      </head>
+
+      <body>
+        <table>
+          ${tableHeader}
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `);
+
+  WinPrint.document.close();
+  WinPrint.focus();
+  WinPrint.print();
+};
+
   // pagination
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -114,7 +247,21 @@ const SupplierList = () => {
             </Link>
           </div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+            <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
+            <button
+              onClick={exportExcel}
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
+            >
+              Excel
+            </button>
+            <button
+              onClick={printTable}
+              className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
+            >
+              Print
+            </button>
+          </div>
           {/* search */}
           <div className="mt-3 md:mt-0 ">
             {/* <span className="text-primary font-semibold pr-3">Search: </span> */}

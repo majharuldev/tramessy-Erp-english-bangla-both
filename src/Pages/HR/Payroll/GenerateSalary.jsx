@@ -36,6 +36,7 @@ const [deleteId, setDeleteId] = useState(null);
   const [salarySheetApiData, setSalarySheetApiData] = useState([]);
 
   const [selectedMonth, setSelectedMonth] = useState("");
+  const [generateSalaryMonth, setGenerateSalaryMonth] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("");
 
   // update
@@ -172,9 +173,32 @@ const handleConfirmDelete = async () => {
   }
 };
 
+// pais salary employee
+const getPaidMonthsByEmployee = (empId) => {
+  const paidMonths = [];
 
-  const generateSalaryForMonth = (selectedMonth) => {
-  if (!selectedMonth) return [];
+  salarySheetApiData.forEach(sheet => {
+    sheet.items?.forEach(item => {
+      if (
+        String(item.employee_id) === String(empId) &&
+        item.status === "Paid"
+      ) {
+        paidMonths.push(sheet.generate_month); // YYYY-MM
+      }
+    });
+  });
+
+  return paidMonths;
+};
+// all paid employee 
+const isAllEmployeePaid = (sheet) => {
+  if (!sheet?.items || sheet.items.length === 0) return false;
+
+  return sheet.items.every(item => item.status === "Paid");
+};
+
+  const generateSalaryForMonth = (generateSalaryMonth) => {
+  if (!generateSalaryMonth) return [];
 
   return employees.map((emp) => {
     const empId = String(emp.id);
@@ -194,7 +218,7 @@ const handleConfirmDelete = async () => {
     const advanceRecord = salaryAdvances.find(
       (a) =>
         String(a.employee_id) === empId &&
-        a.salary_month === selectedMonth
+        a.salary_month === generateSalaryMonth
     );
 
     // advance = full amount deduct
@@ -207,7 +231,7 @@ const handleConfirmDelete = async () => {
       .filter(
         (b) =>
           String(b.employee_id) === empId &&
-          b.month_of === selectedMonth // month match
+          b.month_of === generateSalaryMonth // month match
           //  status filter বাদ
       )
       .reduce((sum, b) => sum + Number(b.amount || 0), 0);
@@ -216,20 +240,17 @@ const handleConfirmDelete = async () => {
     const employeeLoans = loanData.filter(
       (l) => String(l.employee_id) === empId
     );
-
+const paidMonths = getPaidMonthsByEmployee(empId);
     let loanDeduction = 0;
 
     employeeLoans.forEach((loan) => {
       const loanStartMonth = loan.date?.slice(0, 7); // YYYY-MM
-
-      if (loanStartMonth <= selectedMonth) {
         const remaining = toNumber(loan.adjustment || 0);
         const monthly = toNumber(loan.monthly_deduction || 0);
-
-        if (remaining > 0) {
-          loanDeduction += Math.min(remaining, monthly);
-        }
-      }
+  //  ONLY RULE
+  if (remaining > 0) {
+    loanDeduction += Math.min(remaining, monthly);
+  }
     });
 
     /* ================= SALARY PARTS ================= */
@@ -252,7 +273,6 @@ const handleConfirmDelete = async () => {
       employee_id: emp.id,
       designation: emp.designation,
       working_day: workingDay,
-
       basic,
       house_rent,
       conv,
@@ -265,7 +285,7 @@ const handleConfirmDelete = async () => {
       loan: loanDeduction,
       d_total: deductions,
       net_pay: netPay,
-      month: selectedMonth,
+      month: generateSalaryMonth,
     };
   });
 };
@@ -384,12 +404,12 @@ const handleUpdateGenerateSalary = async () => {
 
   const months = [...new Set(salarySheetApiData.map((d) => d.working_day))];
 
-  const filteredData = salarySheetApiData.filter((item) => {
-    return (
-      (selectedMonth ? item.working_day === selectedMonth : true) &&
-      (selectedEmployee ? item.employee_id == selectedEmployee : true)
-    );
-  });
+ const filteredData = salarySheetApiData.filter((item) => {
+  return selectedMonth
+    ? item.generate_month === selectedMonth
+    : true;
+});
+
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -487,21 +507,9 @@ const handleUpdateGenerateSalary = async () => {
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <div className="">
-              {/* <select
-                {...methods.register("month_of", { required: "Month is required" })}
-                className="w-full border px-3 py-2 rounded"
-              >
-                <option value="">Select Month</option>
-
-                {monthYearOptions.map((opt, index) => (
-                  <option key={index} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select> */}
               <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
+                value={generateSalaryMonth}
+                onChange={(e) => setGenerateSalaryMonth(e.target.value)}
                 className="border px-3 py-2 rounded"
               >
                 <option value="">Select Month</option>
@@ -526,6 +534,36 @@ const handleUpdateGenerateSalary = async () => {
             </button>
           </div>
         </div>
+        {/* Conditional Filter Section */}
+                {showFilter && (
+                  <div className="md:flex gap-5 border border-gray-300 rounded-md p-5 my-5 transition-all duration-300 pb-5">
+                    <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        className="border px-3 py-2 rounded"
+                      >
+                        <option value="">Select Month</option>
+                        {monthYearOptions.map((m, index) => (
+                          <option key={index} value={m.value}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </select>
+        
+                    <div className="mt-3 md:mt-0 flex gap-2">
+                      <button
+                        onClick={() => {
+                          setCurrentPage(1)
+                          setSelectedMonth("")
+                          setShowFilter(false)
+                        }}
+                        className="bg-primary text-white px-4 py-1 md:py-0 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
+                      >
+                        <FaFilter /> Clear
+                      </button>
+                    </div>
+                  </div>
+                )}
         {/* Table */}
         <div className="mt-5 overflow-x-auto rounded-md">
           <table className="min-w-full text-sm text-left">
@@ -552,7 +590,7 @@ const handleUpdateGenerateSalary = async () => {
                     <td className="p-2">{item.generate_by}</td>
                     {/* <td className="p-2">{item.status}</td> */}
                     <td className="p-2 flex gap-2 items-center">
-                      { <button
+                      {!isAllEmployeePaid(item) && <button
                       onClick={() => handleUpdateClick(item)}
                         className="text-primary hover:bg-primary hover:text-white px-2 py-1 rounded shadow-md transition-all cursor-pointer"
                       >

@@ -22,6 +22,7 @@ const SalarySheet = () => {
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedSlip, setSelectedSlip] = useState(null);
+  const [sheetMonth, setSheetMonth] = useState("");
   const printRef = useRef();
   // Fetch API
   useEffect(() => {
@@ -38,6 +39,7 @@ const SalarySheet = () => {
 
         setEmployees(activeEmp);
         setSalarySheetApiData(sheet.data.items);
+        setSheetMonth(sheet.data.generate_month);
       } catch (err) {
         toast.error("Failed to load data");
         console.log(err);
@@ -119,7 +121,13 @@ const SalarySheet = () => {
 
   const handlePrintClick = (item) => {
     console.log("[v0] Print button clicked for:", item.name)
-    setSelectedSlip(item)
+    const slipData = {
+    ...item,
+    name: getEmployee[item.employee_id], //  employee name
+    monthYear: sheetMonth //  month/year
+  };
+
+    setSelectedSlip(slipData)
     // Give React time to render the component before printing
     setTimeout(() => {
       if (printRef.current) {
@@ -366,7 +374,7 @@ const handleConfirmStatus = async () => {
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
             {/* <FaTruck className="text-gray-800 text-2xl" /> */}
-            Salary Sheet
+            Salary Sheet {sheetMonth}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <button

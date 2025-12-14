@@ -15,10 +15,9 @@ import { BsThreeDotsVertical } from "react-icons/bs"
 import ChallanInvoicePrint from "../components/modal/ChallanInvoicePrint"
 import { useReactToPrint } from "react-to-print"
 import api from "../../utils/axiosConfig"
-import { formatDate, tableFormatDate } from "../hooks/formatDate"
+import { formatDate } from "../hooks/formatDate"
 import DatePicker from "react-datepicker"
 import { FiFilter } from "react-icons/fi"
-import { FcApproval } from "react-icons/fc";
 import logo from "../assets/AJ_Logo.png"
 const TripList = () => {
   const [trip, setTrip] = useState([])
@@ -537,26 +536,27 @@ const TripList = () => {
       <style>
         @media print {
         @page {
-  margin-top: 60px !important;
-  margin-bottom: 20px;
+  margin-top: 30px !important;
+  margin: 50px;
 }
 
           /* HEADER FIXED FOR ALL PAGES */
-          .print-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            z-index: 1000;
-            padding: 10px 0;
-            border-bottom: 2px solid #000;
-            margin: 0;
-          }
+         .print-header {
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 1000;
+  padding: 10px 0;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /*  PERFECT CENTER */
+  align-items: center;
+}
           
           /* CONTENT START BELOW HEADER */
           .content {
-            margin-top: 120px; /* Adjust based on header height */
+            margin-top: 10px; /* Adjust based on header height */
           }
           
           /* PAGE BREAK HANDLING */
@@ -574,30 +574,25 @@ const TripList = () => {
           padding: 0;
         }
 
-        .print-header {
-          width: 100%;
-          padding: 10px 0;
-          margin-bottom: 20px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-bottom: 2px solid #000;
-        }
-
-        .header-logo img {
-          width: 80px;
-        }
-
-        .header-title {
-          text-align: center;
-          flex-grow: 1;
-        }
-
         .header-title h1 {
           margin: 0;
           font-size: 22px;
           font-weight: bold;
         }
+          .header-logo {
+  justify-self: start;
+  padding-left: 20px;
+  text-align: left;
+}
+
+.header-logo img {
+  width: 60px !important;
+}
+  .header-title {
+  justify-self: center; /*  EXACT CENTER */
+  text-align: center;
+  transform: translate(-15%, -20%);
+}
 
         .addr {
           font-size: 12px;
@@ -643,7 +638,7 @@ const TripList = () => {
   flex: 1;
 }
   .header-logo img{
-  width: 80px !important;
+  width: 60px !important;
 }
 .header-title {
   flex: 2;
@@ -660,25 +655,6 @@ const TripList = () => {
 
     <body>
       <!-- FIXED HEADER FOR ALL PAGES -->
-      <div class="print-header">
-        <div class="header">
-          <div class="header-logo" style="width:80px;">
-            <img src="${logo}" />
-            <div style="font-size:12px; font-weight:bold;">M/S A J ENTERPRISE</div>
-          </div>
-
-          <div class="header-title">
-            <h1>M/S AJ Enterprise</h1>
-            <div class="addr">
-              Razzak Plaza, 11th Floor, Room J-12<br/>
-              2 Sahid Tajuddin Sarani, Moghbazar, Dhaka-1217
-            </div>
-          </div>
-
-          <div style="width:80px;"></div>
-        </div>
-      </div>
-
       <div class="content">
         <h3>Trip Report</h3>
         ${tableHTML}
@@ -696,7 +672,6 @@ const TripList = () => {
     </body>
     </html>
   `);
-
     WinPrint.document.close();
     WinPrint.focus();
     setTimeout(() => {
