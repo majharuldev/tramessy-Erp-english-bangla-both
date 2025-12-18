@@ -3,12 +3,15 @@ import { FaBars } from "react-icons/fa6";
 import avatar from "../../assets/man-noimage.png";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../LanguageSwitcher";
 
 const Header = ({ setMobileSidebarOpen }) => {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
    const dropdownRef = useRef(null);
+    const { t } = useTranslation();
 
   // handle signout
   const handleSignout = () => {
@@ -74,6 +77,9 @@ const Header = ({ setMobileSidebarOpen }) => {
             <FaMagnifyingGlass />
           </div>
         </div> */}
+        <div>
+          <LanguageSwitcher/>
+        </div>
 
       {/* Admin Dropdown */}
       <div className="relative bg-white p-2 rounded-md flex gap-2 items-center" ref={dropdownRef}>

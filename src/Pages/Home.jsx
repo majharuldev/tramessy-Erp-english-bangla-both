@@ -15,10 +15,12 @@ import {
 } from "recharts";
 import useProfitLoseData from "../hooks/useProfitLoseHooks";
 import useAdmin from "../hooks/useAdmin";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
   const { data:monthlyData, loading: monthlyLoading } = useProfitLoseData("month");
   const { data:yearlyData, loading: yearlyLoading } = useProfitLoseData("year");
+  const {t} = useTranslation();
   const isAdmin = useAdmin()
   return (
     <div className="p-2">
@@ -36,7 +38,7 @@ const Home = () => {
           {/* Present Month Graph */}
           <div className="bg-white p-4 rounded-lg shadow-md mb-6">
             <h3 className="text-lg font-semibold mb-4">
-              Present Month Profit vs Expense
+              {t("Present Month Profit vs Expense")}
             </h3>
             <div className="w-full h-80">
               <ResponsiveContainer width="100%" height="100%">
@@ -50,8 +52,8 @@ const Home = () => {
                   <YAxis domain={[0, 'auto']} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="totalExpense" fill="#ed4553" name="Total Expense" />
-                  <Bar dataKey="netProfit" fill="#239230" name="Net Profit"  minPointSize={5}/>
+                  <Bar dataKey="totalExpense" fill="#ed4553" name={t("Total Expense")} />
+                  <Bar dataKey="netProfit" fill="#239230" name={t("Net Profit")}  minPointSize={5}/>
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -61,7 +63,7 @@ const Home = () => {
         {/* Present Year Graph */}
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">
-            Yearly Profit vs Expense
+             {t("Yearly Profit vs Expense")}
           </h3>
           <div className="w-full h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -75,8 +77,8 @@ const Home = () => {
                 <YAxis domain={[0, 'auto']} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="totalExpense" fill="#ed4553" name="Total Expense" />
-                <Bar dataKey="netProfit" fill="#239230" name="Net Profit"  minPointSize={5}/>
+                <Bar dataKey="totalExpense" fill="#ed4553" name={t("Total Expense")} />
+                <Bar dataKey="netProfit" fill="#239230" name={t("Net Profit")}   minPointSize={5}/>
               </BarChart>
             </ResponsiveContainer>
           </div>

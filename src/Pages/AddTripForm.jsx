@@ -12,6 +12,7 @@ import api from "../../utils/axiosConfig"
 import FormSkeleton from "../components/Form/FormSkeleton"
 import { AuthContext } from "../providers/AuthProvider"
 import axios from "axios"
+import { useTranslation } from "react-i18next"
 
 export default function AddTripForm() {
   const [loading, setLoading] = useState(false)
@@ -21,6 +22,7 @@ export default function AddTripForm() {
   const endDateRef = useRef(null)
   const isAdmin = useAdmin()
   const { user } = useContext(AuthContext)
+  const { t } = useTranslation()
 
   // State for dropdown options
   const [vehicle, setVehicle] = useState([])
@@ -82,7 +84,7 @@ export default function AddTripForm() {
       challan_cost: "",
       remarks: "",
       status: "pending",
-      helper_name:""
+      helper_name: ""
     },
   })
 
@@ -382,20 +384,20 @@ export default function AddTripForm() {
   // Handle vehicle selection to auto-fill category and size
   const selectedVehicle = useWatch({ control, name: "vehicle_no" })
 
-useEffect(() => {
-  if (!selectedVehicle) return;
+  useEffect(() => {
+    if (!selectedVehicle) return;
 
-  const vData =
-    selectedTransport === "own_transport"
-      ? vehicleOptions.find((v) => v.value === selectedVehicle)
-      : vendorVehicleOptions.find((v) => v.value === selectedVehicle);
+    const vData =
+      selectedTransport === "own_transport"
+        ? vehicleOptions.find((v) => v.value === selectedVehicle)
+        : vendorVehicleOptions.find((v) => v.value === selectedVehicle);
 
-  if (vData) {
-    setValue("driver_name", vData.driver || "");
-    setValue("driver_mobile", vData.mobile || "");
-    setValue("helper_name", vData.helper || "");
-  }
-}, [selectedVehicle, selectedTransport]);
+    if (vData) {
+      setValue("driver_name", vData.driver || "");
+      setValue("driver_mobile", vData.mobile || "");
+      setValue("helper_name", vData.helper || "");
+    }
+  }, [selectedVehicle, selectedTransport]);
 
 
   // useEffect(() => {
@@ -482,47 +484,47 @@ useEffect(() => {
         : await api.post(url, data, { headers: { "Content-Type": "application/json" } }) // create
 
       if (res.data.success) {
-        toast.success(id ? "Trip updated successfully!" : "Trip created successfully!")
+        toast.success(t(id ? "Trip updated successfully!" : "Trip created successfully!"))
         //  Only send SMS if it's a new trip and sms_sent = "yes"
-        if (!id && data.sms_sent === "yes") {
-          const trip = res.data.data // Assuming your backend returns created trip data
-          const tripId = trip?.id || ""
-          const tripDate = trip?.start_date || ""
-          const customerName = trip?.customer || ""
-          const userName = user.name || ""
-          const loadPoint = trip?.load_point || ""
-          const unloadPoint = trip?.unload_point || ""
-          const driverName = trip?.driver_name || ""
-          const vehicleNo = trip?.vehicle_no || ""
+        // if (!id && data.sms_sent === "yes") {
+        //   const trip = res.data.data // Assuming your backend returns created trip data
+        //   const tripId = trip?.id || ""
+        //   const tripDate = trip?.start_date || ""
+        //   const customerName = trip?.customer || ""
+        //   const userName = user.name || ""
+        //   const loadPoint = trip?.load_point || ""
+        //   const unloadPoint = trip?.unload_point || ""
+        //   const driverName = trip?.driver_name || ""
+        //   const vehicleNo = trip?.vehicle_no || ""
 
-          // Build message content
-          const messageContent = `Dear Sir, A new trip created by ${userName}.\nTrip Date: ${tripDate}\nTrip ID: ${tripId}\nLoad: ${loadPoint}\nUnload: ${unloadPoint}\nDriver: ${driverName}\nVehicle: ${vehicleNo}\ncustomer: ${customerName}`
+        //   // Build message content
+        //   const messageContent = `Dear Sir, A new trip created by ${userName}.\nTrip Date: ${tripDate}\nTrip ID: ${tripId}\nLoad: ${loadPoint}\nUnload: ${unloadPoint}\nDriver: ${driverName}\nVehicle: ${vehicleNo}\ncustomer: ${customerName}`
 
-          // SMS Config
-          const adminNumber = "01872121862"
-          // const adminNumber = "01773288109"
-          const API_KEY = "3b82495582b99be5"
-          const SECRET_KEY = "ae771458"
-          const CALLER_ID = "1234"
+        //   // SMS Config
+        //   const adminNumber = "01872121862"
+        //   // const adminNumber = "01773288109"
+        //   const API_KEY = "3b82495582b99be5"
+        //   const SECRET_KEY = "ae771458"
+        //   const CALLER_ID = "1234"
 
-          // Correct URL (same structure as your given example)
-          const smsUrl = `https://smpp.revesms.com:7790/sendtext?apikey=${API_KEY}&secretkey=${SECRET_KEY}&callerID=${CALLER_ID}&toUser=${adminNumber}&messageContent=${encodeURIComponent(
-            messageContent
-          )}`
-          try {
-            await axios.post(smsUrl);
-            toast.success("SMS sent to admin!")
-          } catch (smsError) {
-            console.error("SMS sending failed:", smsError);
-            // toast.error("Trip saved, but SMS failed to send.");
-          }
-        }
+        //   // Correct URL (same structure as your given example)
+        //   const smsUrl = `https://smpp.revesms.com:7790/sendtext?apikey=${API_KEY}&secretkey=${SECRET_KEY}&callerID=${CALLER_ID}&toUser=${adminNumber}&messageContent=${encodeURIComponent(
+        //     messageContent
+        //   )}`
+        //   try {
+        //     await axios.post(smsUrl);
+        //     toast.success("SMS sent to admin!")
+        //   } catch (smsError) {
+        //     console.error("SMS sending failed:", smsError);
+        //     // toast.error("Trip saved, but SMS failed to send.");
+        //   }
+        // }
         if (id) {
           navigate("/tramessy/tripList")
         }
         reset()
       } else {
-        throw new Error(id ? "Failed to update trip" : "Failed to create trip")
+        throw new Error(t(id ? "Failed to update trip" : "Failed to create trip"))
       }
     } catch (error) {
       console.error(error)
@@ -544,17 +546,17 @@ useEffect(() => {
           <div className="rounded-md shadow border-t-2 border-primary">
             {/* Form Header */}
             <div className=" text-primary px-4 py-2 rounded-t-md">
-              <h2 className="text-lg font-medium">{id ? "Update Trip" : "Create Trip"}</h2>
+              <h2 className="text-lg font-medium">{id ? t("Update Trip") : t("Create Trip")}</h2>
             </div>
             <div className="p-4 space-y-2">
               {/* Trip & Destination Section */}
               <div className="bg-white rounded-lg border border-gray-300 p-4">
-                <h3 className="text-secondary font-medium text-center mb-6">Trip & Destination</h3>
+                <h3 className="text-secondary font-medium text-center mb-6">{t("Trip")} {t("&")} {t("Destination")}</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-6">
                   <div className="relative w-full">
                     <InputField
                       name="start_date"
-                      label="Start Date"
+                      label={t("Date")}
                       type="date"
                       required={!id}
                       inputRef={(e) => {
@@ -562,41 +564,30 @@ useEffect(() => {
                       }}
                     />
                   </div>
-                  <div className="relative w-full">
-                    <InputField
-                      name="end_date"
-                      label="End Date"
-                      type="date"
-                      required={!id}
-                      inputRef={(e) => {
-                        endDateRef.current = e
-                      }}
-                    />
-                  </div>
                   <SelectField
                     name="customer"
-                    label="Customer"
+                    label={t("Customer")}
                     options={customerOptions}
                     control={control}
                     required={!id}
                     isCreatable={false}
                   />
-                </div>
-                <div className="flex gap-x-6 mt-2">
                   <div className="w-full relative">
                     <SelectField
                       name="branch_name"
-                      label="Branch"
+                      label={t("Branch")}
                       required={!id}
                       options={branchOptions}
                       control={control}
                       isCreatable={false}
                     />
                   </div>
+                </div>
+                <div className="flex gap-x-6 mt-2">
                   <div className="w-full relative">
                     <SelectField
                       name="load_point"
-                      label="Load Point"
+                      label={t("Load Point")}
                       required={id ? false : true}
                       options={loadpointOptions}
                       control={control}
@@ -606,7 +597,7 @@ useEffect(() => {
                   <div className="w-full relative">
                     <SelectField
                       name="unload_point"
-                      label="Unload Point"
+                      label={t("Unload Point")}
                       required={id ? false : true}
                       options={unloadpointOptions}
                       control={control}
@@ -618,46 +609,46 @@ useEffect(() => {
                   <div className="w-full">
                     <SelectField
                       name="trip_type"
-                      label="Trip Type"
+                      label={t("Trip Type")}
                       options={[
-                        { value: "single", label: "Single Trip" },
-                        { value: "round trip", label: "Round Trip" },
+                        { value: "single", label: t("Single Trip") },
+                        { value: "round trip", label: t("Round Trip") },
                       ]}
                       control={control}
                     // required={!id}
                     />
                   </div>
                   <div className="w-full">
-                    <InputField name="additional_load" label="Additional Load point" />
+                    <InputField name="additional_load" label={t("Additional Load Point")} />
                   </div>
 
                   <div className="w-full">
-                    <InputField name="buyar_name" label="Buyar Name" required={false} />
+                    <InputField name="buyar_name" label={t("Buyar Name")} required={false} />
                   </div>
                 </div>
                 <div className="flex gap-x-6">
                   <div className="w-full">
-                    <InputField name="invoice_no" label="Invoice No" required={false} />
+                    <InputField name="invoice_no" label={t("Invoice No")} required={false} />
                   </div>
                   <TextAreaField
                     name="product_details"
-                    label="Product Details"
+                    label={t("Product Details")}
                     required={false}
-                    placeholder="Enter product details here..."
+                  // placeholder="Enter product details here..."
                   />
                 </div>
               </div>
 
               {/* Vehicle & Driver Information */}
               <div className="bg-white rounded-lg border border-gray-300 p-4">
-                <h3 className="text-secondary font-medium text-center mb-6">Vehicle & Driver Information</h3>
+                <h3 className="text-secondary font-medium text-center mb-6">{t("Vehicle")} {t("&")} {t("Driver")} {t("Information")}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6">
                   <SelectField
                     name="transport_type"
-                    label="Transport Type"
+                    label={t("Transport Type")}
                     options={[
-                      { value: "own_transport", label: "Own Transport" },
-                      { value: "vendor_transport", label: "Vendor Transport" },
+                      { value: "own_transport", label: t("Own Transport") },
+                      { value: "vendor_transport", label: t("Vendor Transport") },
                     ]}
                     control={control}
                     required={!id}
@@ -666,7 +657,7 @@ useEffect(() => {
                   {selectedTransport === "own_transport" ? (
                     <SelectField
                       name="vehicle_no"
-                      label="Vehicle No."
+                      label={t("Vehicle No")}
                       options={vehicleOptions}
                       control={control}
                       required={!id}
@@ -674,7 +665,7 @@ useEffect(() => {
                   ) : selectedTransport === "vendor_transport" ? (
                     <SelectField
                       name="vehicle_no"
-                      label="Vehicle No."
+                      label={t("Vehicle No")}
                       options={vendorVehicleOptions}
                       control={control}
                       required={!id}
@@ -682,8 +673,14 @@ useEffect(() => {
                   ) : (
                     <SelectField
                       name="vehicle_no"
-                      label="Vehicle No."
-                      options={[{ label: "Select transport type first", value: "", disabled: true }]}
+                      label={t("Vehicle No")}
+                      options={[
+                        {
+                          label: `${t("Select")} ${t("Transport")} ${t("Type")} ${t("First")}`,
+                          value: "",
+                          disabled: true,
+                        },
+                      ]}
                       control={control}
                     />
                   )}
@@ -691,7 +688,7 @@ useEffect(() => {
                   {selectedTransport === "vendor_transport" && (
                     <SelectField
                       name="vendor_name"
-                      label="Vendor Name"
+                      label={t("Vendor Name")}
                       options={vendorOptions}
                       control={control}
                       required={!id}
@@ -701,7 +698,7 @@ useEffect(() => {
                   {selectedTransport === "own_transport" ? (
                     <SelectField
                       name="driver_name"
-                      label="Driver Name"
+                      label={`${t("Driver")} ${t("Name")}`}
                       options={driverOptions}
                       control={control}
                       required={!id}
@@ -709,7 +706,7 @@ useEffect(() => {
                   ) : selectedTransport === "vendor_transport" ? (
                     <SelectField
                       name="driver_name"
-                      label="Driver Name"
+                      label={`${t("Driver")} ${t("Name")}`}
                       options={vendorDriverOptions}
                       control={control}
                       required={!id}
@@ -717,7 +714,7 @@ useEffect(() => {
                   ) : (
                     <SelectField
                       name="driver_name"
-                      label="Driver Name"
+                      label={`${t("Driver")} ${t("Name")}`}
                       options={[{ label: "Select transport type first", value: "", disabled: true }]}
                       control={control}
                     />
@@ -726,7 +723,7 @@ useEffect(() => {
                     selectedTransport === "own_transport" ? (
                       <InputField
                         name="helper_name"
-                        label="Helper Name"
+                        label={`${t("Helper")} ${t("Name")}`}
                         required={id ? false : true}
                         // options={helperOptions}
                         control={control}
@@ -738,7 +735,7 @@ useEffect(() => {
                     <>
                       <SelectField
                         name="vehicle_category"
-                        label="Vehicle Category"
+                        label={t("Vehicle Category")}
                         options={vehicleCategoryOptions}
                         control={control}
                         required={!id}
@@ -746,7 +743,7 @@ useEffect(() => {
 
                       <SelectField
                         name="vehicle_size"
-                        label="Vehicle Size"
+                        label={t("Vehicle Size")}
                         options={vehicleSizeOptions}
                         control={control}
                         required={!id}
@@ -754,13 +751,13 @@ useEffect(() => {
                       />
                     </>
                   )}
-                  <InputField name="challan" label="Challan No." />
+                  <InputField name="challan" label={t("Challan No")} />
 
                   <div className={`w-full ${isAdmin ? "block" : "hidden"}`}>
                     <InputField
                       hidden={isAdmin ? false : true}
                       name="total_rent"
-                      label="Total Rent/Bill Amount"
+                      label={t("Total Rent/Bill Amount")}
                       type="number"
                       required={false}
                       // readOnly={isRateFound}
@@ -773,7 +770,7 @@ useEffect(() => {
               {/* Demurrage Section — Shared by both Own & Vendor Transport */}
               {(selectedTransport === "own_transport" || selectedTransport === "vendor_transport") && (
                 <div className="border border-gray-300 p-5 rounded-md mt-5">
-                  <h3 className="text-secondary font-medium text-center mb-6">Demurrage Details</h3>
+                  <h3 className="text-secondary font-medium text-center mb-6">{t("Demurrage Details")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <InputField
                       name="d_day"
@@ -803,34 +800,34 @@ useEffect(() => {
               {/* Own Transport Expenses Section */}
               {selectedTransport === "own_transport" && (
                 <div className="border border-gray-300 p-5 rounded-md mt-5">
-                  <h3 className="text-secondary font-medium text-center mb-6">Expense Details</h3>
+                  <h3 className="text-secondary font-medium text-center mb-6">{t("Expense Details")}</h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <InputField name="driver_adv" label="Driver Advance" type="number" />
+                    <InputField name="driver_adv" label={`${t("Driver")} ${t("Advance")}`} type="number" />
                     {/* <InputField name="driver_commission" label="Driver Commission" type="number" /> */}
-                    <InputField name="labor" label="Labour Cost" type="number" />
-                    <InputField name="fuel_cost" label="Fuel Cost" type="number" />
-                    <InputField name="night_guard" label="Night Guard" type="number" />
+                    <InputField name="labor" label={t("Labour Cost")} type="number" />
+                    <InputField name="fuel_cost" label={t("Fuel Cost")} type="number" />
+                    <InputField name="night_guard" label={t("Night Guard")} type="number" />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                    <InputField name="toll_cost" label="Toll Cost" type="number" />
-                    <InputField name="feri_cost" label="Feri Cost" type="number" />
-                    <InputField name="police_cost" label="Police Cost" type="number" />
-                    <InputField name="chada" label="Chada" type="number" />
+                    <InputField name="toll_cost" label={t("Toll Cost")} type="number" />
+                    <InputField name="feri_cost" label={t("Feri Cost")} type="number" />
+                    <InputField name="police_cost" label={t("Police Cost")} type="number" />
+                    <InputField name="chada" label={t("Chada")} type="number" />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                    <InputField name="parking_cost" label="Parking Cost" type="number" />
-                    <InputField name="challan_cost" label="Challan Cost" type="number" />
-                    <InputField name="food_cost" label="Food Cost" type="number" />
-                    <InputField name="others_cost" label="Other Costs" type="number" />
+                    <InputField name="parking_cost" label={t("Parking Cost")} type="number" />
+                    <InputField name="challan_cost" label={t("Challan Cost")} type="number" />
+                    <InputField name="food_cost" label={t("Food Cost")} type="number" />
+                    <InputField name="others_cost" label={t("Other Costs")} type="number" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                    <InputField name="additional_cost" label="Additional Load Cost" type="number" />
-                    <InputField name="total_exp" label="Total Expense" readOnly />
+                    <InputField name="additional_cost" label={t("Additional Load Cost")} type="number" />
+                    <InputField name="total_exp" label={t("Total Expense")} readOnly />
 
-                    <InputField name="remarks" label="Remarks" required={false} />
+                    <InputField name="remarks" label={t("Remarks")} required={false} />
 
                   </div>
                 </div>
@@ -839,22 +836,22 @@ useEffect(() => {
               {/* Vendor Transport Section */}
               {selectedTransport === "vendor_transport" && (
                 <div className="border border-gray-300 p-5 rounded-md mt-5">
-                  <h3 className="text-secondary font-medium text-center mb-6">Vendor Payment Details</h3>
+                  <h3 className="text-secondary font-medium text-center mb-6">{t("Vendor Payment Details")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <InputField name="total_exp" label="Vendor Rent" type="number" required={!id} />
-                    <InputField name="advance" label="Advance" type="number" required={!id} />
-                    <InputField name="due_amount" readOnly label="Due Amount" type="number" required={!id} />
+                    <InputField name="total_exp" label={t("Vendor Rent")} type="number" required={!id} />
+                    <InputField name="advance" label={t("Advance")} type="number" required={!id} />
+                    <InputField name="due_amount" readOnly label={t("Due Amount")} type="number" required={!id} />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                    <InputField name="remarks" label="Remarks" required={false} />
+                    <InputField name="remarks" label={t("Remarks")} required={false} />
                   </div>
                 </div>
               )}
-              {isAdmin && id && (
+              {/* {isAdmin && id && (
                 <div className="w-[20%]">
                   <SelectField
                     name="status"
-                    label="Status"
+                    label={t("Status")}
                     required
                     options={[
                       { value: "Pending", label: "Pending" },
@@ -863,26 +860,26 @@ useEffect(() => {
                     ]}
                   />
                 </div>
-              )}
-              {!isAdmin && (
+              )} */}
+              {/* {!isAdmin && (
                 <div className="mt-4">
-                  <h3 className="text-secondary font-medium mb-2">SMS Sent</h3>
+                  <h3 className="text-secondary font-medium mb-2">{t("SMS Sent")}</h3>
                   <div className="flex gap-6">
                     <label className="flex items-center gap-2">
                       <input type="radio" value="yes" {...methods.register("sms_sent", { required: true })} />
-                      Yes
+                      {t("Yes")}
                     </label>
                     <label className="flex items-center gap-2">
                       <input type="radio" value="no" {...methods.register("sms_sent", { required: true })} />
-                      No
+                      {t("No")}
                     </label>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Submit Button */}
               <div className="flex justify-start mt-6">
-                <BtnSubmit loading={loading}>{id ? "Update Trip" : "Create Trip"}</BtnSubmit>
+                <BtnSubmit loading={loading}>{id ? t("Update Trip") : t("Create Trip")}</BtnSubmit>
               </div>
             </div>
           </div>

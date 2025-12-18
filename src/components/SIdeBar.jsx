@@ -19,8 +19,10 @@ import { FaUsers } from "react-icons/fa";
 import { PiUsersFour } from "react-icons/pi";
 import { RiLuggageCartLine } from "react-icons/ri";
 import { HiCurrencyBangladeshi } from "react-icons/hi2";
+import { useTranslation } from "react-i18next";
 
 const Sidebar = () => {
+   const {t} = useTranslation();
   const [openMenu, setOpenMenu] = useState({
     fleet: false,
     business: false,
@@ -79,7 +81,7 @@ const Sidebar = () => {
                 className="flex items-center gap-2 font-semibold"
               >
                 <FaBars />
-                <span className="ps-2">Dashboard</span>
+                <span className="ps-2">{t("dashboard")}</span>
               </Link>
             </li>
             <>
@@ -94,7 +96,7 @@ const Sidebar = () => {
                       }`}
                   >
                     <FaTruckPickup />
-                    <span>Trip Management</span>
+                    <span>{t("Trip Management")}</span>
                   </Link>
                 </li>
                 <li>
@@ -106,7 +108,7 @@ const Sidebar = () => {
                       }`}
                   >
                     <FaCarRear />
-                    <span>Vehicle Info</span>
+                    <span>{t("vehicles")} {t("info")}</span>
                   </Link>
                 </li>
 
@@ -143,7 +145,7 @@ const Sidebar = () => {
                 >
                   <span className="flex items-center gap-2">
                     <FaUsers />
-                    <span>Vendor Management</span>
+                    <span>{t("Vendor")} {t("Management")}</span>
                   </span>
                   <span
                     className={`transform transition-transform duration-900 ${openMenu.vendor ? "rotate-180" : ""
@@ -167,7 +169,7 @@ const Sidebar = () => {
                           }`}
                       >
 
-                        <span>Vendor </span>
+                        <span>{t("Vendor")} {t("info")}</span>
                       </Link>
                     </li>
                     <li>
@@ -179,7 +181,7 @@ const Sidebar = () => {
                           }`}
                       >
 
-                        <span>Rent Vehicle</span>
+                        <span>{t("Rent Vehicle Info")}</span>
                       </Link>
                     </li>
                   </ul>
@@ -235,7 +237,7 @@ const Sidebar = () => {
                 >
                   <span className="flex items-center gap-2">
                     <FaUsersCog />
-                    <span>HR</span>
+                    <span>{t("HR")}</span>
                   </span>
                   <span
                     className={`transform transition-transform duration-900 ${openMenu.hrManagement ? "rotate-180" : ""
@@ -285,7 +287,7 @@ const Sidebar = () => {
                               }`}
                           >
 
-                            Employee Info
+                            {t("Employee Information")}
                           </Link>
                         </li>
                         <li>
@@ -297,7 +299,7 @@ const Sidebar = () => {
                               }`}
                           >
 
-                            <span>Driver Info</span>
+                            <span>{t("Driver Information")}</span>
                           </Link>
                         </li>
                         <li>
@@ -309,7 +311,7 @@ const Sidebar = () => {
                               }`}
                           >
 
-                            <span>Helper Info</span>
+                            <span>{t("Helper Info")}</span>
                           </Link>
                         </li>
                         <li>
@@ -321,7 +323,7 @@ const Sidebar = () => {
                               }`}
                           >
 
-                            Office
+                            {t("Office")}
                           </Link>
                         </li>
                         <li>
@@ -333,7 +335,7 @@ const Sidebar = () => {
                               }`}
                           >
 
-                            Salary Dispatch
+                            {t("Salary Expense")}
                           </Link>
                         </li>
                         <li>
@@ -345,7 +347,7 @@ const Sidebar = () => {
                               }`}
                           >
 
-                            Office Expense
+                            {t("Office Expense")}
                           </Link>
                         </li>
                         <li>
@@ -357,7 +359,7 @@ const Sidebar = () => {
                               }`}
                           >
 
-                            <span>Requisition</span>
+                            <span>{t("Requisition")}</span>
                           </Link>
                         </li>
                       </ul>
@@ -487,7 +489,7 @@ const Sidebar = () => {
                         className="flex justify-between items-center p-2 cursor-pointer hover:text-primary rounded-sm"
                       >
                         <span className="flex gap-2 items-center">
-                          <span>Payroll</span>
+                          <span>{t("Payroll")}</span>
                         </span>
                         <span
                           className={`transform transition-transform duration-900 ${openMenu.payroll ? "rotate-180" : ""
@@ -511,7 +513,7 @@ const Sidebar = () => {
                                 }`}
                             >
 
-                              <span>Attendance</span>
+                              <span>{t("Attendance")}</span>
                             </Link>
                           </li>
                           <li>
@@ -524,7 +526,7 @@ const Sidebar = () => {
                                   : "text-gray-500 hover:text-primary"
                                 }`}
                             >
-                              Bonus
+                              {t("Bonus")}
                             </Link>
                           </li>
                           <li>
@@ -537,7 +539,7 @@ const Sidebar = () => {
                                   : "text-gray-500 hover:text-primary"
                                 }`}
                             >
-                              Salary Advance
+                              {t("Salary Advance")}
                             </Link>
                           </li>
 
@@ -551,7 +553,7 @@ const Sidebar = () => {
                                   : "text-gray-500 hover:text-primary"
                                 }`}
                             >
-                              Loan
+                              {t("Loan")}
                             </Link>
                           </li>
                           <li>
@@ -564,7 +566,7 @@ const Sidebar = () => {
                                   : "text-gray-500 hover:text-primary"
                                 }`}
                             >
-                              Generate Salary
+                              {t("Generate Salary")}
                             </Link>
                           </li>
                           {/* <li>
@@ -671,7 +673,7 @@ const Sidebar = () => {
                 >
                   <span className="flex items-center gap-2">
                     <RiLuggageCartLine />
-                    <span>Purchase</span>
+                    <span>{t("Purchase")}</span>
                   </span>
                   <span
                     className={`transform transition-transform duration-900 ${openMenu.purchase ? "rotate-180" : ""
@@ -696,7 +698,7 @@ const Sidebar = () => {
                           }`}
                       >
 
-                        <span>Maintenance</span>
+                        <span>{t("Maintenance")}</span>
                       </Link>
                     </li>
                     <li>
@@ -708,7 +710,7 @@ const Sidebar = () => {
                           }`}
                       >
 
-                        <span>Official Products</span>
+                        <span>{t("Official Products")}</span>
                       </Link>
                     </li>
                     <li>
@@ -720,7 +722,7 @@ const Sidebar = () => {
                           }`}
                       >
 
-                        <span>Supplier List</span>
+                        <span>{t("Supplier")} {t("info")}</span>
                       </Link>
                     </li>
                   </ul>
@@ -740,7 +742,7 @@ const Sidebar = () => {
                 >
                   <span className="flex items-center gap-2">
                     <PiUsersFour />
-                    <span>Customer</span>
+                    <span>{t("Customer")}</span>
                   </span>
                   <span
                     className={`transform transition-transform duration-500 ${openMenu.customer ? "rotate-180" : ""
@@ -765,7 +767,7 @@ const Sidebar = () => {
                           }`}
                       >
 
-                        <span>Customer Info</span>
+                        <span>{t("Customer")} {t("info")}</span>
                       </Link>
                     </li>
                     {isAdmin && <li>
@@ -777,7 +779,7 @@ const Sidebar = () => {
                           }`}
                       >
 
-                        <span>Route Pricing</span>
+                        <span>{t("Route Pricing")}</span>
                       </Link>
                     </li>}
                   </ul>
@@ -798,7 +800,7 @@ const Sidebar = () => {
                   >
                     <span className="flex items-center gap-2">
                       <FaNewspaper />
-                      <span>Financial Report</span>
+                      <span>{t("Financial Report")}</span>
                     </span>
                     <span
                       className={`transform transition-transform duration-500 ${openMenu.business ? "rotate-180" : ""
@@ -823,7 +825,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Daily Income</span>
+                          <span>{t("Daily Income")}</span>
                         </Link>
                       </li>
 
@@ -836,7 +838,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Monthly Profit/loss</span>
+                          <span>{t("Monthly Profit/Loss")}</span>
                         </Link>
                       </li>
                       {/* <li>
@@ -867,7 +869,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Vehicle Report</span>
+                          <span>{t("Vehicle Report")}</span>
                         </Link>
                       </li>
                       <li>
@@ -879,7 +881,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Driver Report</span>
+                          <span>{t("Driver Report")}</span>
                         </Link>
                       </li>
                       <li>
@@ -891,7 +893,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Fuel Report</span>
+                          <span>{t("Fuel Report")}</span>
                         </Link>
                       </li>
                       <li>
@@ -903,7 +905,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Purchase Report</span>
+                          <span>{t("Purchase Report")}</span>
                         </Link>
                       </li>
                       {/* <li>
@@ -962,7 +964,7 @@ const Sidebar = () => {
                   >
                     <span className="flex items-center gap-2">
                       <FaBriefcase />
-                      <span>Accounts</span>
+                      <span>{t("Accounts")}</span>
                     </span>
                     <span
                       className={`transform transition-transform duration-900 ${openMenu.accounts ? "rotate-180" : ""
@@ -986,7 +988,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Fund Transfer</span>
+                          <span>{t("Fund Transfer")}</span>
                         </Link>
                       </li>
                       <li>
@@ -998,7 +1000,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Payment List</span>
+                          <span>{t("Payment")}</span>
                         </Link>
                       </li>
                       <li>
@@ -1010,7 +1012,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Payment Receive</span>
+                          <span>{t("Payment Receive")}</span>
                         </Link>
                       </li>
                       <li>
@@ -1022,7 +1024,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Vendor Payment</span>
+                          <span>{t("Vendor")} {t("Payment")}</span>
                         </Link>
                       </li>
                       <li>
@@ -1040,7 +1042,7 @@ const Sidebar = () => {
                               : "bg-primary"
                           }`}
                         ></div> */}
-                          <span>Supplier Ledger</span>
+                          <span>{t("Supplier")} {t("Ledger")}</span>
                         </Link>
                       </li>
                       <li>
@@ -1052,7 +1054,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Driver Ledger</span>
+                          <span>{t("Driver")} {t("Ledger")}</span>
                         </Link>
                       </li>
                       <li>
@@ -1064,7 +1066,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Vendor Ledger</span>
+                          <span>{t("Vendor")} {t("Ledger")}</span>
                         </Link>
                       </li>
                       <li>
@@ -1076,7 +1078,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Customer Ledger</span>
+                          <span>{t("Customer")} {t("Ledger")}</span>
                         </Link>
                       </li>
                       <li>
@@ -1088,7 +1090,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Office Ledger</span>
+                          <span>{t("Office")} {t("Ledger")}</span>
                         </Link>
                       </li>
                     </ul>
@@ -1102,7 +1104,7 @@ const Sidebar = () => {
                   >
                     <span className="flex items-center gap-2">
                       <HiCurrencyBangladeshi className="text-xl" />
-                      <span>Billing</span>
+                      <span>{t("Billing")}</span>
                     </span>
                     <span
                       className={`transform transition-transform duration-900 ${openMenu.billing ? "rotate-180" : ""
@@ -1125,7 +1127,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>Bill</span>
+                          <span>{t("Bill")}</span>
                         </Link>
                       </li>
 
@@ -1140,7 +1142,7 @@ const Sidebar = () => {
                   >
                     <span className="flex items-center gap-2">
                       <FaUser />
-                      <span>Users Control</span>
+                      <span>{t("Users Control")}</span>
                     </span>
                     <span
                       className={`transform transition-transform duration-900 ${openMenu.user ? "rotate-180" : ""
@@ -1163,7 +1165,7 @@ const Sidebar = () => {
                             }`}
                         >
 
-                          <span>All Users</span>
+                          <span>{t("All Users")}</span>
                         </Link>
                       </li>
                     </ul>

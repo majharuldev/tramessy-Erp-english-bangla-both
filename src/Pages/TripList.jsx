@@ -19,7 +19,9 @@ import { formatDate } from "../hooks/formatDate"
 import DatePicker from "react-datepicker"
 import { FiFilter } from "react-icons/fi"
 import logo from "../assets/AJ_Logo.png"
+import { useTranslation } from "react-i18next"
 const TripList = () => {
+  const {t} = useTranslation();
   const [trip, setTrip] = useState([])
   const [loading, setLoading] = useState(true)
   const [showFilter, setShowFilter] = useState(false)
@@ -237,7 +239,7 @@ const TripList = () => {
         return;
       }
 
-      // 🔹 Excel-export-ready data
+      //  Excel-export-ready data
       const excelData = filteredData.map((item) => {
         const newItem = {};
         Object.keys(item).forEach((key) => {
@@ -251,7 +253,7 @@ const TripList = () => {
         return newItem;
       });
 
-      // 🔹 Total row calculation
+      //  Total row calculation
       const totalRow = {};
       const numericKeys = Object.keys(excelData[0]).filter((key) =>
         excelData.some((item) => typeof item[key] === "number")
@@ -267,7 +269,7 @@ const TripList = () => {
       // final data with total row
       excelData.push(totalRow);
 
-      // 🔹 Excel sheet generate
+      //  Excel sheet generate
       const worksheet = XLSX.utils.json_to_sheet(excelData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Filtered Trips");
@@ -338,151 +340,6 @@ const TripList = () => {
   }
 
   // print
-  // const printTripsTable = () => {
-  //   const actionColumns = document.querySelectorAll(".action_column");
-  //   actionColumns.forEach((col) => (col.style.display = "none"));
-
-  //   const tableHTML = `
-  //   <table border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse:collapse;">
-  //     <thead>
-  //       <tr style="background:#11375B; color:white;">
-  //         <th>SL.</th>
-  //         <th>StartDate</th>
-  //         <th>EndDate</th>
-  //         <th>customer</th>
-  //         <th>Driver</th>
-  //         <th>VehicleNo</th>
-  //         <th>LoadPoint</th>
-  //         <th>UnloadPoint</th>
-  //         <th>TripRent</th>
-  //         <th>TripCost</th>
-  //         <th>Profit</th>
-  //       </tr>
-  //     </thead>
-  //     <tbody>
-  //       ${trip
-  //       .map(
-  //         (dt, index) => `
-  //       <tr>
-  //           <td>${index + 1}</td>
-  //           <td>${dt.start_date}</td>
-  //           <td>${dt.end_date}</td>
-  //           <td>${(dt.customer || "") + " " + (dt.transport_type || "")}</td>
-  //           <td>${dt.driver_name || ""}</td>
-  //           <td>${dt.vehicle_no || ""}</td>
-  //           <td>${dt.load_point}</td>
-  //           <td>${dt.unload_point}</td>
-  //           <td>${isAdmin ? dt.total_rent : "hide"}</td>
-  //           <td>${dt.total_exp}</td>
-  //           <td>${isAdmin ? dt.total_rent - dt.total_exp : "hide"}</td>
-  //       </tr>
-  //       `
-  //       )
-  //       .join("")}
-  //     </tbody>
-  //   </table>
-  // `;
-
-  //   const WinPrint = window.open("", "", "width=900,height=650");
-  //   WinPrint.document.write(`
-  //   <html>
-  //   <head>
-  //     <title>-</title>
-  //     <style>
-
-  //       body { font-family: Arial, sans-serif; }
-
-  //       /* --- HEADER WILL REPEAT EVERY PAGE --- */
-  //       .print-header {
-  //         display: table-header-group;
-  //       }
-
-  //       .header {
-  //         width: 100%;
-  //         border-bottom: 2px solid #000;
-  //         padding-bottom: 10px;
-  //         margin-bottom: 5px;
-  //         display: flex;
-  //         justify-content: space-between;
-  //         align-items: center;
-  //       }
-
-  //       .header-logo img {
-  //         width: 80px;
-  //       }
-
-  //       .header-title {
-  //         text-align: center;
-  //       }
-
-  //       .header-title h1 {
-  //         margin: 0;
-  //         font-size: 22px;
-  //         font-weight: bold;
-  //       }
-
-  //       .addr {
-  //         font-size: 12px;
-  //         color: #444;
-  //       }
-
-  //       table { width: 100%; border-collapse: collapse; }
-  //       th, td { border: 1px solid #000; padding: 5px; }
-
-  //       thead th {
-  //         background: #11375B !important;
-  //         color: white !important;
-  //         -webkit-print-color-adjust: exact;
-  //         print-color-adjust: exact;
-  //       }
-
-  //       /* Body content repeats normally */
-  //       .content {
-  //         display: table-row-group;
-  //       }
-
-  //     </style>
-  //   </head>
-
-  //   <body>
-
-  //     <!-- HEADER THAT REPEATS -->
-  //     <div class="print-header">
-  //       <div class="header">
-  //         <div class="header-logo">
-  //           <img src="${logo}" />
-  //           <div style="font-size:12px; font-weight:bold;">M/S A J ENTERPRISE</div>
-  //         </div>
-
-  //         <div class="header-title">
-  //           <h1>M/S AJ Enterprise</h1>
-  //           <div class="addr">
-  //             Razzak Plaza, 11th Floor, Room J-12<br/>
-  //             2 Sahid Tajuddin Sarani, Moghbazar, Dhaka-1217
-  //           </div>
-  //         </div>
-
-  //         <div style="width:80px;"></div>
-  //       </div>
-  //     </div>
-
-  //     <div class="content">
-  //       <h3>Trip Report</h3>
-  //       ${tableHTML}
-  //     </div>
-
-  //   </body>
-  //   </html>
-  // `);
-
-  //   WinPrint.document.close();
-  //   WinPrint.focus();
-  //   WinPrint.print();
-  //   WinPrint.close();
-
-  //   actionColumns.forEach((col) => (col.style.display = ""));
-  // };
-
   const printTripsTable = () => {
     const actionColumns = document.querySelectorAll(".action_column");
     actionColumns.forEach((col) => (col.style.display = "none"));
@@ -491,17 +348,16 @@ const TripList = () => {
     <table border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse:collapse;">
       <thead>
         <tr style="background:#11375B; color:white;">
-          <th>SL.</th>
-          <th>StartDate</th>
-          <th>EndDate</th>
-          <th>customer</th>
-          <th>Driver</th>
-          <th>VehicleNo</th>
-          <th>LoadPoint</th>
-          <th>UnloadPoint</th>
-          <th>TripRent</th>
-          <th>TripCost</th>
-          <th>Profit</th>
+          <th>${t("SL")}</th>
+          <th>${t("Date")}</th>
+          <th>${t("customer")}</th>
+          <th>${t("Driver")}</th>
+          <th>${t("Vehicle No")}</th>
+          <th>${t("Load Point")}</th>
+          <th>${t("Unload Point")}</th>
+          <th>${t("TripRent")}</th>
+          <th>${t("TripCost")}</th>
+          <th>${t("Profit")}</th>
         </tr>
       </thead>
       <tbody>
@@ -511,7 +367,6 @@ const TripList = () => {
         <tr>
             <td>${index + 1}</td>
             <td>${dt.start_date}</td>
-            <td>${dt.end_date}</td>
             <td>${(dt.customer || "") + " " + (dt.transport_type || "")}</td>
             <td>${dt.driver_name || ""}</td>
             <td>${dt.vehicle_no || ""}</td>
@@ -871,7 +726,7 @@ const TripList = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentTrip = filteredTripList.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(filteredTripList.length / itemsPerPage)
-  if (loading) return <p className="text-center mt-16">Loading trip...</p>
+  if (loading) return <p className="text-center mt-16">{t("Loading")} {t("Trip")}...</p>
 
   return (
     <main className="p-2">
@@ -881,42 +736,42 @@ const TripList = () => {
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
             <FaTruck className="text-gray-800 text-2xl" />
-            Trip Records
+            {t("Trip Records")}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <button
               onClick={() => setShowFilter((prev) => !prev)}
               className="border border-primary   text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
-              <FaFilter /> Filter
+              <FaFilter /> {t("Filter")}
             </button>
             <Link to="/tramessy/AddTripForm">
               <button className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
-                <FaPlus /> Trip
+                <FaPlus /> {t("Trip")}
               </button>
             </Link>
           </div>
         </div>
         {/* export and search */}
         <div className="md:flex justify-between items-center">
-          <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
+          <div className="flex gap-1 md:gap-3 text-gray-700 font-medium rounded-md">
             <button
               onClick={exportTripsToExcel}
               className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
-              Excel
+              {t("Excel")}
             </button>
             {/* <button
               onClick={exportTripsToPDF}
               className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
-              PDF
+              {t("PDF")}
             </button> */}
             <button
               onClick={printTripsTable}
               className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
-              Print
+              {t("Print")}
             </button>
           </div>
           {/* search */}
@@ -929,7 +784,7 @@ const TripList = () => {
                 setCurrentPage(1)
               }}
               type="text"
-              placeholder="Search trip..."
+              placeholder={`${t("search")}...`}
               className="lg:w-60 border border-gray-300 rounded-md outline-none text-xs py-2 ps-2 pr-5"
             />
             {/*  Clear button */}
@@ -988,7 +843,7 @@ const TripList = () => {
               }}
               className=" flex-1 min-w-0 p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
             >
-              <option value="">Select Customer</option>
+              <option value="">{t("Customer")} {t("Select")}</option>
               {customers.map((c) => (
                 <option key={c.id} value={c.customer_name}>
                   {c.customer_name}
@@ -1005,9 +860,9 @@ const TripList = () => {
               }}
               className="flex-1 min-w-0 p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
             >
-              <option value="">All Transport</option>
-              <option value="own_transport">Own Transport</option>
-              <option value="vendor_transport">Vendor Transport</option>
+              <option value="">{t("All")} {t("Transport")}</option>
+              <option value="own_transport">{t("Own Transport")}</option>
+              <option value="vendor_transport">{t("Vendor Transport")}</option>
             </select>
 
             <div className="flex-gap-2">
@@ -1021,7 +876,7 @@ const TripList = () => {
                 }}
                 className="w-full bg-gradient-to-r from-primary to-[#077a20]  text-white px-2 py-2 rounded-md shadow flex items-center justify-center gap-2 transition-all duration-300"
               >
-                <FiFilter /> Clear
+                <FiFilter /> {t("Clear")}
               </button>
             </div>
           </div>
@@ -1032,19 +887,19 @@ const TripList = () => {
           <table className="min-w-full text-sm text-left">
             <thead className="bg-gray-200 text-primary capitalize text-xs">
               <tr>
-                <th className="px-2 py-4">SL.</th>
-                <th className="px-2 py-4">StartDate</th>
-                {/*  */}
-                <th className="px-2 py-4">EndDate</th>
-                <th className="px-2 py-4">TripId</th>
-                <th className="px-2 py-4">Customer</th>
-                <th className="px-2 py-4">Driver/vehicle</th>
-                <th className="px-2 py-4">Trip&Destination</th>
-                <th className="px-2 py-4">TripRent</th>
-                <th className="px-2 py-4">TripExpense</th>
-                <th className="p-2">Profit</th>
-                <th className="p-2">Status</th>
-                <th className="p-2 action_column">Action</th>
+                <th className="px-2 py-4">{t("SL.")}</th>
+                <th className="px-2 py-4">{t("Date")}</th>
+                <th className="px-2 py-4">{t("TripNo")}</th>
+                <th className="px-2 py-4">{t("Customer")}/{t("Transport")}</th>
+                <th className="p-2">{t("Driver")}/{t("Vehicle No")}</th>
+                {/* <th className="p-2">{t("Vendor")}</th> */}
+                <th className="px-2 py-4">{t("Trip")}{t("&")}{t("Destination")}</th>
+                <th className="px-2 py-4">{t("TripRent")}</th>
+                <th className="p-2">{t("C.Demurrage")}</th>
+                <th className="p-2">{t("TripCost")}</th>
+                <th className="p-2">{t("Profit")}</th>
+                <th className="p-2">{t("Status")}</th>
+                <th className="p-2 action_column">{t("Action")}</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
@@ -1066,7 +921,6 @@ const TripList = () => {
                     >
                       <td className="p-2 font-bold">{indexOfFirstItem + index + 1}</td>
                       <td className="p-2">{formatDate(dt?.start_date)}</td>
-                      <td className="p-2">{formatDate(dt?.end_date)}</td>
                       <td className="p-2">{dt?.id}</td>
                       <td className="p-2">
                         <p>
@@ -1084,12 +938,18 @@ const TripList = () => {
                           <strong className="">vehicle:</strong> {dt.vehicle_no}
                         </p>
                       </td>
+                       {/* <td className="p-2">
+                        <p>
+                          <strong className=""></strong> {dt.vendor_name}
+                        </p>
+                      </td> */}
                       <td className="p-2">
                         <p><strong>Load:</strong> {dt.load_point}</p>
                         <p><strong>Unload:</strong> {dt.unload_point}</p>
                       </td>
 
                       <td className="p-2">{isAdmin ? (dt.total_rent) : "hide"}</td>
+                      <td className="p-2">{dt.total_exp}</td>
                       <td className="p-2">{dt.total_exp}</td>
                       <td className="p-2">
                         {isAdmin ? (Number.parseFloat(dt.total_rent || 0) - Number.parseFloat(dt.total_exp || 0)) : "hide"}

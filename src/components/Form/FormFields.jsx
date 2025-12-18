@@ -23,7 +23,7 @@ export const SelectField = ({
   } = useFormContext();
 
   const error = errors[name]?.message;
-
+const {t} = useTranslation()
   return (
     <div className="mb-4">
       {label && (
@@ -34,7 +34,7 @@ export const SelectField = ({
       <Controller
         name={name}
         control={control}
-        rules={{ required: required ? `${label || name} is required` : false }}
+        rules={{ required: required ? `${label || name} ${t("is required")}` : false }}
 
         render={({ field: { onChange, value, ref } }) => {
           const SelectComponent = isCreatable ? CreatableSelect : Select;
@@ -82,7 +82,7 @@ export const SelectField = ({
                 }
               }}
               options={options}
-              placeholder={placeholder || `Select ${label}`}
+              placeholder={placeholder || `${label}`}
               defaultValue={defaultValue}
               className="text-sm hide-scrollbar"
               menuPortalTarget={document.body}
@@ -111,6 +111,7 @@ export const SelectField = ({
 import { parse } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
 import { FiCalendar } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 export const InputField = ({
   name,
@@ -131,7 +132,7 @@ export const InputField = ({
   } = useFormContext();
 
   const error = errors[name]?.message;
-
+const {t} = useTranslation()
   //  If type="date" → Use react-datepicker
   if (type === "date") {
     return (
@@ -151,7 +152,7 @@ export const InputField = ({
             control={control}
             defaultValue={defaultValue || null}
             rules={{
-              required: required ? `${label || name} is required` : false,
+              required: required ? `${label || name} ${t("is required")}` : false,
             }}
             render={({ field }) => (
               <DatePicker
@@ -159,7 +160,7 @@ export const InputField = ({
                 selected={field.value ? new Date(field.value) : null}
                 onChange={(date) => field.onChange(date)}
                 dateFormat="dd-MM-yyyy"
-                placeholderText={placeholder || `Select ${label || name}`}
+                placeholderText={placeholder || `${label || name}`}
                 className={`mt-1 text-sm border border-gray-300 px-3 py-2 rounded outline-none ${icon ? "pr-12" : ""
                   } ${readOnly ? "bg-gray-200" : "bg-white"} w-full`}
                 readOnly={readOnly}
@@ -187,7 +188,6 @@ export const InputField = ({
   const { ref, ...rest } = register(name, {
     required: required ? `${label || name} is required` : false,
   });
-
   return (
     <div className="mb-4">
       {label && (
@@ -203,7 +203,7 @@ export const InputField = ({
         <input
           id={name}
           type={type}
-          placeholder={placeholder || `Enter ${label || name}`}
+          placeholder={placeholder || ` ${label || name}`}
           defaultValue={defaultValue}
           value={value}
           readOnly={readOnly}
@@ -235,7 +235,7 @@ const TextAreaField = ({
     register,
     formState: { errors },
   } = useFormContext();
-
+const {t} = useTranslation()
   return (
     <div className="mb-4 w-full">
       {label && (
@@ -251,9 +251,9 @@ const TextAreaField = ({
         id={name}
         rows={2}
         {...register(name, {
-          required: required ? `${label || name} is required` : false,
+          required: required ? `${label || name} ${t("is required")}` : false,
         })}
-        placeholder={placeholder || `Enter ${label || name}`} // 👈 placeholder
+        placeholder={placeholder || `${label || name}`} // 👈 placeholder
         className="w-full border border-gray-300 p-2 rounded text-sm"
       />
 

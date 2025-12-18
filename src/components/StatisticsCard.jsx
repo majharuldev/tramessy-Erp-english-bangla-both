@@ -288,10 +288,12 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import api from "../../utils/axiosConfig";
+import { useTranslation } from "react-i18next";
 
 const StatisticsCard = () => {
   const [expiringDocs, setExpiringDocs] = useState([]);
   const [maintenanceAlerts, setMaintenanceAlerts] = useState([]);
+  const {t} = useTranslation()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -402,10 +404,10 @@ const StatisticsCard = () => {
           <table className="min-w-full text-sm text-left border border-gray-200">
             <thead className="bg-gray-100 text-gray-700">
               <tr>
-                <th className="p-2">SL.</th>
-                <th className="p-2">Vehicle</th>
-                <th className="p-2">Type</th>
-                <th className="p-2">Remaining</th>
+                <th className="p-2">{t("SL.")}</th>
+                <th className="p-2">{t("vehicleNo")}</th>
+                <th className="p-2">{t("Type")}</th>
+                <th className="p-2">{t("remaining")}</th>
               </tr>
             </thead>
             <tbody>
@@ -444,12 +446,12 @@ const StatisticsCard = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <ReminderTable
-        title="📄 Document Reminder"
+        title={`${t("Document Reminder")}`}
         data={expiringDocs}
-        emptyText="No documents expiring soon."
+        emptyText={t("noDocumentsExpiringSoon.")}
       />
       <ReminderTable
-        title="🔧 Maintenance Reminder"
+        title={t("Maintenance Reminder")}
         data={maintenanceAlerts}
         emptyText="No maintenance alerts."
       />
