@@ -13,3 +13,4 @@ If you are developing a production application, we recommend using TypeScript an
 # Ms-trading-ERP
 # asif-inter-tramessy
 # Aj-enterprise-react
+# soinik-transport--react
