@@ -10,6 +10,7 @@ import api from "../../../utils/axiosConfig";
 import DatePicker from "react-datepicker";
 import toNumber from "../../hooks/toNumber";
 import { useTranslation } from "react-i18next";
+import { tableFormatDate } from "../../hooks/formatDate";
 // Extend dayjs with isBetween plugin
 dayjs.extend(isBetween);
 
@@ -110,12 +111,12 @@ export default function FuelReport() {
   if (searchTerm) {
     const searchLower = searchTerm.toLowerCase();
     return (
-      item.date.toLowerCase().includes(searchLower) ||
-      item.vehicle.toLowerCase().includes(searchLower) ||
-      item.driver.toLowerCase().includes(searchLower) ||
-      item.customer.toLowerCase().includes(searchLower) ||
-      item.ref_id.toLowerCase().includes(searchLower) ||
-      item.fuel_cost.toString().includes(searchLower)
+      item?.date?.toLowerCase().includes(searchLower) ||
+      item?.vehicle?.toLowerCase().includes(searchLower) ||
+      item?.driver?.toLowerCase().includes(searchLower) ||
+      item?.customer?.toLowerCase().includes(searchLower) ||
+      item?.ref_id?.toLowerCase().includes(searchLower) ||
+      item?.fuel_cost?.toString().includes(searchLower)
     );
   }
     return true;
@@ -350,7 +351,7 @@ export default function FuelReport() {
                 setSearchTerm("");
                 setCurrentPage(1);
               }}
-              className="absolute right-9 top-[6.7rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
+              className="absolute right-9 top-[5.8rem] -translate-y-1/2 text-gray-400 hover:text-red-500 text-sm"
             >
               ✕
             </button>
@@ -439,7 +440,7 @@ export default function FuelReport() {
                 {currentItems.length > 0 ? (
                   currentItems.map((item, index) => (
                     <tr key={index} className="hover:bg-gray-50 transition-all border border-gray-200">
-                      <td className="p-3">{item.date}</td>
+                      <td className="p-3">{tableFormatDate(item.date)}</td>
                       {/* <td className="p-3">{item.ref_id}</td> */}
                       <td className="p-3 border border-gray-300">{item.vehicle}</td>
                       <td className="p-3 border border-gray-300">{item.driver}</td>

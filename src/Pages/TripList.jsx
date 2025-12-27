@@ -20,6 +20,7 @@ import DatePicker from "react-datepicker"
 import { FiFilter } from "react-icons/fi"
 import logo from "../assets/AJ_Logo.png"
 import { useTranslation } from "react-i18next"
+import toNumber from "../hooks/toNumber"
 const TripList = () => {
   const {t} = useTranslation();
   const [trip, setTrip] = useState([])
@@ -223,71 +224,6 @@ const TripList = () => {
       })
   }, [])
 
-
-  // excel
-  const exportTripsToExcel = async () => {
-    try {
-      let filteredData = filteredTripList;
-
-      if (!isAdmin) {
-        filteredData = filteredData.map(({ total_rent, ...rest }) => rest);
-      }
-
-      if (!filteredData || filteredData.length === 0) {
-        toast.error("No filtered trip data found!");
-        return;
-      }
-
-      //  Excel-export-ready data
-      const excelData = filteredData.map((item) => {
-        const newItem = {};
-        Object.keys(item).forEach((key) => {
-          // number string → number
-          if (!isNaN(item[key]) && item[key] !== "" && item[key] !== null) {
-            newItem[key] = Number(item[key]);
-          } else {
-            newItem[key] = item[key];
-          }
-        });
-        return newItem;
-      });
-
-      //  Total row calculation
-      const totalRow = {};
-      const numericKeys = Object.keys(excelData[0]).filter((key) =>
-        excelData.some((item) => typeof item[key] === "number")
-      );
-      numericKeys.forEach((key) => {
-        totalRow[key] = excelData.reduce(
-          (sum, row) => sum + (row[key] || 0),
-          0
-        );
-      });
-      totalRow["customer"] = "TOTAL"; // যেকোনো text field এ total label
-
-      // final data with total row
-      excelData.push(totalRow);
-
-      //  Excel sheet generate
-      const worksheet = XLSX.utils.json_to_sheet(excelData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Filtered Trips");
-
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      saveAs(new Blob([excelBuffer]), "filtered_trip_report.xlsx");
-      toast.success("Filtered trip data downloaded successfully!");
-    } catch (error) {
-      console.error("Excel export error:", error);
-      toast.error("Failed to download Excel file!");
-    }
-  };
-
-
-
   // pdf
   const exportTripsToPDF = () => {
     const doc = new jsPDF("landscape")
@@ -338,6 +274,375 @@ const TripList = () => {
     doc.save("trip_report.pdf")
   }
 
+  // delete by id
+  const handleDelete = async (id) => {
+    try {
+      const response = await api.delete(`/trip/${id}`);
+
+      // Axios er jonno check
+      if (response.status === 200) {
+        // UI update
+        setTrip((prev) => prev.filter((item) => item.id !== id));
+        toast.success("Trip deleted successfully", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+
+        setIsOpen(false);
+        setselectedTripId(null);
+      } else {
+        throw new Error("Delete request failed");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("There was a problem deleting!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  };
+  // view trip by id
+  const handleView = async (id) => {
+    try {
+      const response = await api.get(`/trip/${id}`)
+      setselectedTrip(response.data)
+      setViewModalOpen(true)
+    } catch (error) {
+      console.error("View error:", error)
+      toast.error("Can't get trip details")
+    }
+  }
+
+  // view print
+  const handleViewPrint = () => {
+    const printContent = document.getElementById("printArea");
+    const buttons = document.querySelectorAll('.no-print');
+    buttons.forEach(btn => (btn.style.display = 'none'));
+    const WindowPrint = window.open("", "", "width=900,height=650");
+    WindowPrint.document.write(`
+    <html>
+      <head>
+        <title>-</title>
+        <style>
+          /* --- FIX 1 : Proper margin (no cut on left/right) --- */
+          @page { 
+            size: A4;
+            margin: 10mm; 
+          }
+
+          body {
+            font-family: Arial, sans-serif;
+            padding: 5px;
+          }
+
+          /* --- FIX 2 : Center Header (logo + address) --- */
+         
+          .print-header h2 {
+            margin: 5px 0 0 0;
+            font-size: 20px;
+            font-weight: bold;
+          }
+          .print-header p {
+            margin: 0;
+            font-size: 12px;
+            color: #444;
+          }
+
+          /* Print Layout Fix — Logo left, header centered */
+.print-header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.print-logo{
+  text-align: left !important;
+  flex: 1;
+}
+  .print-logo img{
+  width: 80px !important;
+}
+.print-header-text {
+  flex: 2;
+  text-align: center !important;
+}
+
+
+          /* --- FIX 3 : Two-column grid with border in middle --- */
+          .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 1px solid #ccc;   /* outer border */
+          }
+
+          .grid div {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+          }
+
+          /* Middle vertical border */
+          .grid div:nth-child(odd) {
+            border-right: 1px solid #ddd;
+          }
+
+          /* Remove last row bottom border if odd/even mismatch */
+          .grid div:last-child {
+            border-bottom: none;
+          }
+
+          strong {
+            color: #222;
+          }
+
+        </style>
+      </head>
+
+      <body>
+        ${printContent.innerHTML}
+      </body>
+    </html>
+  `);
+
+    WindowPrint.document.close();
+    WindowPrint.print();
+
+    // Re-show hidden buttons
+    setTimeout(() => {
+      buttons.forEach(btn => (btn.style.display = ''));
+    }, 500);
+  };
+
+
+  // Sort trips by date descending (latest first)
+  const sortedTrips = [...trip].sort((a, b) => new Date(b.start_date) - new Date(a.start_date))
+
+  const filteredTrips = sortedTrips.filter((trip) => {
+    const tripDate = new Date(trip.start_date)
+    const start = startDate ? new Date(startDate) : null
+    const end = endDate ? new Date(endDate) : null
+
+    const matchesDate =
+      (start && end && tripDate >= start && tripDate <= end) ||
+      (start && tripDate.toDateString() === start.toDateString()) ||
+      (!start && !end)
+
+    const matchesCustomer = !selectedCustomer || trip.customer?.toLowerCase() === selectedCustomer.toLowerCase()
+    const matchesTransportType = !transportType || trip.transport_type === transportType
+
+    return matchesDate && matchesCustomer && matchesTransportType
+  })
+
+  // search
+  const filteredTripList = filteredTrips.filter((dt) => {
+    const term = searchTerm.toLowerCase()
+    return (
+      dt.customer?.toLowerCase().includes(term) ||
+      dt.date?.toLowerCase().includes(term) ||
+      (dt.id !== undefined && dt.id !== null && dt.id.toString() === term) ||
+      dt.driver_name?.toLowerCase().includes(term) ||
+      dt.transport_type?.replace("_", " ").toLowerCase().includes(term) ||
+      dt.driver_mobile?.toLowerCase().includes(term) ||
+      dt.load_point?.toLowerCase().includes(term) ||
+      dt.unload_point?.toLowerCase().includes(term) ||
+      dt.invoice_no?.toLowerCase().includes(term) ||
+      dt.buyar_name?.toLowerCase().includes(term) ||
+      dt.branch_name?.toLowerCase().includes(term) ||
+      dt.vendor_name?.toLowerCase().includes(term) ||
+      dt.challan?.toLowerCase().includes(term)
+    )
+  })
+
+// EXPORT TRIPS TO EXCEL
+const exportTripsToExcel = async () => {
+  try {
+    if (!filteredTripList || filteredTripList.length === 0) {
+      toast.error("No filtered trip data found!");
+      return;
+    }
+
+    // EXCEL HEADERS (INSIDE FUNCTION)
+    const headers = [
+      { label: "SL", key: "sl" },
+      { label: "Date", key: "start_date" },
+      { label: "Customer", key: "customer" },
+      { label: "Driver", key: "driver_name" },
+      { label: "Vehicle No", key: "vehicle_no" },
+      { label: "Vendor Name", key: "vendor_name" },
+      { label: "Load Point", key: "load_point" },
+      { label: "Unload Point", key: "unload_point" },
+      { label: "Trip Rent", key: "total_rent" },
+      { label: "C.Demurrage", key: "d_total" },
+      { label: "Food Cost", key: "food_cost" },
+      { label: "Fuel Cost", key: "fuel_cost" },
+      { label: "Challan Cost", key: "challan_cost" },
+      { label: "Parking Cost", key: "parking_cost" },
+      { label: "Night Gurad", key: "night_guard" },
+      { label: "Toll Cost", key: "toll_cost" },
+      { label: "Feri Cost", key: "feri_cost" },
+      { label: "Police Cost", key: "police_cost" },
+      { label: "Labour Cost", key: "labor" },
+      { label: "Chada", key: "chada" },
+      { label: "Additional Cost", key: "additional_cost" },
+      { label: "Others Cost", key: "others_cost" },
+      { label: "Total Trip Cost", key: "total_cost" },
+      { label: "Profit", key: "profit" },
+      { label: "Driver Advance", key: "driver_adv" },
+      { label: "Buyer Name", key: "buyer_name" },
+      { label: "Challan No", key: "challan" },
+      { label: "Invoice No", key: "invoice_no" },
+      { label: "Branch", key: "branch_name" },
+      { label: "Additional load", key: "additional_load" },
+      { label: "Transport Type", key: "transport_type" },
+      { label: "Trip Type", key: "trip_type" },
+      { label: "Vehicle Category", key: "vehicle_category" },
+      { label: "Vehicle Size", key: "vehicle_size" },
+      { label: "Product Details", key: "product_details" },
+      { label: "Driver Mobile", key: "driver_mobile" },
+      { label: "Helper Name", key: "helper_name" },
+      { label: "Remarks", key: "remarks" },
+    ];
+
+    // PREPARE EXCEL DATA
+    const excelData = filteredTripList.map((dt, index) => {
+      const rent = toNumber(dt.total_rent || 0);
+      const demurrage = toNumber(dt.d_total || 0);
+      const expense =
+        toNumber(dt.total_exp || 0) + toNumber(dt.v_d_total || 0);
+
+      return {
+        sl: index + 1,
+        start_date: dt.start_date || "",
+        customer: (dt.customer || "") + " " + (dt.transport_type || ""),
+        driver_name: dt.driver_name || "",
+        vehicle_no: dt.vehicle_no || "",
+        vendor_name: dt.vendor_name || "",
+        load_point: dt.load_point || "",
+        unload_point: dt.unload_point || "",
+        total_rent: rent,
+        d_total: demurrage,
+        food_cost: toNumber(dt.food_cost),
+        fuel_cost: toNumber(dt.fuel_cost),
+        challan_cost: toNumber(dt.challan_cost),
+        parking_cost: toNumber(dt.parking_cost),
+        night_guard: toNumber(dt.night_guard),
+        toll_cost: toNumber(dt.toll_cost),
+        feri_cost: toNumber(dt.feri_cost),
+        police_cost: toNumber(dt.police_cost),
+        labor: toNumber(dt.labor),
+        chada: toNumber(dt.chada),
+        additional_cost: toNumber(dt.additional_cost),
+        others_cost: toNumber(dt.others_cost),
+        total_cost: expense,
+        profit: rent + demurrage - expense,
+        driver_adv: dt.driver_adv,
+        buyer_name: dt.buyer_name,
+        challan: toNumber(dt.challan),
+        invoice_no: dt.invoice_no,
+        branch_name: dt.branch_name,
+        additional_load: dt.additional_load,
+        transport_type: dt.transport_type,
+        trip_type: dt.trip_type,
+        vehicle_category: dt.vehicle_category,
+        vehicle_size: dt.vehicle_size,
+        product_details: dt.product_details,
+        driver_mobile: dt.driver_mobile,
+        helper_name: dt.helper_name,
+        remarks: dt.remarks
+      };
+    });
+
+    // TOTAL ROW
+    const totalRow = {
+      sl: "",
+      start_date: "",
+      customer: "TOTAL",
+      driver_name: "",
+      vehicle_no: "",
+      vendor_name: "",
+      load_point: "",
+      unload_point: "",
+      total_rent: 0,
+       d_total: 0,
+        food_cost: 0,
+        fuel_cost: 0,
+        challan_cost: 0,
+        parking_cost: 0,
+        night_guard: 0,
+        toll_cost: 0,
+        feri_cost: 0,
+        police_cost: 0,
+        labor: 0,
+        chada: 0,
+        additional_cost: 0,
+        others_cost: 0,
+      total_cost: 0,
+      profit: 0,
+      driver_adv: 0,
+        buyer_name: "",
+        challan: "",
+        invoice_no: "",
+        branch_name: "",
+        additional_load: "",
+        transport_type: "",
+        trip_type: "",
+        vehicle_category: "",
+        vehicle_size: "",
+        product_details: "",
+        driver_mobile: "",
+        helper_name: "",
+        remarks: ""
+
+    };
+
+    excelData.forEach((row) => {
+      totalRow.total_rent += row.total_rent || 0;
+      totalRow.d_total += row.d_total || 0;
+      totalRow.food_cost += row.food_cost || 0;
+      totalRow.fuel_cost += row.fuel_cost || 0;
+      totalRow.challan_cost += row.challan_cost || 0;
+      totalRow.parking_cost += row.parking_cost || 0;
+      totalRow.night_guard += row.night_guard || 0;
+      totalRow.toll_cost += row.toll_cost || 0;
+      totalRow.feri_cost += row.feri_cost || 0;
+      totalRow.police_cost += row.police_cost || 0;
+      totalRow.labor += row.labor || 0;
+      totalRow.chada += row.chada || 0;
+      totalRow.additional_cost += row.additional_cost || 0;
+      totalRow.others_cost += row.others_cost || 0;
+      totalRow.total_cost += row.total_cost || 0;
+      totalRow.profit += row.profit || 0;
+      totalRow.driver_adv += driver_adv || 0
+    });
+
+    excelData.push(totalRow);
+
+    // CREATE WORKSHEET
+    const worksheet = XLSX.utils.json_to_sheet(excelData, {
+      header: headers.map((h) => h.key),
+    });
+
+
+    // SET HEADER LABELS
+    headers.forEach((h, index) => {
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: index });
+      worksheet[cellAddress].v = h.label;
+    });
+
+    // CREATE & DOWNLOAD FILE
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Filtered Trips");
+
+    XLSX.writeFile(workbook, "filtered_trip_report.xlsx");
+
+    toast.success("Filtered trip data downloaded successfully!");
+  } catch (error) {
+    console.error("Excel export error:", error);
+    toast.error("Failed to download Excel file!");
+  }
+};
+
+
+
   // print
   const printTripsTable = () => {
     const actionColumns = document.querySelectorAll(".action_column");
@@ -355,14 +660,22 @@ const TripList = () => {
           <th>${t("Load Point")}</th>
           <th>${t("Unload Point")}</th>
           <th>${t("TripRent")}</th>
+          <th>${t("C.Demurrage")}</th>
           <th>${t("TripCost")}</th>
           <th>${t("Profit")}</th>
         </tr>
       </thead>
       <tbody>
-        ${trip
+        ${filteredTripList
         .map(
-          (dt, index) => `
+          (dt, index) =>{ 
+             const rent = toNumber(dt.total_rent || 0);
+  const demurrage = toNumber(dt.d_total || 0);
+  const expense =
+    toNumber(dt.total_exp || 0) + toNumber(dt.v_d_total || 0);
+
+  const profit = rent + demurrage - expense;
+            return `
         <tr>
             <td>${index + 1}</td>
             <td>${dt.start_date}</td>
@@ -371,12 +684,13 @@ const TripList = () => {
             <td>${dt.vehicle_no || ""}</td>
             <td>${dt.load_point}</td>
             <td>${dt.unload_point}</td>
-            <td>${isAdmin ? dt.total_rent : "hide"}</td>
-            <td>${dt.total_exp}</td>
-            <td>${isAdmin ? dt.total_rent - dt.total_exp : "hide"}</td>
+            <td>${dt.total_rent}</td>
+           <td>${dt.d_total || 0}</td>
+        <td>${toNumber(dt.total_exp || 0) + toNumber(dt.v_d_total ||0)}</td>
+        <td>${profit}</td>
         </tr>
         `
-        )
+        })
         .join("")}
       </tbody>
     </table>
@@ -539,192 +853,28 @@ const TripList = () => {
     }, 2000);
   };
 
-
-
-  // delete by id
-  const handleDelete = async (id) => {
-    try {
-      const response = await api.delete(`/trip/${id}`);
-
-      // Axios er jonno check
-      if (response.status === 200) {
-        // UI update
-        setTrip((prev) => prev.filter((item) => item.id !== id));
-        toast.success("Trip deleted successfully", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-
-        setIsOpen(false);
-        setselectedTripId(null);
-      } else {
-        throw new Error("Delete request failed");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("There was a problem deleting!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    }
-  };
-  // view trip by id
-  const handleView = async (id) => {
-    try {
-      const response = await api.get(`/trip/${id}`)
-      setselectedTrip(response.data)
-      setViewModalOpen(true)
-    } catch (error) {
-      console.error("View error:", error)
-      toast.error("Can't get trip details")
-    }
-  }
-
-  // view print
-  const handleViewPrint = () => {
-    const printContent = document.getElementById("printArea");
-    const buttons = document.querySelectorAll('.no-print');
-    buttons.forEach(btn => (btn.style.display = 'none'));
-    const WindowPrint = window.open("", "", "width=900,height=650");
-    WindowPrint.document.write(`
-    <html>
-      <head>
-        <title>-</title>
-        <style>
-          /* --- FIX 1 : Proper margin (no cut on left/right) --- */
-          @page { 
-            size: A4;
-            margin: 10mm; 
-          }
-
-          body {
-            font-family: Arial, sans-serif;
-            padding: 5px;
-          }
-
-          /* --- FIX 2 : Center Header (logo + address) --- */
-         
-          .print-header h2 {
-            margin: 5px 0 0 0;
-            font-size: 20px;
-            font-weight: bold;
-          }
-          .print-header p {
-            margin: 0;
-            font-size: 12px;
-            color: #444;
-          }
-
-          /* Print Layout Fix — Logo left, header centered */
-.print-header-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.print-logo{
-  text-align: left !important;
-  flex: 1;
-}
-  .print-logo img{
-  width: 80px !important;
-}
-.print-header-text {
-  flex: 2;
-  text-align: center !important;
-}
-
-
-          /* --- FIX 3 : Two-column grid with border in middle --- */
-          .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            border: 1px solid #ccc;   /* outer border */
-          }
-
-          .grid div {
-            padding: 5px;
-            border-bottom: 1px solid #ddd;
-          }
-
-          /* Middle vertical border */
-          .grid div:nth-child(odd) {
-            border-right: 1px solid #ddd;
-          }
-
-          /* Remove last row bottom border if odd/even mismatch */
-          .grid div:last-child {
-            border-bottom: none;
-          }
-
-          strong {
-            color: #222;
-          }
-
-        </style>
-      </head>
-
-      <body>
-        ${printContent.innerHTML}
-      </body>
-    </html>
-  `);
-
-    WindowPrint.document.close();
-    WindowPrint.print();
-
-    // Re-show hidden buttons
-    setTimeout(() => {
-      buttons.forEach(btn => (btn.style.display = ''));
-    }, 500);
-  };
-
-
-  // Sort trips by date descending (latest first)
-  const sortedTrips = [...trip].sort((a, b) => new Date(b.date) - new Date(a.date))
-
-  const filteredTrips = sortedTrips.filter((trip) => {
-    const tripDate = new Date(trip.start_date)
-    const start = startDate ? new Date(startDate) : null
-    const end = endDate ? new Date(endDate) : null
-
-    const matchesDate =
-      (start && end && tripDate >= start && tripDate <= end) ||
-      (start && tripDate.toDateString() === start.toDateString()) ||
-      (!start && !end)
-
-    const matchesCustomer = !selectedCustomer || trip.customer?.toLowerCase() === selectedCustomer.toLowerCase()
-    const matchesTransportType = !transportType || trip.transport_type === transportType
-
-    return matchesDate && matchesCustomer && matchesTransportType
-  })
-
-  // search
-  const filteredTripList = filteredTrips.filter((dt) => {
-    const term = searchTerm.toLowerCase()
-    return (
-      dt.customer?.toLowerCase().includes(term) ||
-      dt.date?.toLowerCase().includes(term) ||
-      (dt.id !== undefined && dt.id !== null && dt.id.toString() === term) ||
-      dt.driver_name?.toLowerCase().includes(term) ||
-      dt.transport_type?.replace("_", " ").toLowerCase().includes(term) ||
-      dt.driver_mobile?.toLowerCase().includes(term) ||
-      dt.load_point?.toLowerCase().includes(term) ||
-      dt.unload_point?.toLowerCase().includes(term) ||
-      dt.invoice_no?.toLowerCase().includes(term) ||
-      dt.buyar_name?.toLowerCase().includes(term) ||
-      dt.branch_name?.toLowerCase().includes(term) ||
-      dt.vendor_name?.toLowerCase().includes(term) ||
-      dt.challan?.toLowerCase().includes(term)
-    )
-  })
-
   // pagination
   const itemsPerPage = 10
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentTrip = filteredTripList.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(filteredTripList.length / itemsPerPage)
+
+   // Filtered & paginated trips
+  const totalTripRent = currentTrip.reduce((sum, dt) => sum + toNumber(dt.total_rent || 0), 0);
+  const totalDemurrage = currentTrip.reduce((sum, dt) => sum + toNumber(dt.d_total || 0), 0);
+  // const totalTripCost = currentTrip.reduce((sum, dt) => sum + toNumber(dt.total_exp || 0), 0);
+  const totalTripCost = (currentTrip || []).reduce(
+  (sum, dt) => sum + Number(dt.total_exp || 0) + Number(dt.v_d_total || 0),
+  0
+);
+  const totalProfit = currentTrip.reduce((sum, dt) => {
+    const rent = toNumber(dt.total_rent || 0);
+    const demurrage = toNumber(dt.d_total || 0);
+    const exp = toNumber(dt.total_exp || 0) + toNumber(dt.v_d_total || 0);
+    return sum + (rent + demurrage - exp);
+  }, 0);
+
   if (loading) return <p className="text-center mt-16">{t("Loading")} {t("Trip")}...</p>
 
   return (
@@ -912,6 +1062,11 @@ const TripList = () => {
                 currentTrip?.map((dt, index) => {
                   const rowIndex = indexOfFirstItem + index + 1
                   const isOpen = openDropdown === rowIndex
+                  const totalRent = toNumber(dt.total_rent || 0);
+                    const demurrage = toNumber(dt.d_total || 0);
+                    const vendorDemurrage = toNumber(dt.v_d_total || 0);
+                    const totalExpenses = toNumber(dt.total_exp || 0) + toNumber(dt.v_d_total || 0);
+                    const profit = (totalRent + demurrage) - totalExpenses;
                   return (
                     <tr
                       key={index}
@@ -948,10 +1103,13 @@ const TripList = () => {
                       </td>
 
                       <td className="p-2">{isAdmin ? (dt.total_rent) : "hide"}</td>
-                      <td className="p-2">{dt.total_exp}</td>
-                      <td className="p-2">{dt.total_exp}</td>
+                      <td className="p-2">{dt.d_total}</td>
+                      <td className="p-2">{dt.transport_type === "vendor_transport"
+                            ? totalExpenses 
+                            : toNumber(dt.total_exp) 
+                          }</td>
                       <td className="p-2">
-                        {isAdmin ? (Number.parseFloat(dt.total_rent || 0) - Number.parseFloat(dt.total_exp || 0)) : "hide"}
+                        {profit}
                       </td>
                       <td className="p-2">
                         <span
@@ -993,7 +1151,7 @@ const TripList = () => {
                                 {((isAdmin || dt.status !== "Approved") ) && (<Link to={`/tramessy/UpdateTripForm/${dt.id}`} onClick={() => setOpenDropdown(null)}>
                                   <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <FaPen className="mr-2 text-[12px]" />
-                                    Edit
+                                    {t("Edit")}
                                   </button>
                                 </Link>)}
                                 <button
@@ -1004,7 +1162,7 @@ const TripList = () => {
                                   className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 >
                                   <FaEye className="mr-2 text-[12px]" />
-                                  View
+                                  {t("View")}
                                 </button>
                                 <button
                                   onClick={() => {
@@ -1015,7 +1173,7 @@ const TripList = () => {
                                   className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 >
                                   <BiPrinter className="mr-2 h-4 w-4" />
-                                  Challan
+                                  {t("Challan")}
                                 </button>
                                 {/* {isAdmin && dt.status !== "Approved" && (
                                   <button
@@ -1037,7 +1195,7 @@ const TripList = () => {
                                     setIsOpen(true);
                                   }}
                                   className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"                                >
-                                  <FaTrashAlt className="mr-2 h-4 w-3 text-red-500" /> Delete  </button>
+                                  <FaTrashAlt className="mr-2 h-4 w-3 text-red-500" /> {t("Delete")}  </button>
                               </div>
                             </div>
                           )}
@@ -1046,8 +1204,19 @@ const TripList = () => {
                     </tr>
                   )
                 })
-              )}
+              )}             
             </tbody>
+            <tfoot className="bg-gray-100 font-bold text-sm">
+              <tr>
+                <td className="p-2 text-center" colSpan="6">{t("Total")}</td>
+                <td className="p-2">{totalTripRent}</td>
+                <td className="p-2">{totalDemurrage}</td>
+                <td className="p-2">{totalTripCost}</td>
+                <td className="p-2">{totalProfit}</td>
+                <td className="p-2"></td>
+                <td className="p-2"></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
         {/* pagination */}
@@ -1079,19 +1248,19 @@ const TripList = () => {
               <div className="flex justify-center mb-4 text-red-500 text-4xl">
                 <FaTrashAlt />
               </div>
-              <p className="text-center text-gray-700 font-medium mb-6">Are you sure you want to delete this trip?</p>
+              <p className="text-center text-gray-700 font-medium mb-6">{t("Are you sure you want to delete?")}</p>
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={toggleModal}
                   className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-primary hover:text-white cursor-pointer"
                 >
-                  No
+                  {t("No")}
                 </button>
                 <button
                   onClick={() => handleDelete(selectedTripId)}
                   className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 cursor-pointer"
                 >
-                  Yes
+                  {t("Yes")}
                 </button>
               </div>
             </div>
@@ -1105,8 +1274,7 @@ const TripList = () => {
           <div className="bg-white w-[90%] md:w-[800px] rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-fadeIn">
             <div id="printArea" ref={printViewRef} className="print:p-0">
               <div className="flex items-center justify-between p-4 print-header-container">
-                <div className="print-logo">
-                  {/* Logo */}
+                {/* <div className="print-logo">
                   <img src={logo} alt="" />
                   <div className="text-xs text-secondary">
                     <div className="font-bold">M/S A J ENTERPRISE</div>
@@ -1118,7 +1286,8 @@ const TripList = () => {
                     <div>Razzak Plaza, 11th Floor, Room No: J-12,</div>
                     <div>2 Sahid Tajuddin Sarani, Moghbazar, Dhaka-1217, Bangladesh</div>
                   </div>
-                </div>
+                </div> */}
+                <div></div>
                 <div className="w-16">
                   <button
                     onClick={() => setViewModalOpen(false)}
@@ -1131,69 +1300,72 @@ const TripList = () => {
               {/* Body */}
               <div className="p-6 text-gray-800">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-bold border-b pb-2">Trip Information</h3>
+                  <h3 className="text-lg font-bold border-b pb-2">{t("Trip")} {t("Information")}</h3>
                   <p className="text-sm text-gray-500">
-                    Created By: <span className="font-semibold">{selectedTrip.created_by || "N/A"}</span>
+                    {t("Created By")}: <span className="font-semibold">{selectedTrip.created_by || "N/A"}</span>
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <div><strong>Trip ID:</strong> {selectedTrip.id}</div>
-                  <div><strong>Trip Type:</strong> {selectedTrip.trip_type || "N/A"}</div>
-                  <div><strong>Customer:</strong> {selectedTrip.customer || "N/A"}</div>
-                  <div><strong>Trip Start Date:</strong> {selectedTrip.start_date || "N/A"}</div>
-                  <div><strong>Trip End Date:</strong> {selectedTrip.end_date || "N/A"}</div>
-                  <div><strong>Load Point:</strong> {selectedTrip.load_point || "N/A"}</div>
-                  <div><strong>Unload Point:</strong> {selectedTrip.unload_point || "N/A"}</div>
-                  <div><strong>Additional Load:</strong> {selectedTrip.additional_load || "N/A"}</div>
-                  <div><strong>Branch:</strong> {selectedTrip.branch_name || "N/A"}</div>
-                  <div><strong>Transport Type:</strong> {selectedTrip.transport_type || "N/A"}</div>
-                  <div><strong>Vehicle No:</strong> {selectedTrip.vehicle_no || "N/A"}</div>
-                  <div><strong>Vendor Name:</strong> {selectedTrip.vendor_name || "N/A"}</div>
-                  <div><strong>Driver Name:</strong> {selectedTrip.driver_name || "N/A"}</div>
-                  <div><strong>Helper Name:</strong> {selectedTrip.helper_name || "N/A"}</div>
-                  <div><strong>Driver Mobile:</strong> {selectedTrip.driver_mobile || "N/A"}</div>
-                  <div><strong>Product Details:</strong> {selectedTrip.product_details || "N/A"}</div>
-                  <div><strong>Invoice No:</strong> {selectedTrip.invoice_no || 0}</div>
-                  <div><strong>Buyar Name:</strong> {selectedTrip.buyar_name || "N/A"}</div>
-                  <div><strong>Challan No:</strong> {selectedTrip.challan || "N/A"}</div>
+                  <div><strong>{t("Trip")} {t("ID")}:</strong> {selectedTrip.id}</div>
+                  <div><strong>{t("Trip Type")}:</strong> {selectedTrip.trip_type || "N/A"}</div>
+                  <div><strong>{t("Customer")}:</strong> {selectedTrip.customer || "N/A"}</div>
+                  <div><strong>{t("Trip")} {t("Start Date")}:</strong> {selectedTrip.start_date || "N/A"}</div>
+                  <div><strong>{t("Trip")} {t("End Date")}:</strong> {selectedTrip.end_date || "N/A"}</div>
+                  <div><strong>{t("Load Point")}:</strong> {selectedTrip.load_point || "N/A"}</div>
+                  <div><strong>{t("Unload Point")}:</strong> {selectedTrip.unload_point || "N/A"}</div>
+                  <div><strong>{t("Additional Load")}:</strong> {selectedTrip.additional_load || "N/A"}</div>
+                  <div><strong>{t("Branch")}:</strong> {selectedTrip.branch_name || "N/A"}</div>
+                  <div><strong>{t("Transport Type")}:</strong> {selectedTrip.transport_type || "N/A"}</div>
+                  <div><strong>{t("Vehicle No")}:</strong> {selectedTrip.vehicle_no || "N/A"}</div>
+                  <div><strong>{t("Vendor")} {t("Name")}:</strong> {selectedTrip.vendor_name || "N/A"}</div>
+                  <div><strong>{t("Driver")} {t("Name")}:</strong> {selectedTrip.driver_name || "N/A"}</div>
+                  <div><strong>{t("Helper")} {t("Name")}:</strong> {selectedTrip.helper_name || "N/A"}</div>
+                  <div><strong>{t("Driver")} {t("Mobile")}:</strong> {selectedTrip.driver_mobile || "N/A"}</div>
+                  <div><strong>{t("Product Details")}:</strong> {selectedTrip.product_details || "N/A"}</div>
+                  <div><strong>{t("Invoice No")}:</strong> {selectedTrip.invoice_no || 0}</div>
+                  <div><strong>{t("Buyar Name")}:</strong> {selectedTrip.buyar_name || "N/A"}</div>
+                  <div><strong>{t("Challan No")}:</strong> {selectedTrip.challan || "N/A"}</div>
                 </div>
 
                 <h3 className="text-lg font-bold mt-3 mb-3 border-b">
-                  Expense Details
+                  {t("Expense Details")}
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <div><strong>Labor Cost:</strong> {selectedTrip.labor || 0}</div>
-                  <div><strong>Toll Cost:</strong> {selectedTrip.toll_cost || 0}</div>
-                  <div><strong>Fuel Cost:</strong> {selectedTrip.fuel_cost || 0}</div>
-                  <div><strong>Parking Cost:</strong> {selectedTrip.parking_cost || 0}</div>
-                  <div><strong>Night Guard Cost:</strong> {selectedTrip.night_guard || 0}</div>
-                  <div><strong>Callan Cost:</strong> {selectedTrip.callan_cost || 0}</div>
-                  <div><strong>Others Cost:</strong> {selectedTrip.others_cost || 0}</div>
-                  <div><strong>Feri Cost:</strong> {selectedTrip.feri_cost || 0}</div>
-                  <div><strong>Police Cost:</strong> {selectedTrip.police_cost || 0}</div>
-                  <div><strong>Chada Cost:</strong> {selectedTrip.chada || 0}</div>
-                  <div><strong>Food Cost:</strong> {selectedTrip.food_cost || 0}</div>
-                  <div><strong>Additional Cost:</strong> {selectedTrip.additional_cost || 0}</div>
-                  <div><strong>Total Expense:</strong> {selectedTrip.total_exp || 0}</div>
-                  <div><strong>Driver Advance:</strong> {selectedTrip.driver_adv || 0}</div>
-                  <div>{selectedTrip.transport_type === "vendor_transport" && (<><strong>Vendor Rent:</strong>{selectedTrip.total_exp || 0}</>)}</div>
-
+                  <div><strong>{t("Labour Cost")}:</strong> {selectedTrip.labor || 0}</div>
+                  <div><strong>{t("Toll Cost")}:</strong> {selectedTrip.toll_cost || 0}</div>
+                  <div><strong>{t("Fuel Cost")}:</strong> {selectedTrip.fuel_cost || 0}</div>
+                  <div><strong>{t("Parking Cost")}:</strong> {selectedTrip.parking_cost || 0}</div>
+                  <div><strong>{t("Night Guard")}:</strong> {selectedTrip.night_guard || 0}</div>
+                  <div><strong>{t("Challan Cost")}:</strong> {selectedTrip.callan_cost || 0}</div>
+                  <div><strong>{t("Others Cost")}:</strong> {selectedTrip.others_cost || 0}</div>
+                  <div><strong>{t("Feri Cost")}:</strong> {selectedTrip.feri_cost || 0}</div>
+                  <div><strong>{t("Police Cost")}:</strong> {selectedTrip.police_cost || 0}</div>
+                  <div><strong>{t("Chada Cost")}:</strong> {selectedTrip.chada || 0}</div>
+                  <div><strong>{t("Food Cost")}:</strong> {selectedTrip.food_cost || 0}</div>
+                  <div><strong>{t("Additional Load Cost")}:</strong> {selectedTrip.additional_cost || 0}</div>
+                  <div><strong>{t("Total Expense")}:</strong> {selectedTrip.total_exp || 0}</div>
+                  <div><strong>{t("Driver Advance")}:</strong> {selectedTrip.driver_adv || 0}</div>
+                  <div>{selectedTrip.transport_type === "vendor_transport" && (<><strong>{t("Vendor Rent")}:</strong>{selectedTrip.total_exp || 0}</>)}</div>
                 </div>
 
                 <h3 className="text-lg font-bold mt-3 border-b">
-                  Financial Summary
+                  {t("Financial Summary")}
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <div><strong>Total Rent:</strong> {isAdmin ? selectedTrip.total_rent || 0 : "N/A"}</div>
-                  <div><strong>Demurrage Days:</strong> {selectedTrip.d_day || 0}</div>
-                  <div><strong>Demurrage Amount:</strong> {selectedTrip.d_amount || 0}</div>
-                  <div><strong>Demurrage Total:</strong> {selectedTrip.d_total || 0}</div>
-                  <div><strong>Profit:</strong>
-                    {isAdmin ? (selectedTrip.total_rent && selectedTrip.total_exp ? ((selectedTrip.total_rent + selectedTrip.d_total) - selectedTrip.total_exp) : 0) : "N/A"}</div>
-                  <div><strong>Status:</strong>
+                  <div><strong>{t("Total Rent")}:</strong> { selectedTrip.total_rent || 0 }</div>
+                  <div><strong>{t("Demurrage Days")}:</strong> {selectedTrip.d_day || 0}</div>
+                  {/* <div><strong>{t("Demurrage Amount")}:</strong> {selectedTrip.d_amount || 0}</div> */}
+                  <div><strong>{t("Total Demurrage")}:</strong> {selectedTrip.d_total || 0}</div>
+                  <div><strong>{t("Profit")}:</strong>
+                  { toNumber(selectedTrip.total_rent || 0) +
+  toNumber(selectedTrip.d_total || 0) -
+  (toNumber(selectedTrip.total_exp || 0) +
+   toNumber(selectedTrip.v_d_total || 0))}
+                  </div>
+                  {/* <div><strong>{t("Status")}:</strong>
                     <span
                       className={`!ml-2 px-2 py-0.5 rounded text-white text-xs 
                 ${selectedTrip.status === "Approved"
@@ -1204,9 +1376,9 @@ const TripList = () => {
                     >
                       {selectedTrip.status}
                     </span>
-                  </div>
+                  </div> */}
                   <div className="">
-                    <strong>Remarks:</strong>
+                    <strong>{t("Remarks")}:</strong>
                     <p className="bg-gray-100 rounded-md p-2 text-sm">{selectedTrip.remarks || "N/A"}</p>
                   </div>
                 </div>
@@ -1218,13 +1390,13 @@ const TripList = () => {
                   onClick={() => setViewModalOpen(false)}
                   className="px-4 py-1 rounded-md border border-gray-400 text-gray-600 hover:bg-gray-100 transition"
                 >
-                  Close
+                  {t("Close")}
                 </button>
                 <button
                   onClick={handleViewPrint}
                   className="flex items-center gap-2 bg-gradient-to-r from-primary to-green-600 text-white px-4 py-1 rounded-md shadow hover:opacity-90 transition"
                 >
-                  <BiPrinter size={18} /> Print
+                  <BiPrinter size={18} /> {(t("Print"))}
                 </button>
               </div>
             </div>
@@ -1244,7 +1416,7 @@ const TripList = () => {
                 disabled={isApproving}
                 className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                {t("Cancel")}
               </button>
               <button
                 onClick={confirmApprove}

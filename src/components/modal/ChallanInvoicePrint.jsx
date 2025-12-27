@@ -34,14 +34,14 @@ const ChallanInvoicePrint = forwardRef(({ data }, ref) => {
       <div className="flex items-center justify-center mb-3">
         <div className="flex items-center gap-3">
           <div>
-            <img src={logo} alt="" />
+            {/* <img src={logo} alt="" /> */}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-cyan-600 mb-1 text-center">মেসার্স এজে এন্টারপ্রাইজ</h1>
+            <h1 className="text-2xl font-bold text-cyan-600 mb-1 text-center">মেসার্স সৈনিক ট্রান্সপোর্ট এজেন্সি</h1>
             <p className="text-xs leading-tight text-center">
-              অফিস: রাজ্জাক প্লাজা ১২ তম তলা, রুম নং: জে-১২, শহিদ তাজউদ্দিন, মগবাজার,  ঢাকা।
+              অফিস:  ঢাকা।
               <br />
-              মোবাইল নং- ০১৮৭২-১২১৮৬২, ০১৮৬৬৭৩৪৩১৪
+              মোবাইল নং- ০১********, ০১********
             </p>
           </div>
         </div>
