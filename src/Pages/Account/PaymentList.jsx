@@ -468,7 +468,7 @@ const PaymentList = () => {
               className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
               isClearable
             />
-            <div className="flex gap-2">
+            <div className="w-sm flex gap-2">
               <button
                 onClick={() => {
                   setStartDate("");
@@ -603,8 +603,8 @@ const PaymentList = () => {
                             }
                           >
                             {parseFloat(dt.total_amount) - parseFloat(dt.pay_amount) > 0
-                              ? "Pay Now"
-                              : "Complete"}
+                              ? t("Pay Now")
+                              : t("Complete")}
                           </button>
                         </div>
                       </td>

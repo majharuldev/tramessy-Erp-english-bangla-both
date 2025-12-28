@@ -11,8 +11,10 @@ import { tableFormatDate } from "../../hooks/formatDate";
 import DatePicker from "react-datepicker";
 import { FaFilter } from "react-icons/fa6";
 import toNumber from "../../hooks/toNumber";
+import { useTranslation } from "react-i18next";
 
 const SupplierLedger = () => {
+  const {t} = useTranslation();
   const [supplies, setSupplies] = useState([]); // Supplier dropdown options
   const [supplierLedger, setSupplierLedger] = useState([]); // Ledger data for table
   const [loading, setLoading] = useState(true); // Loading state
@@ -212,13 +214,13 @@ const SupplierLedger = () => {
           <table>
             <thead>
               <tr>
-                <th>SL</th>
-                <th>Date</th>
-                <th>Particulars</th>
-                <th>Mode</th>
-                <th>Purchase</th>
-                <th>Payment</th>
-                <th>Balance</th>
+                <th>${t("SL.")}</th>
+                <th>${t("Date")}</th>
+                <th>${t("Particulars")}</th>
+                <th>${t("Mode")}</th>
+                <th>${t("Purchase")}</th>
+                <th>${t("Payment")}</th>
+                <th>${t("Balance")}</th>
               </tr>
             </thead>
             <tbody>
@@ -280,7 +282,7 @@ const SupplierLedger = () => {
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold text-gray-800 capitalize flex items-center gap-3">
-            Supplier ledger
+            {t("Supplier")} {t("Ledger")}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2"></div>
         </div>
@@ -288,19 +290,19 @@ const SupplierLedger = () => {
         {/* Export and Supplier Filter */}
         <div className="md:flex items-center justify-between mb-4">
           <div className="flex gap-1 text-gray-700 md:gap-3 flex-wrap">
-            <button onClick={exportExcel} className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
-              Excel
+            <button onClick={exportExcel} className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
+              {t("Excel")}
             </button>
             {/* <button onClick={exportPDF} className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
               PDF
             </button> */}
-            <button onClick={printTable} className="py-1 px-5 bg-white shadow font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
-              Print
+            <button onClick={printTable} className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
+              {t("Print")}
             </button>
           </div>
           <div className="flex gap-2 mt-2">
             <button onClick={() => setShowFilter((prev) => !prev)} className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300">
-              <FaFilter /> Filter
+              <FaFilter /> {t("Filter")}
             </button>
           </div>
         </div>
@@ -313,7 +315,7 @@ const SupplierLedger = () => {
               startDate={startDate}
               endDate={endDate}
               dateFormat="dd/MM/yyyy"
-              placeholderText="Start Date"
+              placeholderText={t("Start Date")}
               locale="en-GB"
               className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
               isClearable
@@ -327,7 +329,7 @@ const SupplierLedger = () => {
               endDate={endDate}
               minDate={startDate}
               dateFormat="dd/MM/yyyy"
-              placeholderText="End Date"
+              placeholderText={t("End Date")}
               locale="en-GB"
               className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
               isClearable
@@ -342,7 +344,7 @@ const SupplierLedger = () => {
                 onChange={(e) => setSelectedSupplier(e.target.value)}
                 className=" w-full text-gray-700 text-sm border border-gray-300 bg-white p-2 rounded appearance-none outline-none"
               >
-                <option value="">All Supplier</option>
+                <option value="">{t("All")} {t("Supplier")}</option>
                 {supplies.map((supply, idx) => (
                   <option key={idx} value={supply.supplier_name}>
                     {supply.supplier_name}
@@ -352,7 +354,8 @@ const SupplierLedger = () => {
               </select>
               <MdOutlineArrowDropDown className="absolute top-[14px] right-2 pointer-events-none text-xl text-gray-500" />
             </div>
-            <button
+            <div className="w-lg">
+              <button
               onClick={() => {
                 setStartDate("");
                 setEndDate("");
@@ -361,8 +364,9 @@ const SupplierLedger = () => {
               }}
               className="bg-primary text-white px-2 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
-              <FaFilter /> Clear
+              <FaFilter /> {t("Clear")}
             </button>
+            </div>
           </div>
 
         )}
@@ -373,30 +377,30 @@ const SupplierLedger = () => {
             <thead className="text-black capitalize font-bold">
               <tr>
                 <td colSpan="6" className="text-right border border-gray-700 px-2 py-2">
-                  Closing Balance:
+                  {t("Closing")} {t("Balance")}:
                 </td>
                 <td className="border border-gray-700 px-2 py-2">
                   {closingBalance < 0 ? `(${Math.abs(closingBalance)})` : closingBalance}
                 </td>
               </tr>
               <tr>
-                <th className="border border-gray-700 px-2 py-1">SL.</th>
-                <th className="border border-gray-700 px-2 py-1">Date</th>
+                <th className="border border-gray-700 px-2 py-1">{t("SL.")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Date")}</th>
                 <th className="border border-gray-700 px-2 py-1">
-                  Particulars
+                  {t("Particulars")}
                 </th>
-                <th className="border border-gray-700 px-2 py-1">Mode</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Payment Mode")}</th>
                 <th className="border border-gray-700 px-2 py-1">
-                  PurchaseAmount
+                  {t("Purchase Amount")}
                 </th>
                 <th className="border border-gray-700 px-2 py-1">
-                  PaymentAmount
+                  {t("Payment")} {t("Amount")}
                 </th>
                 <th className="border border-gray-700 py-1 text-center">
                   <p className="border-b">
-                    OpeningBalance: {openingBalance}
+                    {t("Opening Balance")}: {openingBalance}
                   </p>
-                  Balance
+                  {t("Balance")}
                 </th>
               </tr>
             </thead>

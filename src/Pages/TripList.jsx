@@ -659,9 +659,9 @@ const exportTripsToExcel = async () => {
           <th>${t("Vehicle No")}</th>
           <th>${t("Load Point")}</th>
           <th>${t("Unload Point")}</th>
-          <th>${t("TripRent")}</th>
+          <th>${t("Trip Rent")}</th>
           <th>${t("C.Demurrage")}</th>
-          <th>${t("TripCost")}</th>
+          <th>${t("Trip Cost")}</th>
           <th>${t("Profit")}</th>
         </tr>
       </thead>
@@ -824,7 +824,7 @@ const exportTripsToExcel = async () => {
     <body>
       <!-- FIXED HEADER FOR ALL PAGES -->
       <div class="content">
-        <h3>Trip Report</h3>
+        <h3>{t("Trip")} {("Report")}</h3>
         ${tableHTML}
       </div>
 
@@ -1043,9 +1043,9 @@ const exportTripsToExcel = async () => {
                 <th className="p-2">{t("Driver")}/{t("Vehicle No")}</th>
                 {/* <th className="p-2">{t("Vendor")}</th> */}
                 <th className="px-2 py-4">{t("Trip")}{t("&")}{t("Destination")}</th>
-                <th className="px-2 py-4">{t("TripRent")}</th>
+                <th className="px-2 py-4">{t("Trip Rent")}</th>
                 <th className="p-2">{t("C.Demurrage")}</th>
-                <th className="p-2">{t("TripCost")}</th>
+                <th className="p-2">{t("Trip Cost")}</th>
                 <th className="p-2">{t("Profit")}</th>
                 <th className="p-2">{t("Status")}</th>
                 <th className="p-2 action_column">{t("Action")}</th>
@@ -1055,7 +1055,7 @@ const exportTripsToExcel = async () => {
               {currentTrip.length === 0 ? (
                 <tr>
                   <td colSpan="10" className="text-center p-4 text-gray-500 ">
-                    No trip found
+                    {t("No trip found")}
                   </td>
                 </tr>
               ) : (

@@ -12,10 +12,12 @@ import { IoIosRemoveCircle } from "react-icons/io"
 import api from "../../../utils/axiosConfig"
 import { tableFormatDate } from "../../hooks/formatDate"
 import DatePicker from "react-datepicker"
+import { useTranslation } from "react-i18next"
 
 pdfMake.vfs = pdfFonts.vfs
 
 const Bill = () => {
+  const {t} = useTranslation();
   const [yamaha, setYamaha] = useState([])
   const [loading, setLoading] = useState(true)
   const [showFilter, setShowFilter] = useState(false)
@@ -353,7 +355,7 @@ const Bill = () => {
           <table>
             <thead>
               <tr>
-                <th>Trip No</th>
+                <th>TripNo</th>
                 <th>Date</th>
                 <th>Driver</th>
                 <th>Customer</th>
@@ -487,7 +489,7 @@ const Bill = () => {
   const currentItems = filteredTrips.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(filteredTrips.length / itemsPerPage)
 
-  if (loading) return <p className="text-center mt-16">Loading...</p>
+  if (loading) return <p className="text-center mt-16">{t("Loading")}...</p>
 
   return (
     <div className="p-2">
@@ -496,27 +498,27 @@ const Bill = () => {
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-extrabold text-gray-800 flex items-center gap-3">
             <HiCurrencyBangladeshi className="text-gray-800 text-2xl" />
-            Billing
+            {t("Billing")}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <button
               onClick={() => setShowFilter((prev) => !prev)}
               className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
-              <FaFilter /> Filter
+              <FaFilter /> {t("Filter")}
             </button>
           </div>
         </div>
 
         {/* export and search */}
         <div className="md:flex justify-between items-center">
-          <div className="flex flex-wrap md:flex-row gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
+          <div className="flex flex-wrap md:flex-row gap-1 md:gap-3 text-gray-700 font-medium rounded-md">
             <button
               onClick={exportToExcel}
               className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded  transition-all duration-300 cursor-pointer"
             >
               <FaFileExcel className="" />
-              Excel
+              {t("Excel")}
             </button>
             {/* <button
               onClick={exportToPDF}
@@ -530,7 +532,7 @@ const Bill = () => {
               className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-white shadow  hover:text-white rounded transition-all duration-300 cursor-pointer"
             >
               <FaPrint className="" />
-              Print
+              {t("Print")}
             </button>
           </div>
 
@@ -582,7 +584,7 @@ const Bill = () => {
                 className="text-sm"
               />
             </div>
-            <div className="">
+            <div className="w-lg">
               <button
                 onClick={() => {
                   setStartDate("");
@@ -592,7 +594,7 @@ const Bill = () => {
                 }}
                 className="bg-primary text-white px-2 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <FaFilter /> Clear
+                <FaFilter /> {t("Clear")}
               </button>
             </div>
           </div>
@@ -602,17 +604,17 @@ const Bill = () => {
           <table className="min-w-full text-sm text-left text-gray-900">
             <thead className="capitalize text-sm">
               <tr>
-                <th className="border border-gray-700 px-2 py-1">Trip Id.</th>
-                <th className="border border-gray-700 px-2 py-1">Date</th>
-                <th className="border border-gray-700 px-2 py-1">Driver</th>
-                <th className="border border-gray-700 px-2 py-1">Customer</th>
-                <th className="border border-gray-700 px-2 py-1">Truck No</th>
-                <th className="border border-gray-700 px-2 py-1">Load Point</th>
-                <th className="border border-gray-700 px-2 py-1">Unload Point</th>
-                <th className="border border-gray-700 px-2 py-1">Total Rent</th>
-                <th className="border border-gray-700 px-2 py-1">Demurrage</th>
-                <th className="border border-gray-700 px-2 py-1">Bill Amount</th>
-                <th className="border border-gray-700 px-2 py-1">BillStatus</th>
+                <th className="border border-gray-700 px-2 py-1">{t("TripNo")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Date")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Driver")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Customer")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Truck No")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Load Point")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Unload Point")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Total Rent")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Demurrage")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Bill Amount")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Bill")} {t("Status")}</th>
               </tr>
             </thead>
             <tbody className="font-semibold">
@@ -641,12 +643,12 @@ const Bill = () => {
                       />
                       {dt.status === "Pending" && (
                         <span className=" inline-block px-2  text-xs text-yellow-600 rounded">
-                          Not Submitted
+                          {t("Not Submitted")}
                         </span>
                       )}
                       {dt.status === "Submitted" && (
                         <span className=" inline-block px-2  text-xs text-green-700 rounded">
-                          Submitted
+                          {t("Submitted")}
                         </span>
                       )}
                     </div>
@@ -657,7 +659,7 @@ const Bill = () => {
             <tfoot>
               <tr className="font-bold">
                 <td colSpan={7} className="border border-black px-2 py-1 text-right">
-                  Total
+                  {t("Total")}
                 </td>
                 <td className="border border-black px-2 py-1">{totalRent}</td>
                 <td className="border border-black px-2 py-1">{totalDemurrage}</td>
@@ -666,7 +668,7 @@ const Bill = () => {
               </tr>
               <tr className="font-bold">
                 <td colSpan={11} className="border border-black px-2 py-1">
-                  Total Amount In Words: <span className="font-medium">{numberToWords(grandTotal)}</span>
+                  {t("Total")} {t("Amount")} {t("In Words")}: <span className="font-medium">{numberToWords(grandTotal)}</span>
                 </td>
               </tr>
             </tfoot>
@@ -687,7 +689,7 @@ const Bill = () => {
               className="bg-primary text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 cursor-pointer"
               onClick={handleSubmit}
             >
-              Save Change
+              {t("Save Change")}
             </button>
           </div>
         </div>

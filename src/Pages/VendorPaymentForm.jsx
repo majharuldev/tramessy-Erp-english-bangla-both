@@ -7,8 +7,10 @@ import { useNavigate, useParams } from "react-router-dom"
 import { InputField, SelectField } from "../components/Form/FormFields"
 import BtnSubmit from "../components/Button/BtnSubmit"
 import api from "../../utils/axiosConfig"
+import { useTranslation } from "react-i18next"
 
 const VendorPaymentForm = () => {
+  const {t} = useTranslation()
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   const { id } = useParams() // Get ID from URL parameters
@@ -107,10 +109,10 @@ const VendorPaymentForm = () => {
       paymentData = paymentResponse.data
 
       if (paymentData.success) {
-        toast.success("Payment updated successfully", { position: "top-right" })
+        toast.success(t("Payment updated successfully"), { position: "top-right" })
         navigate("/tramessy/account/vendor-payment")
       } else {
-        toast.error("Payment API failed: " + (paymentData.message || "Unknown error"))
+        toast.error("Payment API failed: " + (paymentData.message || t("Unknown error")))
       }
     } else {
       // Create new vendor payment
@@ -118,17 +120,17 @@ const VendorPaymentForm = () => {
       paymentData = paymentResponse.data
 
       if (paymentData.success) {
-        toast.success("Payment saved successfully", { position: "top-right" })
+        toast.success(t("Payment saved successfully"), { position: "top-right" })
         reset()
         navigate("/tramessy/account/vendor-payment")
       } else {
-        toast.error("Payment API failed: " + (paymentData.message || "Unknown error"))
+        toast.error("Payment API failed: " + (paymentData.message || t("Unknown error")))
       }
     }
   } catch (error) {
     console.error("Submit error:", error)
-    const errorMessage = error.response?.data?.message || error.message || "Unknown error"
-    toast.error("Server issue: " + errorMessage)
+    const errorMessage = error.response?.data?.message || error.message || t("Unknown error")
+    toast.error(t("Server issue:") + errorMessage)
   } finally {
     setLoading(false)
   }
@@ -140,7 +142,7 @@ const VendorPaymentForm = () => {
       <Toaster />
       <div className="mx-auto p-6  rounded-md shadow border-t-2 border-primary">
         <h3 className="pb-4 text-primary font-semibold ">
-        {id ? "Update Vendor Payment  Form" : "Vendor Payment Form"}
+        {id ? t("Update Vendor Payment  Form") : t("Vendor Payment Form")}
       </h3>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 mx-auto ">
@@ -150,7 +152,7 @@ const VendorPaymentForm = () => {
               <div className="w-full">
                 <InputField
                   name="date"
-                  label="Date"
+                  label={t("Date")}
                   type="date"
                   required={!id}
                   inputRef={(e) => {
@@ -179,7 +181,7 @@ const VendorPaymentForm = () => {
                <div className="w-full">
                 <SelectField
                   name="vendor_name"
-                  label="Vendor Name"
+                  label={`${t("Vendor")} ${t("Name")}`}
                  required={!id}
                   options={vendorOptions}
                   control={control}
@@ -188,7 +190,7 @@ const VendorPaymentForm = () => {
               <div className="w-full">
                 <SelectField
                   name="branch_name"
-                  label="Branch Name"
+                  label={`${t("Branch")} ${t("Name")}`}
                   required={!id}
                   control={control}
                   options={[
@@ -201,27 +203,27 @@ const VendorPaymentForm = () => {
             </div>
             <div className="mt-5 md:mt-1 md:flex justify-between gap-3">
               <div className="w-full">
-                <InputField name="bill_ref" label="Bill Ref" required={!id}/>
+                <InputField name="bill_ref" label={t("Bill Ref")} required={!id}/>
               </div>
               <div className="w-full">
-                <InputField name="amount" label="Amount" required={!id} type="number" />
+                <InputField name="amount" label={t("Amount")} required={!id} type="number" />
               </div>
             </div>
             <div className="mt-5 md:mt-1 md:flex justify-between gap-3">
               <div className="w-full">
                 <SelectField
                   name="cash_type"
-                  label="Cash Type"
+                  label={t("Payment Method")}
                   required={!id}
                   options={[
-                    { value: "Cash", label: "Cash" },
-                    { value: "Bank", label: "Bank" },
-                    { value: "Card", label: "Card" },
+                    { value: "Cash", label: t("Cash") },
+                    { value: "Bank", label: t("Bank") },
+                    { value: "Card", label: t("Card") },
                   ]}
                 />
               </div>
               <div className="w-full">
-                <InputField name="note" label="Note" />
+                <InputField name="note" label={t("Note")} />
               </div>
               {/* <div className="w-full">
                 <InputField name="created_by" label="Created By" required={!id} />
@@ -229,18 +231,18 @@ const VendorPaymentForm = () => {
               <div className="w-full">
                 <SelectField
                   name="status"
-                  label="Status"
+                  label={t("Status")}
                   required={!id}
                   options={[
-                    { value: "Paid", label: "Paid" },
-                    { value: "Unpaid", label: "Unpaid" },
+                    { value: "Paid", label: t("Paid") },
+                    { value: "Unpaid", label: t("Unpaid") },
                   ]}
                 />
               </div>
             </div>
             {/* Submit Button */}
             <div className="text-left p-5">
-              <BtnSubmit loading={loading}>{id ? "Update" : "Submit"}</BtnSubmit>
+              <BtnSubmit loading={loading}>{id ? t("Update") : t("Submit")}</BtnSubmit>
             </div>
           </div>
         </form>

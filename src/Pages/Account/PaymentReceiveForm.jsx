@@ -53,7 +53,7 @@ const PaymentReceiveForm = () => {
       });
     } catch (error) {
       console.error("Error fetching payment data:", error);
-      toast.error("Failed to load payment data");
+      toast.error(t("Failed to load payment data"));
     } finally {
       setLoading(false);
     }
@@ -117,7 +117,7 @@ const PaymentReceiveForm = () => {
 
       if (paymentData.success) {
         toast.success(
-          isEditing ? "Payment updated successfully" : "Payment saved successfully", 
+          isEditing ? t("Payment updated successfully") : t("Payment saved successfully"), 
           { position: "top-right" }
         );
 
@@ -128,13 +128,13 @@ const PaymentReceiveForm = () => {
           navigate("/tramessy/account/PaymentReceive");
         }
       } else {
-        toast.error(paymentData.message || "Operation failed");
+        toast.error(paymentData.message || t("Operation failed"));
       }
     } catch (error) {
       console.error("Submit error:", error);
       const errorMessage =
-        error.response?.data?.message || error.message || "Unknown error";
-      toast.error("Server issue: " + errorMessage);
+        error.response?.data?.message || error.message || t("Unknown error");
+      toast.error(t("Server issue:") + errorMessage);
     }
   };
 

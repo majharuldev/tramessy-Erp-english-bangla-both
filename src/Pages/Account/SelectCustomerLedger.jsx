@@ -11,11 +11,13 @@ import { tableFormatDate } from "../../hooks/formatDate";
 import DatePicker from "react-datepicker";
 import { jsPDF } from "jspdf";       
 import autoTable from "jspdf-autotable";
+import { useTranslation } from "react-i18next";
 
 // Patch jsPDF manually
 // autoTable(jsPDF);
 
 const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
+  const {t} = useTranslation();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [showFilter, setShowFilter] = useState(false);
@@ -214,7 +216,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>${customerName} Ledger</title>
+          <title>${customerName} ${t("Ledger")}</title>
           <style>
             table { width: 100%; border-collapse: collapse; font-size: 12px; }
             th, td { border: 1px solid #333; padding: 5px; text-align: center; }
@@ -222,7 +224,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
           </style>
         </head>
         <body>
-          <h2 style="text-align:center;">${customerName} - Customer Ledger</h2>
+          <h2 style="text-align:center;">${customerName} - ${t("Customer")} ${t("Ledger")}</h2>
           <h4 style="text-align:center;">Date Range: ${startDate ? tableFormatDate(startDate) : "All"} - ${endDate ? tableFormatDate(endDate) : "All"}</h4>
           ${printContent}
         </body>
@@ -239,7 +241,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
           <h1 className="text-xl font-extrabold text-[#11375B]">
             {filteredLedger.length > 0
               ? filteredLedger[0].customer_name
-              : "All Customers"} Ledger
+              : `${t("All")} ${t("Customer")}`} {t("Ledger")}
           </h1>
         </div>
 
@@ -249,7 +251,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
               onClick={exportToExcel}
               className="flex items-center gap-2 py-1 px-5 bg-white hover:bg-primary hover:text-white rounded shadow  transition-all duration-300"
             >
-              <FaFileExcel /> Excel
+              <FaFileExcel /> {t("Excel")}
             </button>
             {/* <button
               onClick={exportToPDF}
@@ -261,7 +263,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
               onClick={handlePrint}
               className="flex items-center gap-2 py-1 px-5 bg-white hover:bg-primary hover:text-white rounded shadow transition-all duration-300"
             >
-              <FaPrint /> Print
+              <FaPrint /> {t("Print")}
             </button>
           </div>
           <div className="flex gap-2">
@@ -269,7 +271,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
               onClick={() => setShowFilter((prev) => !prev)}
               className="border border-primary text-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300"
             >
-              <FaFilter /> Filter
+              <FaFilter /> {t("Filter")}
             </button>
           </div>
         </div>
@@ -302,7 +304,7 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
               className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
               isClearable
             />
-            <div className="w-xs">
+            <div className="w-sm">
               <button
                 onClick={() => {
                   setStartDate("");
@@ -311,21 +313,21 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
                 }}
                 className="bg-primary w-full text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <IoIosRemoveCircle /> Clear
+                <IoIosRemoveCircle /> {t("Clear")}
               </button>
             </div>
           </div>
         )}
 
         {loading ? (
-          <p className="text-center mt-16">Loading...</p>
+          <p className="text-center mt-16">{t("Loading")}...</p>
         ) : (
           <div ref={tableRef}>
             <table className="min-w-full text-sm text-left text-gray-900">
               <thead className="bg-gray-100 text-gray-800 font-bold">
                 <tr className="font-bold bg-gray-50">
                   <td colSpan={8} className="border border-black px-2 py-1 text-right">
-                    Total
+                    {t("Total")}
                   </td>
                   <td className="border border-black px-2 py-1 text-right">
                     ৳{totals.rent}
@@ -338,24 +340,24 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
                   </td>
                 </tr>
                 <tr>
-                  <th className="border px-2 py-1">SL.</th>
-                  <th className="border px-2 py-1">Date</th>
-                  <th className="border px-2 py-1">Customer</th>
-                  <th className="border px-2 py-1">Load</th>
-                  <th className="border px-2 py-1">Unload</th>
-                  <th className="border px-2 py-1">Vehicle</th>
+                  <th className="border px-2 py-1">{t("SL.")}</th>
+                  <th className="border px-2 py-1">{t("Date")}</th>
+                  <th className="border px-2 py-1">{t("Customer")}</th>
+                  <th className="border px-2 py-1">{t("Load")}</th>
+                  <th className="border px-2 py-1">{t("Unload")}</th>
+                  <th className="border px-2 py-1">{t("Vehicle")}</th>
                   {/* <th className="border px-2 py-1">Driver</th> */}
-                  <th className="border px-2 py-1">Trip Rent</th>
-                  <th className="border px-2 py-1">Demurage</th>
-                  <th className="border px-2 py-1">Bill Amount</th>
-                  <th className="border px-2 py-1">Recieved Amount</th>
+                  <th className="border px-2 py-1">{t("Trip Rent")}</th>
+                  <th className="border px-2 py-1">{t("Demurrage")}</th>
+                  <th className="border px-2 py-1">{t("Bill Amount")}</th>
+                  <th className="border px-2 py-1">{t("Received Amount")}</th>
                   <th className="border border-gray-700 px-2 py-1">
                     {selectedCustomerName && (
                       <p className="text-sm font-medium text-gray-800">
-                        Opening Amount: ৳{dueAmount?.toFixed(2)}
+                        {t("Opening Balance")}: ৳{dueAmount?.toFixed(2)}
                       </p>
                     )}
-                    Due
+                    {t("Due")}
                   </th>
                 </tr>
               </thead>

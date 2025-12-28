@@ -9,8 +9,10 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import api from "../../../utils/axiosConfig";
 import { tableFormatDate } from "../../hooks/formatDate";
+import { useTranslation } from "react-i18next";
 
 const VendorLedger = () => {
+  const {t} = useTranslation();
   const [vendorData, setVendorData] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState("");
   const [loading, setLoading] = useState(true);
@@ -302,15 +304,15 @@ const VendorLedger = () => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Print Vendor Ledger</title>
+          <title>-</title>
           ${style}
         </head>
         <body>
           <div class="print-header">
-            <div class="print-title">Vendor Ledger: ${selectedVendor || "All Vendors"
+            <div class="print-title">${t("Vendor")} ${t("Ledger")}: ${selectedVendor || "All Vendors"
       }</div>
             ${selectedVendor
-        ? `<div class="opening-balance-text">Opening Balance: ${openingBalance.toFixed(
+        ? `<div class="opening-balance-text">${t("Opening Balance")}: ${openingBalance.toFixed(
           2
         )}</div>`
         : ""
@@ -330,39 +332,39 @@ const VendorLedger = () => {
         <div className="overflow-x-auto max-w-5xl mx-auto">
           <div className="md:flex items-center justify-between mb-6">
             <h1 className="text-xl font-bold text-gray-800 capitalize">
-              Vendor Ledger: {selectedVendor || "All Vendors"}
+              {t("Vendor")} {t("Ledger")}: {selectedVendor || t("All") + " " + t("Vendor")}
             </h1>
             <div className="mt-3 md:mt-0 flex gap-2">
               <button
                 onClick={() => setShowFilter((prev) => !prev)}
                 className="text-primary border border-primary px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 cursor-pointer"
               >
-                <FaFilter /> Filter
+                <FaFilter /> {t("Filter")}
               </button>
             </div>
           </div>
           <div className="md:flex items-center justify-between mb-4">
-            <div className="flex gap-2 flex-wrap text-gray-700">
+            <div className="flex gap-2 flex-wrap text-gray-700 font-medium">
               <button
                 onClick={exportToExcel}
-                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow font-semibold hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow  hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaFileExcel className="" />
-                Excel
+                {t("Excel")}
               </button>
               {/* <button
                 onClick={exportToPDF}
-                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow font-semibold hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow  hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaFilePdf className="" />
                 PDF
               </button> */}
               <button
                 onClick={printTable}
-                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow font-semibold hover:text-white rounded-md transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 py-1 px-5 hover:bg-primary bg-gray-50 shadow  hover:text-white rounded-md transition-all duration-300 cursor-pointer"
               >
                 <FaPrint className="" />
-                Print
+                {t("Print")}
               </button>
             </div>
           </div>
@@ -373,14 +375,14 @@ const VendorLedger = () => {
                 <div className="w-[50%]">
                   <div className="relative w-full">
                     <label className="text-gray-700 text-sm font-semibold">
-                      Select Month
+                      {t("Month")}
                     </label>
                     <select
                       value={selectedMonth}
                       onChange={(e) => setSelectedMonth(e.target.value)}
                       className="mt-1 w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
                     >
-                      <option value="">All Months</option>
+                      <option value="">{t("All")} {t("Month")}</option>
                       {availableMonths.map((month, idx) => {
                         const [year, monthNum] = month.split("-");
                         const date = new Date(`${month}-01`);
@@ -399,7 +401,7 @@ const VendorLedger = () => {
                 {/* select vendor */}
                 <div className="mt-3 md:mt-0 relative w-[50%]">
                   <label className="text-gray-700 text-sm font-semibold">
-                    Select Vendor
+                    {t("Vendor")}
                   </label>
                   <select
                     value={selectedVendor}
@@ -408,7 +410,7 @@ const VendorLedger = () => {
                     }}
                     className="mt-1 w-full text-gray-600 text-sm border border-gray-300 bg-white p-2 rounded appearance-none outline-none"
                   >
-                    <option value="">All Vendors</option>
+                    <option value="">{t("All")} {t("Vendor")}</option>
                     {vendorList.map((vendor, idx) => (
                       <option key={idx} value={vendor.vendor_name}>
                         {vendor.vendor_name}
@@ -417,7 +419,7 @@ const VendorLedger = () => {
                   </select>
                   <MdOutlineArrowDropDown className="absolute top-[35px] right-2 pointer-events-none text-xl text-gray-500" />
                 </div>
-                <div className=" mt-7">
+                <div className="w-xs mt-7">
                   <button
                     onClick={() => {
                       setSelectedVendor("");
@@ -426,7 +428,7 @@ const VendorLedger = () => {
                     }}
                     className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
                   >
-                    Clear
+                    {t("Clear")}
                   </button>
                 </div>
               </div>
@@ -437,7 +439,7 @@ const VendorLedger = () => {
               <thead className="bg-gray-100">
                 <tr className="font-bold bg-gray-100">
                   <td colSpan={7} className="border px-2 py-1 text-right">
-                    TOTAL:
+                    {t("Total")}:
                   </td>
                   <td className="border px-2 py-1">{totals.rent}</td>
                   <td className="border px-2 py-1">{totals.advance}</td>
@@ -456,21 +458,21 @@ const VendorLedger = () => {
                   </td>
                 </tr>
                 <tr>
-                  <th className="border px-2 py-1">SL.</th>
-                  <th className="border px-2 py-1">Date</th>
-                  <th className="border px-2 py-1">Vendor</th>
-                  <th className="border px-2 py-1">Load</th>
-                  <th className="border px-2 py-1">Unload</th>
-                  <th className="border px-2 py-1">Vehicle</th>
-                  <th className="border px-2 py-1">Driver</th>
-                  <th className="border px-2 py-1">Trip Rent</th>
-                  <th className="border px-2 py-1">Advance</th>
-                  <th className="border px-2 py-1">Pay Amount</th>
+                  <th className="border px-2 py-1">{t("SL.")}</th>
+                  <th className="border px-2 py-1">{t("Date")}</th>
+                  <th className="border px-2 py-1">{t("Vendor")}</th>
+                  <th className="border px-2 py-1">{t("Load")}</th>
+                  <th className="border px-2 py-1">{t("Unload")}</th>
+                  <th className="border px-2 py-1">{t("Vehicle")}</th>
+                  <th className="border px-2 py-1">{t("Driver")}</th>
+                  <th className="border px-2 py-1">{t("Trip Rent")}</th>
+                  <th className="border px-2 py-1">{t("Advance")}</th>
+                  <th className="border px-2 py-1">{t("Pay Amount")}</th>
                   <th className="border px-2 py-1">
-                    Due{" "}
+                    {t("Due")}{" "}
                     {selectedVendor && (
                       <p className="text-xs text-gray-600 font-normal">
-                        Opening Balance: {openingBalance.toFixed(2)}
+                        {t("Opening Balance")}: {openingBalance.toFixed(2)}
                       </p>
                     )}
                   </th>

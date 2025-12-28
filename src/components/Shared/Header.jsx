@@ -110,7 +110,7 @@ const Header = ({ setMobileSidebarOpen }) => {
                 onClick={handleSignout}
                 className="text-red-500 font-medium hover:underline cursor-pointer"
               >
-                Logout
+                {t("Logout")}
               </button>
             </p>
           </div>

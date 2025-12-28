@@ -8,8 +8,10 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { FaFilter } from "react-icons/fa";
 import api from "../../../utils/axiosConfig";
+import { useTranslation } from "react-i18next";
 
 const DriverLedger = () => {
+  const {t} = useTranslation();
   const [driver, setDriver] = useState([]);
   const [loading, setLoading] = useState(true);
   const [driverList, setDriverList] = useState([]);
@@ -430,7 +432,7 @@ const toNumber = (val) => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Print Driver Ledger</title>
+          <title>${t("Print")} ${t("Driver")} ${t("Ledger")}</title>
           <style>
             table, th, td {
               border: 1px solid black;
@@ -459,7 +461,7 @@ const toNumber = (val) => {
     printWindow.print();
   };
 
-  if (loading) return <p className="text-center mt-16">Loading Driver...</p>;
+  if (loading) return <p className="text-center mt-16">{t("Loading")} {t("Driver")}...</p>;
 
   return (
     <div className="p-2">
@@ -467,7 +469,7 @@ const toNumber = (val) => {
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold text-gray-800 capitalize flex items-center gap-3">
-            Driver ledger : {selectedDriver || "All Drivers"}{" "}
+            {t("Driver")} {t("Ledger")} : {selectedDriver || t("All") + " " + t("Driver")}{" "}
             {selectedMonth && `(${selectedMonth})`}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
@@ -475,18 +477,18 @@ const toNumber = (val) => {
               onClick={() => setShowFilter((prev) => !prev)}
               className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
-              <FaFilter /> Filter
+              <FaFilter /> {t("Filter")}
             </button>
           </div>
         </div>
         {/* Export and Driver Dropdown */}
         <div className="md:flex items-center justify-between mb-4">
-          <div className="flex gap-1 md:gap-3 flex-wrap font-semibold text-gray-700">
+          <div className="flex gap-1 md:gap-3 flex-wrap font-medium text-gray-700">
             <button
               onClick={exportDriversToExcel}
               className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
-              Excel
+              {t("Excel")}
             </button>
             {/* <button
               onClick={exportDriversToPDF}
@@ -498,7 +500,7 @@ const toNumber = (val) => {
               onClick={printDriversTable}
               className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
-              Print
+              {t("Print")}
             </button>
           </div>
         </div>
@@ -508,14 +510,14 @@ const toNumber = (val) => {
             <div className="w-full">
               <div className="relative w-full">
                 <label className="text-gray-700 text-sm font-semibold">
-                  Select Month
+                  {t("Month")}
                 </label>
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
                   className="mt-1 w-full text-sm border border-gray-300 px-3 py-2 rounded bg-white outline-none"
                 >
-                  <option value="">All Months</option>
+                  <option value="">{t("All")} {t("Month")}</option>
                   {availableMonths.map((month, idx) => (
                     <option key={idx} value={month}>
                       {month}
@@ -528,7 +530,7 @@ const toNumber = (val) => {
             <div className="w-full">
               <div className="relative w-full">
                 <label className="text-gray-700 text-sm font-semibold">
-                  Select Driver
+                 {t("Driver")}
                 </label>
                 {/* <select
                   value={selectedDriver}
@@ -547,7 +549,7 @@ const toNumber = (val) => {
   onChange={(e) => setSelectedDriver(e.target.value)}
   className="mt-1 w-full text-gray-500 text-sm border border-gray-300 bg-white p-2 rounded appearance-none outline-none"
 >
-  <option value="">All Drivers</option>
+  <option value="">{t("All")} {t("Driver")}</option>
   {driverList.map((driver, idx) => (
     <option key={idx} value={driver.driver_name}>
       {driver.driver_name}
@@ -589,7 +591,7 @@ const toNumber = (val) => {
   }}
                 className="w-full bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                 Clear
+                 {t("Clear")}
               </button>
             </div>
           </div>
@@ -598,9 +600,9 @@ const toNumber = (val) => {
         {selectedDriver && tadaAmounts[selectedDriver] && (
           <div className="mb-4 p-3 bg-blue-50 rounded-md">
             <h3 className="font-semibold text-primary">
-              Present Summary for {selectedDriver}
+              {t("Present Summary for")} {selectedDriver}
             </h3>
-            <p>Total Days Present: {tadaAmounts[selectedDriver].days}</p>
+            <p>{t("Total")} {("Days")} {t("Present")}: {tadaAmounts[selectedDriver].days}</p>
             {/* <p>
               Total TADA Amount: {tadaAmounts[selectedDriver].amount} BDT (300
               BDT per day)
@@ -613,42 +615,42 @@ const toNumber = (val) => {
             <thead>
               <tr>
                 <th rowSpan="2" className="border px-2 py-1">
-                  Date
+                  {t("Date")}
                 </th>
                 <th colSpan="2" className="border py-1">
-                  Particulars
+                  {t("Particulars")}
                 </th>
                 <th rowSpan="2" className="border px-2 py-1">
-                  Advance
+                  {t("Advance")}
                 </th>
                 <th colSpan="11" className="border px-2 py-1">
-                  Expense
+                  {t("Expense")}
                 </th>
                 <th rowSpan="2" className="border py-1">
                   <p className="border-b">
-                    Opening Balance:{" "}
+                    {t("Opening Balance")}:{" "}
                     {selectedDriver
                       ? driverOpeningBalances[selectedDriver] || 0
                       : 0}
                   </p>
-                  Balance
+                  {t("Balance")}
                 </th>
               </tr>
               <tr>
-                <th className="border px-2 py-1">Load</th>
-                <th className="border px-2 py-1">Unload</th>
+                <th className="border px-2 py-1">{t("Load")}</th>
+                <th className="border px-2 py-1">{t("Unload")}</th>
                 {/* <th className="border px-2 py-1">Commission</th> */}
-                <th className="border px-2 py-1">Labor</th>
-                <th className="border px-2 py-1">Parking</th>
-                <th className="border px-2 py-1">Night</th>
-                <th className="border px-2 py-1">Toll</th>
-                <th className="border px-2 py-1">Ferry</th>
-                <th className="border px-2 py-1">Police</th>
-                <th className="border px-2 py-1">Chada</th>
-                <th className="border px-2 py-1">Fuel</th>
-<th className="border px-2 py-1">Callan</th>
-<th className="border px-2 py-1">Others</th>
-                <th className="border px-2 py-1">Total</th>
+                <th className="border px-2 py-1">{t("Labour")}</th>
+                <th className="border px-2 py-1">{t("Parking")}</th>
+                <th className="border px-2 py-1">{t("Night")}</th>
+                <th className="border px-2 py-1">{t("Toll")}</th>
+                <th className="border px-2 py-1">{t("Ferry")}</th>
+                <th className="border px-2 py-1">{t("Police")}</th>
+                <th className="border px-2 py-1">{t("Chada")}</th>
+                <th className="border px-2 py-1">{t("Fuel")}</th>
+<th className="border px-2 py-1">{t("Callan")}</th>
+<th className="border px-2 py-1">{t("Others")}</th>
+                <th className="border px-2 py-1">{t("Total")}</th>
               </tr>
             </thead>
             <tbody className="overflow-x-auto">
@@ -683,7 +685,7 @@ const toNumber = (val) => {
             <tfoot>
               <tr className="font-bold bg-gray-100">
                 <td colSpan={4} className="border px-2 py-1 text-right">
-                  Total:
+                  {t("Total")}:
                 </td>
                 {/* <td className="border px-2 py-1">{footerTotals.commission}</td> */}
                 <td className="border px-2 py-1">{footerTotals.advance}</td>
@@ -705,7 +707,7 @@ const toNumber = (val) => {
                   <tr className="font-bold bg-gray-100">
                     <td colSpan={17} className="border px-2 py-1">
                       <div className="flex justify-between">
-                        <span>Balance:</span>
+                        <span>{t("Balance")}:</span>
                         <span className={footerTotals.balance < 0 ? "text-red-500" : ""}>
                           {footerTotals.balance < 0
                             ? `(${Math.abs(footerTotals.balance)})`
@@ -748,7 +750,7 @@ const toNumber = (val) => {
                   <tr className="font-bold bg-gray-100">
                     <td colSpan={16} className="border px-2 py-1">
                       <div className="flex justify-between">
-                        <span>Final Balance (After All Deductions):</span>
+                        <span>{t("Final Balance")} ({t("After")} {t("All")} {t("Deduction")}):</span>
                         <span className={finalBalance < 0 ? "text-red-500" : ""}>
                           {finalBalance < 0
                             ? `(${Math.abs(finalBalance)})`
@@ -764,7 +766,7 @@ const toNumber = (val) => {
               {!selectedDriver && (
                 <tr className="font-bold bg-gray-100">
                   <td colSpan={3} className="border px-2 py-1 text-right">
-                    Final Balance:
+                    {t("Final Balance")}:
                   </td>
                   <td colSpan={14} className="border px-8 py-1 text-right">
                     <span className={footerTotals.balance < 0 ? "text-red-500" : ""}>

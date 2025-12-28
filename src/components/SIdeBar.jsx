@@ -48,7 +48,7 @@ const Sidebar = () => {
         <div className="py-[9px] flex justify-center border-b border-gray-300">
           <Link to="/tramessy">
             {/* <img src={logo} alt="Logo" className="w-10" /> */}
-            <div className="text-xs text-secondary">
+            <div className="text-xs text-primary">
               <div className="font-semibold text-xl py-2">সৈনিক ট্রান্সপোর্ট এজেন্সি</div>
             </div>
           </Link>

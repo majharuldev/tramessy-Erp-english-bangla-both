@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { HiMiniCalendarDateRange } from "react-icons/hi2";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
+import { useTranslation } from "react-i18next";
 
 const FileUploadWithPreview = ({ field, name, accept = "*" }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -76,6 +77,7 @@ const FileUploadWithPreview = ({ field, name, accept = "*" }) => {
 
 const ReusableForm = ({ children, onSubmit }) => {
   const { handleSubmit, control } = useForm();
+  const {t} = useTranslation()
 
   const enhanceChildren = (children) =>
     React.Children.map(children, (child) => {
@@ -181,7 +183,7 @@ const ReusableForm = ({ children, onSubmit }) => {
           type="submit"
           className="font-semibold uppercase text-sm bg-primary text-white px-16 py-2 rounded hover:bg-primary cursor-pointer transition-all duration-700"
         >
-          Login
+          {t("Login")}
         </button>
       </div>
     </form>

@@ -158,7 +158,7 @@ const exportToExcel = () => {
     WindowPrint.document.write(`
     <html>
       <head>
-        <title>Vendor Payment Report</title>
+        <title>-</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 20px; }
           h2 { text-align: center; margin-bottom: 20px; }
@@ -172,17 +172,17 @@ const exportToExcel = () => {
         </style>
       </head>
       <body>
-        <h2>Vendor Payment Report</h2>
+        <h2>${t("Vendor")} ${t("Payment")} ${t("Report")}</h2>
         <table>
           <thead>
             <tr>
-              <th>SL.</th>
-              <th>Date</th>
-              <th>Vendor Name</th>
-              <th>BillRef</th>
-              <th>Amount</th>
-              <th>Cash Type</th>
-              <th>Status</th>
+              <th>${t("SL.")}</th>
+              <th>${t("Date")}</th>
+              <th>${t("Vendor")} ${t("Name")}</th>
+              <th>${t("Bill Ref")}</th>
+              <th>${t("Amount")}</th>
+              <th>${t("Cash Type")}</th>
+              <th>${t("Status")}</th>
             </tr>
           </thead>
           <tbody>
@@ -215,7 +215,7 @@ const exportToExcel = () => {
   const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
 
 
-  if (loading) return <p className="text-center mt-16">Loading payment...</p>;
+  if (loading) return <p className="text-center mt-16">{t("Loading")}...</p>;
   return (
     <div className="p-2 ">
       <div className="w-[22rem] md:w-full max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-md p-2 py-10 md:p-4 border border-gray-200">
@@ -351,7 +351,7 @@ const exportToExcel = () => {
             {currentPayment.length > 0 && (
               <tfoot className="bg-gray-100 font-bold">
                 <tr>
-                  <td colSpan="4" className="text-right p-2">Total:</td>
+                  <td colSpan="4" className="text-right p-2">{t("Total")}:</td>
                   <td className="p-2">{totalAmount}</td>
                   <td colSpan="3"></td>
                 </tr>

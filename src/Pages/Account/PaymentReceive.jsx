@@ -207,16 +207,16 @@ const exportToExcel = () => {
     <table style="width:100%; border-collapse:collapse; font-size:13px;">
       <thead>
         <tr style="background:#f3f4f6; color:#047857;">
-          <th style="padding:8px; border:1px solid #e5e7eb;">SL</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Date</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Customer</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Branch</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Bill Ref</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Amount</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Cash Type</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Note</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Created By</th>
-          <th style="padding:8px; border:1px solid #e5e7eb;">Status</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("SL.")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Date")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Customer")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Branch")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Bill Ref")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Amount")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Cash Type")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Note")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Created By")}</th>
+          <th style="padding:8px; border:1px solid #e5e7eb;">${t("Status")}</th>
         </tr>
       </thead>
       <tbody>
@@ -236,7 +236,7 @@ const exportToExcel = () => {
     printWindow.document.write(`
     <html>
       <head>
-        <title>Payment Receive Report</title>
+        <title>-</title>
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
         <style>
           body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto; padding:20px; color:#111827; }
@@ -250,7 +250,7 @@ const exportToExcel = () => {
       </head>
       <body>
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800">Payment Receive Report</h2>
+          <h2 class="text-xl font-bold text-gray-800">${t("Payment Receive")} ${t("Report")}</h2>
           <p class="text-gray-600 text-sm">Generated: ${format(new Date(), "dd/MM/yyyy HH:mm")}</p>
         </div>
         ${tableHtml}
@@ -282,14 +282,14 @@ const exportToExcel = () => {
     setCurrentPage(1);
   };
 
-  if (loading) return <p className="text-center mt-16">Loading payment...</p>;
+  if (loading) return <p className="text-center mt-16">{t("Loading")}...</p>;
 
   return (
     <div className="p-2">
       <div className="w-[22rem] md:w-full overflow-hidden overflow-x-auto max-w-7xl mx-auto bg-white/80 backdrop-blur-md shadow-xl rounded-md p-2 py-10 md:p-4 border border-gray-200">
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-extrabold text-gray-800 flex items-center gap-3">
-            {t("Payment")} {t("Receive")}
+            {t("Payment Receive")}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <div className=" md:mt-0 flex gap-2">
@@ -333,7 +333,7 @@ const exportToExcel = () => {
               onChange={(e) => {
                 setSearchTerm(e.target.value);
               }}
-              placeholder="Search list..."
+              placeholder={`${t("search")} ${t("list")}...`}
               className="lg:w-60 border border-gray-300 rounded-md outline-none text-xs py-2 ps-2 pr-5"
             />
             {/*  Clear button */}
@@ -379,12 +379,12 @@ const exportToExcel = () => {
               className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
               isClearable
             />
-            <div className=" ">
+            <div className="w-sm ">
               <button
                 onClick={handleClearFilter}
                 className="bg-primary text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <FiFilter /> Clear
+                <FiFilter /> {t("Clear")}
               </button>
             </div>
           </div>
@@ -426,7 +426,7 @@ const exportToExcel = () => {
                             d="M9.75 9.75L14.25 14.25M9.75 14.25L14.25 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        No payment receive data found.
+                        {t("No payment receive data found")}
                       </div>
                     </td>
                   </tr>
@@ -469,7 +469,7 @@ const exportToExcel = () => {
             {currentPayments.length > 0 && (
               <tfoot className="bg-gray-100 font-bold">
                 <tr>
-                  <td colSpan="5" className="text-right p-2">Total:</td>
+                  <td colSpan="5" className="text-right p-2">{t("Total")}:</td>
                   <td className="p-2">{totalAmount}</td>
                   <td colSpan="5"></td>
                 </tr>
@@ -502,20 +502,20 @@ const exportToExcel = () => {
                 <FaTrashAlt />
               </div>
               <p className="text-center text-gray-700 font-medium mb-6">
-                Are you sure you want to delete this Customer?
+                {t("Are you sure you want to delete?")}
               </p>
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={toggleModal}
                   className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-primary hover:text-white cursor-pointer"
                 >
-                  No
+                  {t("No")}
                 </button>
                 <button
                   onClick={() => handleDelete(selectedPaymentId)}
                   className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 cursor-pointer"
                 >
-                  Yes
+                  {t("Yes")}
                 </button>
               </div>
             </div>

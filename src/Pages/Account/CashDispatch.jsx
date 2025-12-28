@@ -210,13 +210,13 @@ const exportExcel = async () => {
     <table style="width:100%; border-collapse:collapse; font-size:13px;">
       <thead>
         <tr>
-          <th style="padding:10px; border:1px solid #e5e7eb;">SL</th>
-          <th style="padding:10px; border:1px solid #e5e7eb;">Date</th>
-          <th style="padding:10px; border:1px solid #e5e7eb;">Branch</th>
-          <th style="padding:10px; border:1px solid #e5e7eb;">PersonName</th>
-          <th style="padding:10px; border:1px solid #e5e7eb;">Type</th>
-          <th style="padding:10px; border:1px solid #e5e7eb;">Amount</th>
-          <th style="padding:10px; border:1px solid #e5e7eb;">Bank Name</th>
+          <th style="padding:10px; border:1px solid #e5e7eb;">${t("SL.")}</th>
+          <th style="padding:10px; border:1px solid #e5e7eb;">${t("Date")}</th>
+          <th style="padding:10px; border:1px solid #e5e7eb;">${t("Branch")}</th>
+          <th style="padding:10px; border:1px solid #e5e7eb;">${t("Person Name")}</th>
+          <th style="padding:10px; border:1px solid #e5e7eb;">${t("Type")}</th>
+          <th style="padding:10px; border:1px solid #e5e7eb;">${t("Amount")}</th>
+          <th style="padding:10px; border:1px solid #e5e7eb;">${t("Bank Name")}</th>
         </tr>
       </thead>
       <tbody>
@@ -236,7 +236,7 @@ const exportExcel = async () => {
     printWindow.document.write(`
     <html>
       <head>
-        <title>Fund Transfer Report</title>
+        <title>-</title>
         <!-- Tailwind CDN (keeps the look similar). If you use a custom build, include that instead -->
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
         <style>
@@ -250,7 +250,7 @@ const exportExcel = async () => {
         </style>
       </head>
       <body>
-        <h1 style="font-size:18px; margin-bottom:8px;">Fund Transfer Report</h1>
+        <h1 style="font-size:18px; margin-bottom:8px;">${t("Fund Transfer")} ${t("Report")}</h1>
         <div style="margin-bottom:10px; color:#374151;">Generated: ${format(new Date(), "dd/MM/yyyy HH:mm")}</div>
         ${tableHtml}
       </body>

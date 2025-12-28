@@ -8,8 +8,10 @@ import BtnSubmit from "../components/Button/BtnSubmit";
 import { MdOutlineArrowDropDown } from "react-icons/md";
 import { InputField, SelectField } from "../components/Form/FormFields";
 import api from "../../utils/axiosConfig";
+import { useTranslation } from "react-i18next";
 
 const AddUserForm = () => {
+  const {t} = useTranslation();
   const navigate = useNavigate()
   const { id } = useParams();
   const isEditMode = Boolean(id);
@@ -79,20 +81,20 @@ const AddUserForm = () => {
       
       <div className="mx-auto p-6 border-t-2 border-primary rounded-md shadow">
         <h3 className="pb-4 text-primary font-semibold rounded-t-md">
-        {isEditMode ? "Update User" : "Add User"}
+        {isEditMode ? t("Update User") : t("Add User")}
       </h3>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Row 1 */}
             <div className="md:flex justify-between gap-3">
               <div className="w-full">
-                <InputField name="name" label="Name" required={!isEditMode} />
+                <InputField name="name" label={t("Name")} required={!isEditMode} />
               </div>
               {/* <div className="w-full">
                 <InputField name="phone" label="Phone" type="number" required={!isEditMode} />
               </div> */}
               <div className="w-full">
-                <InputField name="email" label="Email" type="email" required={!isEditMode} />
+                <InputField name="email" label={t("Email")} type="email" required={!isEditMode} />
               </div>
             </div>
 
@@ -102,7 +104,7 @@ const AddUserForm = () => {
                   <div className="w-full">
                     <InputField
                       name="password"
-                      label="Password"
+                      label={t("Password")}
                       type="password"
                       // required={!isEditMode}
                       required
@@ -111,7 +113,7 @@ const AddUserForm = () => {
                   <div className="w-full">
                     <InputField
                       name="password_confirmation"
-                      label="Confirm Password"
+                      label={t("Confirm Password")}
                       type="password"
                       // required={!isEditMode}
                       required
@@ -127,12 +129,12 @@ const AddUserForm = () => {
               <div className="w-full relative">
                 <SelectField
                   name="role"
-                  label="User Type"
+                  label={t("User Type")}
                   required={!isEditMode}
                   options={[
-                    { value: "", label: "Select User Type..." },
-                    { value: "User", label: "User" },
-                    { value: "Admin", label: "Admin" },
+                    { value: "", label:  `${t("User")} ${t("Role")} ${t("Select")}...` },
+                    { value: "User", label: t("User") },
+                    { value: "Admin", label: t("Admin") },
                   ]}
                 />
                 <MdOutlineArrowDropDown className="absolute top-[35px] right-2 pointer-events-none text-xl text-gray-500" />
@@ -140,12 +142,12 @@ const AddUserForm = () => {
               <div className="w-full relative">
                 <SelectField
                   name="status"
-                  label="Status"
+                  label={t("Status")}
                   required={!isEditMode}
                   options={[
-                    { value: "", label: "Select Status..." },
-                    { value: "Active", label: "Active" },
-                    { value: "Inactive", label: "Inactive" },
+                    { value: "", label: `${t("Status")} ${t("Select")}...` },
+                    { value: "Active", label: t("Active") },
+                    { value: "Inactive", label: t("Inactive") },
                   ]}
                 />
                 <MdOutlineArrowDropDown className="absolute top-[35px] right-2 pointer-events-none text-xl text-gray-500" />
@@ -155,7 +157,7 @@ const AddUserForm = () => {
             {/* Submit */}
             <div className="mt-6">
               <BtnSubmit>
-                {isEditMode ? "Update User" : "Add User"}
+                {isEditMode ? t("Update") : t("Submit")}
               </BtnSubmit>
             </div>
           </form>

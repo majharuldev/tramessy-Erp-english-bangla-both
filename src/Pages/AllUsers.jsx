@@ -13,7 +13,9 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { saveAs } from "file-saver";
 import api from "../../utils/axiosConfig";
+import { useTranslation } from "react-i18next";
 const AllUsers = () => {
+  const {t} = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   // delete modal
@@ -177,19 +179,19 @@ const AllUsers = () => {
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
             <FaTruck className="text-gray-800 text-2xl" />
-            All Users List
+            {t("All Users List")}
           </h1>
           <div className="mt-3 md:mt-0">
             <Link to="/tramessy/AddUserForm">
               <button className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
-                <FaPlus /> User
+                <FaPlus /> {t("User")}
               </button>
             </Link>
           </div>
         </div>
         {/* Export */}
         <div className="md:flex justify-between items-center">
-          <div className="flex gap-1 md:gap-3 text-gray-700 font-semibold rounded-md">
+          <div className="flex gap-1 md:gap-3 text-gray-700 font-medium rounded-md">
             {/* <CSVLink
               data={csvData}
               headers={headers}
@@ -202,7 +204,7 @@ const AllUsers = () => {
               onClick={exportExcel}
               className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
-              Excel
+              {t("Excel")}
             </button>
             {/* <button
               onClick={exportPDF}
@@ -214,7 +216,7 @@ const AllUsers = () => {
               onClick={printTable}
               className="py-1 px-5 hover:bg-primary bg-white hover:text-white rounded shadow transition-all duration-300 cursor-pointer"
             >
-              Print
+              {t("Print")}
             </button>
           </div>
           <div className="mt-3 md:mt-0">
@@ -226,7 +228,7 @@ const AllUsers = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Search User..."
+              placeholder={`${t("search")} ${t("User")}...`}
               className="border border-gray-300 rounded-md outline-none text-xs py-2 ps-2 pr-5"
             />
           </div>
@@ -236,13 +238,13 @@ const AllUsers = () => {
           <table className="min-w-full text-sm text-left">
             <thead className="bg-gray-200 text-primary capitalize text-sm">
               <tr>
-                <th className="px-2 py-4">#</th>
-                <th className="px-2 py-4">Name</th>
+                <th className="px-2 py-4">{t("SL.")}</th>
+                <th className="px-2 py-4">{t("Name")}</th>
                 {/* <th className="px-2 py-4">Mobile</th> */}
-                <th className="px-2 py-4">Email</th>
-                <th className="px-2 py-4">Role</th>
-                <th className="px-2 py-4">Status</th>
-                <th className="px-2 py-4 action_column">Action</th>
+                <th className="px-2 py-4">{t("Email")}</th>
+                <th className="px-2 py-4">{t("Role")}</th>
+                <th className="px-2 py-4">{t("Status")}</th>
+                <th className="px-2 py-4 action_column">{t("Action")}</th>
               </tr>
             </thead>
             <tbody className="text-gray-700 ">
@@ -250,7 +252,7 @@ const AllUsers = () => {
                 currentUsers.length === 0?(
                   <tr>
                   <td colSpan="8" className="text-center p-4 text-gray-500">
-                    No user found
+                    {t("No user found")}
                   </td>
                   </tr>
                 )
@@ -344,20 +346,20 @@ const AllUsers = () => {
                 <FaTrashAlt />
               </div>
               <p className="text-center text-gray-700 font-medium mb-6">
-                Do you want to delete this user?
+                {t("Are you sure you want to delete?")}
               </p>
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={toggleModal}
                   className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-primary hover:text-white cursor-pointer"
                 >
-                  No
+                  {t("No")}
                 </button>
                 <button
                   onClick={() => handleDelete(selectedUserId)}
                   className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 cursor-pointer"
                 >
-                  Yes
+                  {t("Yes")}
                 </button>
               </div>
             </div>

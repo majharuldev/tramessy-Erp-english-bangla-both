@@ -13,7 +13,8 @@ i18n
       en: { translation: en },
       bn: { translation: bn }
     },
-    fallbackLng: "en",
+    lng: "bn", // ডিফল্ট ভাষা বাংলা
+    fallbackLng: "bn",
     interpolation: { escapeValue: false }
   });
 

@@ -11,8 +11,10 @@ import autoTable from "jspdf-autotable";
 import DatePicker from "react-datepicker";
 import { tableFormatDate } from "../../hooks/formatDate";
 import api from "../../../utils/axiosConfig";
+import { useTranslation } from "react-i18next";
 
 const OfficeLedger = () => {
+  const {t} = useTranslation();
   const [branch, setBranch] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
@@ -71,7 +73,7 @@ const OfficeLedger = () => {
     }
   }, [selectedBranch, officeList]);
 
-  if (loading) return <p className="text-center mt-16">Loading data...</p>;
+  if (loading) return <p className="text-center mt-16">{t("Loading")}...</p>;
 
   // Filtered data based on selected branch and date range
   const filteredBranch = branch.filter((item) => {
@@ -195,7 +197,7 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
     const tableHTML = `
     <html>
       <head>
-        <title>Office Ledger - ${selectedBranch}</title>
+        <title> - </title>
         <style>
           body { font-family: Arial, sans-serif; margin: 20px; }
           h2 { color: #11375B; text-align: center; font-size: 20px; margin-bottom: 10px; }
@@ -212,20 +214,20 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
         </style>
       </head>
       <body>
-        <h2>Office Ledger - ${selectedBranch}</h2>
+        <h2>${t("Office")} ${t("Ledger")} - ${selectedBranch}</h2>
         <table>
           <thead>
             <tr>
-              <th>SL</th>
-              <th>Date</th>
-              <th>Particulars</th>
-              <th>Mode</th>
-              <th>Destination</th>
-              <th>Due</th>
-              <th>CashIn</th>
-              <th>CashOut</th>
-              <th>Balance</th>
-              <th>Ref</th>
+              <th>${t("SL.")}</th>
+              <th>${t("Date")}</th>
+              <th>${t("Particulars")}</th>
+              <th>${t("Mode")}</th>
+              <th>${t("Destination")}</th>
+              <th>${t("Due")}</th>
+              <th>${t("CashIn")}</th>
+              <th>${t("CashOut")}</th>
+              <th>${t("Balance")}</th>
+              <th>${t("Ref")}</th>
             </tr>
           </thead>
           <tbody>
@@ -263,14 +265,14 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
         {/* Header */}
         <div className="md:flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold text-gray-800 capitalize flex items-center gap-3">
-            OFFICE LEDGER: {selectedBranch}
+            {t("Office")} {t("Ledger")}: {selectedBranch}
           </h1>
           <div className="mt-3 md:mt-0 flex gap-2">
             <button
               onClick={() => setShowFilter((prev) => !prev)}
               className="bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
-              <FaFilter /> Filter
+              <FaFilter /> {t("Filter")}
             </button>
           </div>
         </div>
@@ -278,20 +280,20 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
         {/* Export and Branch Selection */}
         <div className="md:flex items-center justify-between mb-4">
           <div className="flex gap-1 md:gap-3 text-gray-700 flex-wrap">
-            <button onClick={exportExcel} className="py-1 px-5 bg-white shadow  font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
-              Excel
+            <button onClick={exportExcel} className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
+              {t("Excel")}
             </button>
             {/* <button onClick={exportPDF} className="py-1 px-5 bg-white shadow  font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
               PDF
             </button> */}
-            <button onClick={printTable} className="py-1 px-5 bg-white shadow  font-semibold rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
-              Print
+            <button onClick={printTable} className="py-1 px-5 bg-white shadow rounded hover:bg-primary hover:text-white transition-all cursor-pointer">
+              {t("Print")}
             </button>
           </div>
           <div className="mt-3 md:mt-0">
             <div className="relative w-full">
               <label className="text-gray-700 text-sm font-semibold">
-                Select Branch Ledger
+                {t("Branch")}
               </label>
               <select
                 value={selectedBranch}
@@ -300,7 +302,7 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
               >
                 {officeList.map((office, i) => (
                   <option key={i} value={office.branch_name}>
-                    {office.branch_name} (Balance: {office.opening_balance})
+                    {office.branch_name} ({t("Balance")}: {office.opening_balance})
                   </option>
                 ))}
               </select>
@@ -338,7 +340,7 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
               className="!w-full p-2 border border-gray-300 rounded text-sm appearance-none outline-none"
               isClearable
             />
-            <div className="w-xs">
+            <div className="w-sm">
               <button
                 onClick={() => {
                   setStartDate("");
@@ -347,7 +349,7 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
                 }}
                 className="w-full bg-gradient-to-r from-primary to-[#115e15] text-white px-4 py-1.5 rounded-md shadow-lg flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <IoIosRemoveCircle /> Clear
+                <IoIosRemoveCircle /> {t("Clear")}
               </button>
             </div>
           </div>
@@ -359,7 +361,7 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
             <thead className="text-black capitalize font-bold">
               <tr className="bg-gray-100 font-bold text-black">
                 <td colSpan="6" className="text-right border border-gray-700 px-2 py-2">
-                  Closing Balance:
+                  {t("Closing")} {t("Balance")}:
                 </td>
                 <td className="border border-gray-700 px-2 py-2">
                   <span className="text-gray-800">{totalCashIn}</span>
@@ -373,19 +375,19 @@ const totalBalance = openingBalance + totalCashIn - totalCashOut;
                 <td className="border border-gray-700 px-2 py-2"></td>
               </tr>
               <tr>
-                <th className="border border-gray-700 px-2 py-1">SL</th>
-                <th className="border border-gray-700 px-2 py-1">Date</th>
-                <th className="border border-gray-700 px-2 py-1">Particulars</th>
-                <th className="border border-gray-700 px-2 py-1">Mode</th>
-                <th className="border border-gray-700 px-2 py-1">Destination</th>
-                <th className="border border-gray-700 px-2 py-1">Due</th>
-                <th className="border border-gray-700 px-2 py-1">CashIn</th>
-                <th className="border border-gray-700 px-2 py-1">CashOut</th>
+                <th className="border border-gray-700 px-2 py-1">{t("SL.")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Date")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Particulars")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Payment Mode")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Destination")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Due")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("CashIn")}</th>
+                <th className="border border-gray-700 px-2 py-1">{t("CashOut")}</th>
                 <th className="border border-gray-700 py-1 text-center">
-                  <p className="border-b">Opening Balance: {openingBalance}</p>
-                  <p>Current Balance</p>
+                  <p className="border-b">{t("Opening Balance")}: {openingBalance}</p>
+                  <p>{t("Current Balance")}</p>
                 </th>
-                <th className="border border-gray-700 px-2 py-1">Ref</th>
+                <th className="border border-gray-700 px-2 py-1">{t("Ref")}</th>
               </tr>
             </thead>
             <tbody className="text-black font-semibold">

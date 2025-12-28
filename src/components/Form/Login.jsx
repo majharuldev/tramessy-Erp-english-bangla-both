@@ -5,8 +5,10 @@ import ReusableForm from "./ReusableForm";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
 import toast, { Toaster } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
+  const {t} = useTranslation();
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
     const [error, setError] = useState("")
@@ -69,10 +71,10 @@ if (res.success) {
         <div className="flex items-center justify-center md:w-1/2 bg-white rounded-xl py-7 md:p-8">
           <div className="bg-white shadow-lg p-5 md:p-7 rounded-md border md:border-none border-gray-200">
             <h2 className="text-3xl font-semibold text-center text-[#11375B] mb-1">
-              Tramessy
+              {t("Tramessy")}
             </h2>
             <p className="text-sm text-center text-primary mb-6">
-              Please Login!
+              {t("Please Login")}!
             </p>
 
             <ReusableForm onSubmit={handleLogin}>

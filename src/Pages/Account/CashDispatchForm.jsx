@@ -48,7 +48,7 @@ const CashDispatchForm = () => {
       })
     } catch (error) {
       console.error("Error fetching data:", error)
-      toast.error("Failed to load data")
+      toast.error(t("Failed to load data"))
     } finally {
       setLoading(false)
     }
@@ -119,7 +119,7 @@ const formatDate = (date) => {
       const responseData = response.data
 
       if (responseData.success) {
-        toast.success(isEditing ? "Fund transfer updated successfully" : "Fund transfer created successfully", {
+        toast.success(isEditing ? t("Fund transfer updated successfully") : t("Fund transfer created successfully"), {
           position: "top-right",
         })
 
@@ -131,12 +131,12 @@ const formatDate = (date) => {
           navigate("/tramessy/account/CashDispatch")
         }
       } else {
-        toast.error(responseData.message || "Operation failed")
+        toast.error(responseData.message || t("Operation failed"))
       }
     } catch (error) {
       console.error(error)
-      const errorMessage = error.response?.data?.message || error.message || "Unknown error"
-      toast.error("Server issue: " + errorMessage)
+      const errorMessage = error.response?.data?.message || error.message || t("Unknown error")
+      toast.error(t("Server issue:") + errorMessage)
     }
   }
 
