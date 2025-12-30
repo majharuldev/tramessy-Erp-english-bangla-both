@@ -10,6 +10,7 @@ import autoTable from "jspdf-autotable";
 import api from "../../../utils/axiosConfig";
 import { tableFormatDate } from "../../hooks/formatDate";
 import { useTranslation } from "react-i18next";
+import { Spin } from "antd";
 
 const VendorLedger = () => {
   const {t} = useTranslation();
@@ -65,8 +66,8 @@ const VendorLedger = () => {
     ? toNumber(selectedVendorInfo.opening_balance || 0)
     : 0;
 
-  if (loading)
-    return <p className="text-center mt-16">Loading Vendor Ledger...</p>;
+  // if (loading)
+  //   return <p className="text-center mt-16">Loading Vendor Ledger...</p>;
 
   // Get unique months from data for dropdown
   const availableMonths = [
@@ -105,9 +106,11 @@ const VendorLedger = () => {
     const tripRent = toNumber(item.total_rent || 0);
     const advance = toNumber(item.advance || 0);
     const payAmount = toNumber(item.pay_amount || 0);
+    const demurrage = toNumber(item.v_d_total || 0);
+    const total = tripRent + demurrage;
 
     // Calculate the net effect of this transaction on the balance
-    const transactionEffect = tripRent - advance - payAmount;
+    const transactionEffect = total - advance - payAmount;
 
     currentRunningBalance += transactionEffect;
 
@@ -122,11 +125,14 @@ const VendorLedger = () => {
   const totals = rowsWithRunningBalance.reduce(
     (acc, item) => {
       acc.rent += toNumber(item.total_rent || 0);
+      acc.demurrage += toNumber(item.v_d_total || 0);
+      acc.total +=
+        toNumber(item.total_rent || 0) + toNumber(item.v_d_total || 0);
       acc.advance += toNumber(item.advance || 0);
       acc.pay_amount += toNumber(item.pay_amount || 0);
       return acc;
     },
-    { rent: 0, advance: 0, pay_amount: 0 }
+    { rent: 0, demurrage: 0, total: 0, advance: 0, pay_amount: 0 }
   );
 
   // The grand total due is the last running balance, or opening balance if no transactions
@@ -143,15 +149,18 @@ const VendorLedger = () => {
     if (selectedVendor) {
       dataToExport.push({
         Date: "",
+        "Trip Id" : "",
         Vendor: "Opening Balance",
         Load: "",
         Unload: "",
         Vehicle: "",
         Driver: "",
         "Trip Rent": "",
+        Demurrage: "",
+        Total: "",
         Advance: "",
         "Pay Amount": "",
-        Due: openingBalance.toFixed(2),
+        Due: openingBalance,
       });
     }
 
@@ -159,12 +168,18 @@ const VendorLedger = () => {
     rowsWithRunningBalance.forEach((item) => {
       dataToExport.push({
         Date: item.date,
+        "Trip Id": item.trip_id,
         Vendor: item.vendor_name,
         Load: item.load_point || "--",
         Unload: item.unload_point || "--",
         Vehicle: item.vehicle_no || "--",
         Driver: item.driver_name || "--",
         "Trip Rent": item.total_rent ? toNumber(item.total_rent) : "--",
+        Demurrage: item.v_d_total ? toNumber(item.v_d_total) : "--",
+        Total:
+          item.total_rent || item.v_d_total
+            ? toNumber(item.total_rent || 0) + toNumber(item.v_d_total || 0)
+            : "--",
         Advance: item.advance ? toNumber(item.advance) : "--",
         "Pay Amount": item.pay_amount ? toNumber(item.pay_amount) : "--",
         Due: item.running_balance,
@@ -179,9 +194,11 @@ const VendorLedger = () => {
       Unload: "",
       Vehicle: "",
       Driver: "",
-      "Trip Rent": totals.rent,
-      Advance: totals.advance,
-      "Pay Amount": totals.pay_amount,
+      "Trip Rent": toNumber(totals.rent),
+      Demurrage: toNumber(totals.demurrage),
+      Total: toNumber(totals.total),
+      Advance: toNumber(totals.advance),
+      "Pay Amount": toNumber(totals.pay_amount),
       Due: grandDue,
     });
 
@@ -192,6 +209,7 @@ const VendorLedger = () => {
     const blob = new Blob([buffer], { type: "application/octet-stream" });
     saveAs(blob, `Vendor_Ledger_${selectedVendor || "All"}.xlsx`);
   };
+
 
   // Export to PDF
   const exportToPDF = () => {
@@ -442,6 +460,8 @@ const VendorLedger = () => {
                     {t("Total")}:
                   </td>
                   <td className="border px-2 py-1">{totals.rent}</td>
+                   <td className="border px-2 py-1">{totals.demurrage}</td>
+                   <td className="border px-2 py-1">{totals.total}</td>
                   <td className="border px-2 py-1">{totals.advance}</td>
                   <td className="border px-2 py-1">{totals.pay_amount}</td>
                   <td className="border px-2 py-1">
@@ -452,7 +472,7 @@ const VendorLedger = () => {
                     </span>
                     {selectedVendor && (
                       <p className="text-xs text-gray-600 font-normal">
-                        (Including Opening Balance)
+                        {t("Including") + " " + t("Opening Balance")}
                       </p>
                     )}
                   </td>
@@ -466,6 +486,8 @@ const VendorLedger = () => {
                   <th className="border px-2 py-1">{t("Vehicle")}</th>
                   <th className="border px-2 py-1">{t("Driver")}</th>
                   <th className="border px-2 py-1">{t("Trip Rent")}</th>
+                  <th className="border px-2 py-1">{t("Demurrage")}</th>
+                   <th className="border px-2 py-1">{t("Total")}</th>
                   <th className="border px-2 py-1">{t("Advance")}</th>
                   <th className="border px-2 py-1">{t("Pay Amount")}</th>
                   <th className="border px-2 py-1">
@@ -479,7 +501,14 @@ const VendorLedger = () => {
                 </tr>
               </thead>
               <tbody>
-                {rowsWithRunningBalance.map((item, idx) => {
+                {
+                  loading ? (
+                    <tr>
+                  <td colSpan={12} className="text-center py-20"><Spin /></td>
+                </tr>
+                  )
+                :(rowsWithRunningBalance.map((item, idx) => {
+                  const total = toNumber(item.total_rent || 0) + toNumber(item.v_d_total || 0);
                   return (
                     <tr key={idx}>
                       <td className="border px-2 py-1">{idx + 1}</td>
@@ -517,6 +546,12 @@ const VendorLedger = () => {
                         {item.total_rent ? toNumber(item.total_rent) : "--"}
                       </td>
                       <td className="border px-2 py-1">
+                        {item.v_d_total ? toNumber(item.v_d_total) : "--"}
+                      </td>
+                      <td className="border px-2 py-1">
+                        {total || "--"}
+                      </td>
+                      <td className="border px-2 py-1">
                         {item.advance ? toNumber(item.advance) : "--"}
                       </td>
                       <td className="border px-2 py-1">
@@ -533,7 +568,7 @@ const VendorLedger = () => {
                       </td>
                     </tr>
                   );
-                })}
+                }))}
               </tbody>
               <tfoot></tfoot>
             </table>

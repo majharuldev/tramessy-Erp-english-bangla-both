@@ -9,7 +9,7 @@ import { IoIosRemoveCircle } from "react-icons/io";
 import api from "../../../utils/axiosConfig";
 import { tableFormatDate } from "../../hooks/formatDate";
 import DatePicker from "react-datepicker";
-import { jsPDF } from "jspdf";       
+import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useTranslation } from "react-i18next";
 
@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 // autoTable(jsPDF);
 
 const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [showFilter, setShowFilter] = useState(false);
@@ -71,15 +71,21 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
   // Calculate totals including opening balance
   const totals = filteredLedger.reduce(
     (acc, item) => {
-      acc.rent += toNumber(item.bill_amount || 0);
-      acc.rec_amount += toNumber(item.rec_amount || 0);
+      const rent = toNumber(item.bill_amount || 0);
+      const dem = toNumber(item.d_total || 0);
+      const received = toNumber(item.rec_amount || 0);
+
+      acc.tripRent += rent;
+      acc.demurrage += dem;
+      acc.billAmount += rent + dem;
+      acc.received += received;
+
       return acc;
     },
-    { rent: 0, rec_amount: 0 }
+    { tripRent: 0, demurrage: 0, billAmount: 0, received: 0 }
   );
-  // Now calculate due from total trip - advance - pay_amount
-  totals.due = totals.rent - totals.rec_amount;
 
+  totals.due = totals.billAmount - totals.received;
   const grandDue = totals.due + dueAmount;
 
   const totalRent = filteredLedger.reduce(
@@ -91,124 +97,160 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
 
 
   //  Excel Export (Filtered Data)
-  const exportToExcel = () => {
-    const rows = filteredLedger.map((dt, index) => ({
+const exportToExcel = () => {
+  let cumulativeDue = dueAmount; // opening balance
+
+  const rows = filteredLedger.map((dt, index) => {
+    const tripRent = toNumber(dt.bill_amount || 0);
+    const dem = toNumber(dt.d_total || 0);
+    const received = toNumber(dt.rec_amount || 0);
+    const billAmount = tripRent + dem;
+
+    cumulativeDue += billAmount;
+    cumulativeDue -= received;
+
+    return {
       SL: index + 1,
       Date: tableFormatDate(dt.working_date),
       Customer: dt.customer_name,
       Load: dt.load_point || "--",
       Unload: dt.unload_point || "--",
       Vehicle: dt.vehicle_no || "--",
-      Driver: dt.driver_name || "--",
-      "Trip Rent": toNumber(dt.bill_amount || 0),
-      Demurage: toNumber(dt.d_total || 0),
-      "Bill Amount": toNumber(dt.bill_amount || 0) + toNumber(dt.d_total || 0),
-      "Received Amount": toNumber(dt.rec_amount || 0),
-    }));
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Customer Ledger");
-    XLSX.writeFile(workbook, `${customerName}-Ledger.xlsx`);
-  };
+      "Trip Rent": tripRent,
+      Demurrage: dem,
+      "Bill Amount": billAmount,
+      "Received Amount": received,
+      Due:
+        cumulativeDue < 0
+          ? `(${Math.abs(cumulativeDue)})`
+          : cumulativeDue,
+    };
+  });
+
+  //  Total row
+  rows.push({
+    SL: "Total",
+    Date: "",
+    Customer: "",
+    Load: "",
+    Unload: "",
+    Vehicle: "",
+    "Trip Rent": totals.tripRent,
+    Demurrage: totals.demurrage,
+    "Bill Amount": totals.billAmount,
+    "Received Amount": totals.received,
+    Due: grandDue < 0 ? `(${Math.abs(grandDue)})` : grandDue,
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Customer Ledger");
+  XLSX.writeFile(workbook, `${customerName}-Ledger.xlsx`);
+};
+
+
 
   //  PDF Export (Filtered Data
-// const exportToPDF = () => {
-//   const doc = new jsPDF("p", "pt", "a4");
+  // const exportToPDF = () => {
+  //   const doc = new jsPDF("p", "pt", "a4");
 
-//   // Prepare table rows
-//   let cumulativeDue = dueAmount;
-//   const rows = filteredLedger.map((dt, index) => {
-//     const tripRent = toNumber(dt.bill_amount);
-//     const receivedAmount = toNumber(dt.rec_amount);
-//     const demurageTotal = toNumber(dt.d_total);
-//     const billAmount = tripRent + demurageTotal;
-//     cumulativeDue += billAmount - receivedAmount;
+  //   // Prepare table rows
+  //   let cumulativeDue = dueAmount;
+  //   const rows = filteredLedger.map((dt, index) => {
+  //     const tripRent = toNumber(dt.bill_amount);
+  //     const receivedAmount = toNumber(dt.rec_amount);
+  //     const demurageTotal = toNumber(dt.d_total);
+  //     const billAmount = tripRent + demurageTotal;
+  //     cumulativeDue += billAmount - receivedAmount;
 
-//     return [
-//       index + 1,
-//       tableFormatDate(dt.working_date),
-//       dt.customer_name,
-//       dt.load_point || "--",
-//       dt.unload_point || "--",
-//       dt.vehicle_no || "--",
-//       dt.driver_name || "--",
-//       tripRent.toFixed(2),
-//       demurageTotal.toFixed(2),
-//       billAmount.toFixed(2),
-//       receivedAmount.toFixed(2),
-//       cumulativeDue.toFixed(2),
-//     ];
-//   });
+  //     return [
+  //       index + 1,
+  //       tableFormatDate(dt.working_date),
+  //       dt.customer_name,
+  //       dt.load_point || "--",
+  //       dt.unload_point || "--",
+  //       dt.vehicle_no || "--",
+  //       dt.driver_name || "--",
+  //       tripRent.toFixed(2),
+  //       demurageTotal.toFixed(2),
+  //       billAmount.toFixed(2),
+  //       receivedAmount.toFixed(2),
+  //       cumulativeDue.toFixed(2),
+  //     ];
+  //   });
 
-//   // Add totals row (first 7 columns empty for alignment)
-//   rows.push([
-//     "Total",
-//     "", "", "", "", "", "",
-//     totals.rent.toFixed(2),
-//     "", "",
-//     totals.rec_amount.toFixed(2),
-//     totals.due.toFixed(2),
-//   ]);
+  //   // Add totals row (first 7 columns empty for alignment)
+  //   rows.push([
+  //     "Total",
+  //     "", "", "", "", "", "",
+  //     totals.rent.toFixed(2),
+  //     "", "",
+  //     totals.rec_amount.toFixed(2),
+  //     totals.due.toFixed(2),
+  //   ]);
 
-//   // Table headers
-//   const headers = [
-//     "SL.",
-//     "Date",
-//     "Customer",
-//     "Load",
-//     "Unload",
-//     "Vehicle",
-//     "Driver",
-//     "Trip Rent",
-//     "Demurage",
-//     "Bill Amount",
-//     "Received Amount",
-//     "Due",
-//   ];
+  //   // Table headers
+  //   const headers = [
+  //     "SL.",
+  //     "Date",
+  //     "Customer",
+  //     "Load",
+  //     "Unload",
+  //     "Vehicle",
+  //     "Driver",
+  //     "Trip Rent",
+  //     "Demurage",
+  //     "Bill Amount",
+  //     "Received Amount",
+  //     "Due",
+  //   ];
 
-//   // Add table
-//   doc.autoTable({
-//     head: [headers],
-//     body: rows,
-//     startY: 70,
-//     styles: { fontSize: 8, cellPadding: 3 },
-//     headStyles: { fillColor: [22, 160, 133], textColor: 255, halign: "center" },
-//     columnStyles: {
-//       0: { halign: "center" }, // SL
-//       1: { halign: "center" }, // Date
-//       2: { halign: "left" },   // Customer
-//       3: { halign: "left" },
-//       4: { halign: "left" },
-//       5: { halign: "left" },
-//       6: { halign: "left" },
-//       7: { halign: "right" },  // Trip Rent
-//       8: { halign: "right" },  // Demurage
-//       9: { halign: "right" },  // Bill Amount
-//       10: { halign: "right" }, // Received Amount
-//       11: { halign: "right" }, // Due
-//     },
-//     didParseCell: (data) => {
-//       // Make totals row bold
-//       if (data.row.index === rows.length - 1) {
-//         data.cell.styles.fontStyle = "bold";
-//       }
-//     },
-//   });
+  //   // Add table
+  //   doc.autoTable({
+  //     head: [headers],
+  //     body: rows,
+  //     startY: 70,
+  //     styles: { fontSize: 8, cellPadding: 3 },
+  //     headStyles: { fillColor: [22, 160, 133], textColor: 255, halign: "center" },
+  //     columnStyles: {
+  //       0: { halign: "center" }, // SL
+  //       1: { halign: "center" }, // Date
+  //       2: { halign: "left" },   // Customer
+  //       3: { halign: "left" },
+  //       4: { halign: "left" },
+  //       5: { halign: "left" },
+  //       6: { halign: "left" },
+  //       7: { halign: "right" },  // Trip Rent
+  //       8: { halign: "right" },  // Demurage
+  //       9: { halign: "right" },  // Bill Amount
+  //       10: { halign: "right" }, // Received Amount
+  //       11: { halign: "right" }, // Due
+  //     },
+  //     didParseCell: (data) => {
+  //       // Make totals row bold
+  //       if (data.row.index === rows.length - 1) {
+  //         data.cell.styles.fontStyle = "bold";
+  //       }
+  //     },
+  //   });
 
-//   // Add title
-//   doc.setFontSize(14);
-//   doc.text(`${customerName} - Customer Ledger`, doc.internal.pageSize.getWidth() / 2, 30, { align: "center" });
-//   doc.setFontSize(10);
-//   doc.text(
-//     `Date Range: ${startDate ? tableFormatDate(startDate) : "All"} - ${endDate ? tableFormatDate(endDate) : "All"}`,
-//     doc.internal.pageSize.getWidth() / 2,
-//     45,
-//     { align: "center" }
-//   );
+  //   // Add title
+  //   doc.setFontSize(14);
+  //   doc.text(`${customerName} - Customer Ledger`, doc.internal.pageSize.getWidth() / 2, 30, { align: "center" });
+  //   doc.setFontSize(10);
+  //   doc.text(
+  //     `Date Range: ${startDate ? tableFormatDate(startDate) : "All"} - ${endDate ? tableFormatDate(endDate) : "All"}`,
+  //     doc.internal.pageSize.getWidth() / 2,
+  //     45,
+  //     { align: "center" }
+  //   );
 
-//   doc.save(`${customerName}-Ledger.pdf`);
-// };
+  //   doc.save(`${customerName}-Ledger.pdf`);
+  // };
 
+  
+  
+  
   //  Print (Filtered Data)
   const handlePrint = () => {
     const printContent = tableRef.current.innerHTML;
@@ -326,17 +368,28 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
             <table className="min-w-full text-sm text-left text-gray-900">
               <thead className="bg-gray-100 text-gray-800 font-bold">
                 <tr className="font-bold bg-gray-50">
-                  <td colSpan={8} className="border border-black px-2 py-1 text-right">
+                  <td colSpan={6} className="border px-2 py-1 text-right">
                     {t("Total")}
                   </td>
-                  <td className="border border-black px-2 py-1 text-right">
-                    ৳{totals.rent}
+
+                  <td className="border px-2 py-1 text-right">
+                    ৳{totals.tripRent}
                   </td>
-                  <td className="border border-black px-2 py-1 text-right">
-                    ৳{totals.rec_amount}
+
+                  <td className="border px-2 py-1 text-right">
+                    ৳{totals.demurrage}
                   </td>
-                  <td className="border border-black px-2 py-1 text-right">
-                    ৳{totals.due}
+
+                  <td className="border px-2 py-1 text-right">
+                    ৳{totals.billAmount}
+                  </td>
+
+                  <td className="border px-2 py-1 text-right">
+                    ৳{totals.received}
+                  </td>
+
+                  <td className="border px-2 py-1 text-right font-extrabold">
+                    ৳{grandDue}
                   </td>
                 </tr>
                 <tr>
@@ -402,9 +455,9 @@ const SelectCustomerLadger = ({ customer, selectedCustomerName }) => {
                         <td className="border px-2 py-1">
                           {receivedAmount ? receivedAmount : "--"}
                         </td>
-                       <td className={`border border-gray-700 px-2 py-1 ${cumulativeDue < 0 ? 'text-red-600' : ''}`}>
-                      {cumulativeDue < 0 ? `(${Math.abs(cumulativeDue)})` : cumulativeDue}
-                    </td>
+                        <td className={`border border-gray-700 px-2 py-1 ${cumulativeDue < 0 ? 'text-red-600' : ''}`}>
+                          {cumulativeDue < 0 ? `(${Math.abs(cumulativeDue)})` : cumulativeDue}
+                        </td>
                       </tr>
                     );
                   });

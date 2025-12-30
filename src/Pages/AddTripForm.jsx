@@ -84,7 +84,9 @@ export default function AddTripForm() {
       challan_cost: "",
       remarks: "",
       status: "pending",
-      helper_name: ""
+      helper_name: "",
+      v_d_day: "",
+      v_d_total: ""
     },
   })
 
@@ -180,8 +182,8 @@ export default function AddTripForm() {
     // For vendor_transport, total_exp is manually entered and should not be auto-calculated
 
     // Calculate damarage total
-    const d_total = (Number(d_day) || 0) * (Number(d_amount) || 0)
-    setValue("d_total", d_total)
+    // const d_total = (Number(d_day) || 0) * (Number(d_amount) || 0)
+    // setValue("d_total", d_total)
   }, [
     labourCost,
     parkingCost,
@@ -201,7 +203,49 @@ export default function AddTripForm() {
     selectedTransport,
   ])
 
-    useEffect(() => {
+//     useEffect(() => {
+//   const transport = selectedTransport;
+
+//   if (transport === "own_transport") {
+//     // Own transport: total_exp already computed from expenses
+//     const rent = Number(watch("total_rent")) || 0;
+//     const dTotal = Number(watch("d_total")) || 0;
+
+//     setValue("trip_rent", rent + dTotal);
+//   }
+
+//   if (transport === "vendor_transport") {
+//     // Vendor transport: vehicle_rent = total_exp (vendor rent) + v_d_total (vendor demurrage)
+//     const totalExp = Number(watch("total_exp")) || 0;
+//     const vDemurrage = Number(watch("v_d_total")) || 0;
+
+//     setValue("vehicle_rent", totalExp + vDemurrage);
+
+//     // If you also need trip_rent for customer
+//     const rent = Number(watch("total_rent")) || 0;  // customer rent
+//     const dTotal = Number(watch("d_total")) || 0;   // customer demurrage
+//     setValue("trip_rent", rent + dTotal);
+//   }
+
+//   // Vendor due amount
+//   const vendorRent = Number(watch("vehicle_rent")) || 0;
+//   const vendorAdvance = Number(watch("advance")) || 0;
+//   setValue("due_amount", vendorRent - vendorAdvance);
+
+// }, [
+//   selectedTransport,
+//   watch("total_exp"),
+//   watch("v_d_total"),
+//   watch("total_rent"),
+//   watch("d_total"),
+//   watch("advance"),
+//   setValue
+// ]);
+
+
+  // Watch vendor transport fields
+  
+   useEffect(() => {
   const transport = selectedTransport;
 
   if (transport === "own_transport") {
@@ -241,7 +285,6 @@ export default function AddTripForm() {
 ]);
 
 
-  // Watch vendor transport fields
   const [vendorRent, vendorAdvance] = watch(["total_exp", "advance"])
 
   useEffect(() => {
@@ -440,24 +483,6 @@ export default function AddTripForm() {
       setValue("helper_name", vData.helper || "");
     }
   }, [selectedVehicle, selectedTransport]);
-
-
-  // useEffect(() => {
-  //   if (selectedTransport === "own_transport") {
-  //     const vehicle = vehicleOptions.find((v) => v.value === selectedVehicle)
-  //     if (vehicle) {
-  //       // setValue("vehicle_category", vehicle.category || "");
-  //       // setValue("vehicle_size", vehicle.size || "");
-  //     }
-  //   } else if (selectedTransport === "vendor_transport") {
-  //     const vehicle = vendorVehicleOptions.find((v) => v.value === selectedVehicle)
-  //     if (vehicle) {
-  //       // setValue("vehicle_category", vehicle.category || "");
-  //       // setValue("vehicle_size", vehicle.size || "");
-  //     }
-  //   }
-  // }, [selectedVehicle, selectedTransport, setValue])
-
 
   // Fixed rate calculation based on load point, unload point, vehicle category and size
   useEffect(() => {
@@ -897,8 +922,8 @@ export default function AddTripForm() {
                     type="number"
                     onChange={(e) => {
                       const days = Number(e.target.value) || 0;
-                      setValue("d_day", days);
-                      setValue("d_total", days * (Number(d_amount) || 0));
+                      setValue("v_d_day", days);
+                      setValue("v_d_total", days * (Number(d_amount) || 0));
                     }}
                   />
                   {/* <InputField
@@ -969,7 +994,7 @@ export default function AddTripForm() {
                 <div className="border border-gray-300 p-5 rounded-md mt-5">
                   <h3 className="text-secondary font-medium text-center mb-6">{t("Vendor Payment Details")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <InputField name="total_exp" label={t("Vendor Rent")} type="number" required={!id} />
+                     <InputField name="vehicle_rent"  label="Vendor Rent +Demurrage" type="number" required={!id} readOnly />
                     <InputField name="advance" label={t("Advance")} type="number" required={!id} />
                     <InputField name="due_amount" readOnly label={t("Due Amount")} type="number" required={!id} />
                   </div>

@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import bgImage from "../../assets/aj-e.jpeg"
+import bgImage from "../../assets/login.png"
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import ReusableForm from "./ReusableForm";
 import { Link, useNavigate } from "react-router-dom";
